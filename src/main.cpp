@@ -9,6 +9,7 @@
 
 // Middleware & Controller Includes
 #include "controllers/auth_controller.hpp"
+#include "controllers/event_controller.hpp"
 #include "controllers/user_controller.hpp"
 #include "middleware/auth_middleware.hpp"
 
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]) {
   // zu akzeptieren, oder wir machen registerRoutes zum Template.
   AuthController::registerRoutes(app);
   UserController::registerRoutes(app);
+  EventController::registerRoutes(app);
 
   // Beispiel für geschützte Route (liest User aus Kontext):
   CROW_ROUTE(app, "/api/profile")

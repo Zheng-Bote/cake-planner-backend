@@ -111,10 +111,13 @@ set(SOURCES
     src/models/user_model.cpp
     src/controllers/user_controller.cpp
     src/controllers/auth_controller.cpp 
+    src/models/event_model.cpp
+    src/controllers/event_controller.cpp
     src/utils/token_utils.cpp           
     src/utils/password_utils.cpp
     src/utils/env_loader.cpp
     src/utils/seeder.cpp
+    src/utils/totp_utils.cpp
 )
 
 # Executable erstellen

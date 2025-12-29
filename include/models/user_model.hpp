@@ -10,9 +10,10 @@ struct User {
   QString full_name;
   QString email;
   QString password_hash;
+  QString totp_secret;
   bool is_active;
   bool is_admin;
-
+  bool enable2FA(const QString &secret);
   // --- View Logic (Serialization) ---
   crow::json::wvalue toJson() const;
 
@@ -21,7 +22,6 @@ struct User {
   static std::optional<User> getByEmail(const QString &email);
   static std::vector<User> getAll();
 
-  // WICHTIG: Diese Methode fehlte in Ihrer Header-Datei
   static bool existsAnyAdmin();
 
   bool create();
