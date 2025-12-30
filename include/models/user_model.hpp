@@ -21,6 +21,7 @@ struct User {
   static std::optional<User> getById(const QString &id);
   static std::optional<User> getByEmail(const QString &email);
   static std::vector<User> getAll();
+  static bool updateStatus(const QString &userId, bool isActive);
 
   static bool existsAnyAdmin();
 

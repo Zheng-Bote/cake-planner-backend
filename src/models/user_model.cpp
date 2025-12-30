@@ -13,6 +13,7 @@ crow::json::wvalue User::toJson() const {
   json["isAdmin"] = is_admin;   // Nicht "is_admin"
   json["isActive"] = is_active; // Nicht "is_active"
   // Password Hash und TOTP Secret geben wir nicht raus
+  json["has2FA"] = !totp_secret.isEmpty();
   return json;
 }
 
@@ -122,4 +123,15 @@ bool User::enable2FA(const QString &secret) {
     return true;
   }
   return false;
+}
+
+bool User::updateStatus(const QString &userId, bool isActive) {
+  auto db = DatabaseManager::instance().getDatabase();
+  QSqlQuery query(db);
+
+  query.prepare("UPDATE users SET is_active = :active WHERE id = :id");
+  query.bindValue(":active", isActive);
+  query.bindValue(":id", userId);
+
+  return query.exec();
 }

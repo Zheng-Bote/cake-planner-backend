@@ -8,6 +8,7 @@
 #include <QDebug>
 
 // Middleware & Controller Includes
+#include "controllers/admin_controller.hpp"
 #include "controllers/auth_controller.hpp"
 #include "controllers/event_controller.hpp"
 #include "controllers/user_controller.hpp"
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
   AuthController::registerRoutes(app);
   UserController::registerRoutes(app);
   EventController::registerRoutes(app);
+  AdminController::registerRoutes(app);
 
   // Beispiel für geschützte Route (liest User aus Kontext):
   CROW_ROUTE(app, "/api/profile")
