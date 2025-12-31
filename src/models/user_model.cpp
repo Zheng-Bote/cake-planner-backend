@@ -12,8 +12,10 @@ crow::json::wvalue User::toJson() const {
   // WICHTIG: Hier muss es matchen!
   json["isAdmin"] = is_admin;   // Nicht "is_admin"
   json["isActive"] = is_active; // Nicht "is_active"
+  json["mustChangePassword"] = must_change_password;
   // Password Hash und TOTP Secret geben wir nicht raus
   json["has2FA"] = !totp_secret.isEmpty();
+  json["groupId"] = groupId.toStdString();
   return json;
 }
 
@@ -21,7 +23,8 @@ std::optional<User> User::getByEmail(const QString &email) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
   query.prepare("SELECT id, full_name, email, password_hash, is_active, "
-                "is_admin, totp_secret FROM users WHERE email = :email");
+                "is_admin, totp_secret, must_change_password FROM users WHERE "
+                "email = :email");
   query.bindValue(":email", email);
 
   if (query.exec() && query.next()) {
@@ -32,6 +35,7 @@ std::optional<User> User::getByEmail(const QString &email) {
     u.password_hash = query.value("password_hash").toString();
     u.is_active = query.value("is_active").toBool();
     u.is_admin = query.value("is_admin").toBool();
+    u.must_change_password = query.value("must_change_password").toBool();
     u.totp_secret = query.value("totp_secret").toString();
     return u;
   }
@@ -41,8 +45,9 @@ std::optional<User> User::getByEmail(const QString &email) {
 std::optional<User> User::getById(const QString &id) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
-  query.prepare("SELECT id, full_name, email, password_hash, is_active, "
-                "is_admin, totp_secret FROM users WHERE id = :id");
+  query.prepare(
+      "SELECT id, full_name, email, password_hash, is_active, "
+      "is_admin, totp_secret, must_change_password FROM users WHERE id = :id");
   query.bindValue(":id", id);
 
   if (query.exec() && query.next()) {
@@ -53,6 +58,7 @@ std::optional<User> User::getById(const QString &id) {
     u.password_hash = query.value("password_hash").toString();
     u.is_active = query.value("is_active").toBool();
     u.is_admin = query.value("is_admin").toBool();
+    u.must_change_password = query.value("must_change_password").toBool();
     u.totp_secret = query.value("totp_secret").toString();
     return u;
   }
@@ -64,8 +70,14 @@ std::vector<User> User::getAll() {
   QSqlQuery query(db);
   std::vector<User> users;
 
-  if (query.exec(
-          "SELECT id, full_name, email, is_active, is_admin FROM users")) {
+  query.prepare(R"(
+        SELECT u.id, u.full_name, u.email, u.is_active, u.is_admin, u.must_change_password,
+               gm.group_id 
+        FROM users u
+        LEFT JOIN group_members gm ON u.id = gm.user_id
+    )");
+
+  if (query.exec()) {
     while (query.next()) {
       User u;
       u.id = query.value("id").toString();
@@ -73,6 +85,8 @@ std::vector<User> User::getAll() {
       u.email = query.value("email").toString();
       u.is_active = query.value("is_active").toBool();
       u.is_admin = query.value("is_admin").toBool();
+      u.must_change_password = query.value("must_change_password").toBool();
+      u.groupId = query.value("group_id").toString();
       users.push_back(u);
     }
   }
@@ -132,6 +146,63 @@ bool User::updateStatus(const QString &userId, bool isActive) {
   query.prepare("UPDATE users SET is_active = :active WHERE id = :id");
   query.bindValue(":active", isActive);
   query.bindValue(":id", userId);
+
+  return query.exec();
+}
+
+bool User::setMustChangePassword(const QString &userId, bool mustChange) {
+  auto db = DatabaseManager::instance().getDatabase();
+  QSqlQuery query(db);
+  query.prepare("UPDATE users SET must_change_password = :val WHERE id = :id");
+  query.bindValue(":val", mustChange ? 1 : 0);
+  query.bindValue(":id", userId);
+  return query.exec();
+}
+
+bool User::updatePassword(const QString &userId, const QString &newHash) {
+  auto db = DatabaseManager::instance().getDatabase();
+  QSqlQuery query(db);
+
+  // LOGIK: Neues Passwort setzen UND Flag löschen
+  query.prepare("UPDATE users SET password_hash = :hash, must_change_password "
+                "= 0 WHERE id = :id");
+  query.bindValue(":hash", newHash);
+  query.bindValue(":id", userId);
+
+  return query.exec();
+}
+
+// getAllGroups Implementierung
+std::vector<std::pair<QString, QString>> User::getAllGroups() {
+  auto db = DatabaseManager::instance().getDatabase();
+  QSqlQuery query(db);
+  std::vector<std::pair<QString, QString>> groups;
+
+  if (query.exec("SELECT id, name FROM groups")) {
+    while (query.next()) {
+      groups.push_back(
+          {query.value("id").toString(), query.value("name").toString()});
+    }
+  }
+  return groups;
+}
+
+// assignToGroup Implementierung
+bool User::assignToGroup(const QString &userId, const QString &groupId) {
+  auto db = DatabaseManager::instance().getDatabase();
+  QSqlQuery query(db);
+
+  // Zuerst: Alte Zuweisungen löschen (Wir erlauben erstmal nur 1 Gruppe pro
+  // User)
+  query.prepare("DELETE FROM group_members WHERE user_id = :uid");
+  query.bindValue(":uid", userId);
+  query.exec();
+
+  // Dann: Neu zuweisen
+  query.prepare(
+      "INSERT INTO group_members (group_id, user_id) VALUES (:gid, :uid)");
+  query.bindValue(":gid", groupId);
+  query.bindValue(":uid", userId);
 
   return query.exec();
 }

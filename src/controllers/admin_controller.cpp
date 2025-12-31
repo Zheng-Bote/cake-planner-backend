@@ -53,4 +53,23 @@ void AdminController::registerRoutes(crow::App<AuthMiddleware> &app) {
           return crow::response(500, "Database error");
         }
       });
+
+  CROW_ROUTE(app, "/api/admin/users/force-password-change")
+      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
+        const auto &ctx = app.get_context<AuthMiddleware>(req);
+        if (!ctx.currentUser.isAdmin)
+          return crow::response(403);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("userId") || !json.has("mustChange"))
+          return crow::response(400, "Missing params");
+
+        QString userId = QString::fromStdString(json["userId"].s());
+        bool mustChange = json["mustChange"].b();
+
+        if (User::setMustChangePassword(userId, mustChange)) {
+          return crow::response(200, "Updated");
+        }
+        return crow::response(500, "DB Error");
+      });
 }

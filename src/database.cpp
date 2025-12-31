@@ -99,6 +99,7 @@ bool DatabaseManager::migrate() {
             totp_secret TEXT,
             is_active INTEGER DEFAULT 0,
             is_admin INTEGER DEFAULT 0,
+            must_change_password INTEGER DEFAULT 0,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
@@ -106,12 +107,14 @@ bool DatabaseManager::migrate() {
         CREATE TABLE IF NOT EXISTS groups (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
+            description TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS group_members (
             user_id TEXT NOT NULL,
             group_id TEXT NOT NULL,
+            role TEXT DEFAULT 'member',
             joined_at TEXT DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (user_id, group_id),
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

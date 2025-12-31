@@ -79,4 +79,79 @@ void UserController::registerRoutes(crow::App<AuthMiddleware> &app) {
           return crow::response(500, "Database error during registration");
         }
       });
+
+  // --- POST /api/user/change-password ---
+  CROW_ROUTE(app, "/api/user/change-password")
+      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
+        // 1. Auth Check (Middleware nutzen)
+        const auto &ctx = app.get_context<AuthMiddleware>(req);
+        if (ctx.currentUser.userId.isEmpty()) {
+          return crow::response(401, "Unauthorized");
+        }
+
+        // 2. Input parsen
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("newPassword")) {
+          return crow::response(400, "Missing parameter: newPassword");
+        }
+
+        std::string newPassRaw = json["newPassword"].s();
+
+        // 3. Validierung (Minimalanforderung)
+        if (newPassRaw.length() < 8) {
+          return crow::response(400, "Password must be at least 8 chars");
+        }
+
+        // 4. Hashing (PasswordUtils nutzen)
+        QString newHash =
+            PasswordUtils::hashPassword(QString::fromStdString(newPassRaw));
+        if (newHash.isEmpty()) {
+          return crow::response(500, "Hashing failed");
+        }
+
+        // 5. Model aufrufen (MVC)
+        if (User::updatePassword(ctx.currentUser.userId, newHash)) {
+          return crow::response(200, "Password changed successfully");
+        } else {
+          return crow::response(500, "Database error");
+        }
+      });
+
+  // GET /api/admin/groups
+  CROW_ROUTE(app, "/api/admin/groups")
+  ([&](const crow::request &req) {
+    const auto &ctx = app.get_context<AuthMiddleware>(req);
+    if (!ctx.currentUser.isAdmin)
+      return crow::response(403);
+
+    auto groups = User::getAllGroups();
+    crow::json::wvalue json = crow::json::wvalue::list();
+    int i = 0;
+    for (const auto &g : groups) {
+      json[i]["id"] = g.first.toStdString();
+      json[i]["name"] = g.second.toStdString();
+      i++;
+    }
+    return crow::response(json);
+  });
+
+  // POST /api/admin/users/assign-group
+  CROW_ROUTE(app, "/api/admin/users/assign-group")
+      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
+        const auto &ctx = app.get_context<AuthMiddleware>(req);
+        if (!ctx.currentUser.isAdmin)
+          return crow::response(403);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("userId") || !json.has("groupId"))
+          return crow::response(400);
+
+        QString uid = QString::fromStdString(json["userId"].s());
+        QString gid = QString::fromStdString(json["groupId"].s());
+
+        if (User::assignToGroup(uid, gid)) {
+          return crow::response(200);
+        }
+        return crow::response(500);
+      });
 }
