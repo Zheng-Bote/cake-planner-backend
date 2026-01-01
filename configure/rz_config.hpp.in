@@ -1,12 +1,13 @@
 /**
- * @file config.hpp.in
- * @author ZHENG Robert (robert.hase-zheng.net)
+ * @file rz_config.hpp.in
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief configuration
- * @version 2.0.0
- * @date 2025-11-15
+ * @version 2.1.0
+ * @date 2026-01-01
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
+ * SPDX-License-Identifier: MIT
  */
 #pragma once
 

@@ -1,8 +1,37 @@
+/**
+ * @file user_model.cpp
+ * @author ZHENG Robert (robert@hase-zheng.net)
+ * @brief No description provided
+ * @version 0.2.0
+ * @date 2026-01-01
+ *
+ * @copyright Copyright (c) 2025 ZHENG Robert
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "models/user_model.hpp"
 #include "database.hpp"
 #include <QSqlQuery>
 #include <QUuid>
 #include <QVariant>
+
+// --- Helpers ---
+
+std::pair<QString, QString> User::getGroupAndRole(const QString &userId) {
+  auto db = DatabaseManager::instance().getDatabase();
+  QSqlQuery query(db);
+  query.prepare(
+      "SELECT group_id, role FROM group_members WHERE user_id = :uid");
+  query.bindValue(":uid", userId);
+
+  if (query.exec() && query.next()) {
+    return {query.value("group_id").toString(), query.value("role").toString()};
+  }
+  return {}; // Leer, falls keine Gruppe
+}
+
+// --- Business / DB Logic ---
 
 crow::json::wvalue User::toJson() const {
   crow::json::wvalue json;
@@ -16,6 +45,7 @@ crow::json::wvalue User::toJson() const {
   // Password Hash und TOTP Secret geben wir nicht raus
   json["has2FA"] = !totp_secret.isEmpty();
   json["groupId"] = groupId.toStdString();
+  json["groupRole"] = groupRole.toStdString();
   return json;
 }
 
@@ -37,6 +67,19 @@ std::optional<User> User::getByEmail(const QString &email) {
     u.is_admin = query.value("is_admin").toBool();
     u.must_change_password = query.value("must_change_password").toBool();
     u.totp_secret = query.value("totp_secret").toString();
+
+    // --- FIX: Gruppen-Infos nachladen ---
+    // Das hat gefehlt! Wir holen manuell die Rolle aus der anderen Tabelle.
+    auto groupInfo = getGroupAndRole(u.id);
+    u.groupId = groupInfo.first;
+    u.groupRole = groupInfo.second;
+
+    // Fallback: Wenn in einer Gruppe, aber Rolle leer -> Member
+    if (u.groupRole.isEmpty() && !u.groupId.isEmpty()) {
+      u.groupRole = "member";
+    }
+    // ------------------------------------
+
     return u;
   }
   return std::nullopt;
@@ -60,22 +103,45 @@ std::optional<User> User::getById(const QString &id) {
     u.is_admin = query.value("is_admin").toBool();
     u.must_change_password = query.value("must_change_password").toBool();
     u.totp_secret = query.value("totp_secret").toString();
+
+    // --- Gruppen-Infos nachladen ---
+    auto groupInfo = getGroupAndRole(u.id);
+    u.groupId = groupInfo.first;
+    u.groupRole = groupInfo.second;
+
+    // Fallback, falls Rolle leer ist, aber Gruppe existiert
+    if (u.groupRole.isEmpty() && !u.groupId.isEmpty()) {
+      u.groupRole = "member";
+    }
+    // ------------------------------------
+
     return u;
   }
   return std::nullopt;
 }
 
-std::vector<User> User::getAll() {
+std::vector<User> User::getAll(const QString &filterGroupId) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
   std::vector<User> users;
 
-  query.prepare(R"(
+  QString sql = R"(
         SELECT u.id, u.full_name, u.email, u.is_active, u.is_admin, u.must_change_password,
-               gm.group_id 
+               gm.group_id, gm.role
         FROM users u
         LEFT JOIN group_members gm ON u.id = gm.user_id
-    )");
+    )";
+
+  // Filter anwenden, falls gesetzt
+  if (!filterGroupId.isEmpty()) {
+    sql += " WHERE gm.group_id = :gid";
+  }
+
+  query.prepare(sql);
+
+  if (!filterGroupId.isEmpty()) {
+    query.bindValue(":gid", filterGroupId);
+  }
 
   if (query.exec()) {
     while (query.next()) {
@@ -86,9 +152,17 @@ std::vector<User> User::getAll() {
       u.is_active = query.value("is_active").toBool();
       u.is_admin = query.value("is_admin").toBool();
       u.must_change_password = query.value("must_change_password").toBool();
+
+      // WICHTIG: Felder füllen für das Frontend-Dropdown
       u.groupId = query.value("group_id").toString();
+      u.groupRole = query.value("role").toString();
+      if (u.groupRole.isEmpty())
+        u.groupRole = "member";
+
       users.push_back(u);
     }
+  } else {
+    qWarning() << "User::getAll error:" << query.lastError().text();
   }
   return users;
 }
@@ -205,4 +279,38 @@ bool User::assignToGroup(const QString &userId, const QString &groupId) {
   query.bindValue(":uid", userId);
 
   return query.exec();
+}
+
+bool User::setGroupRole(const QString &userId, const QString &groupId,
+                        const QString &role) {
+  auto db = DatabaseManager::instance().getDatabase();
+  QSqlQuery query(db);
+
+  // Wir nutzen UPDATE, da der User schon Mitglied sein muss
+  query.prepare("UPDATE group_members SET role = :role WHERE user_id = :uid "
+                "AND group_id = :gid");
+  query.bindValue(":role", role);
+  query.bindValue(":uid", userId);
+  query.bindValue(":gid", groupId);
+
+  if (query.exec()) {
+    // Prüfen, ob wirklich eine Zeile geändert wurde (User war also in der
+    // Gruppe)
+    return query.numRowsAffected() > 0;
+  }
+  return false;
+}
+
+QString User::getGroupRole(const QString &userId, const QString &groupId) {
+  auto db = DatabaseManager::instance().getDatabase();
+  QSqlQuery query(db);
+  query.prepare("SELECT role FROM group_members WHERE user_id = :uid AND "
+                "group_id = :gid");
+  query.bindValue(":uid", userId);
+  query.bindValue(":gid", groupId);
+
+  if (query.exec() && query.next()) {
+    return query.value("role").toString();
+  }
+  return ""; // Nicht in der Gruppe
 }

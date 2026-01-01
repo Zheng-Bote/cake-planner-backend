@@ -1,3 +1,15 @@
+/**
+ * @file user_controller.cpp
+ * @author ZHENG Robert (robert@hase-zheng.net)
+ * @brief No description provided
+ * @version 0.4.0
+ * @date 2026-01-01
+ *
+ * @copyright Copyright (c) 2025 ZHENG Robert
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "controllers/user_controller.hpp"
 #include "models/user_model.hpp"
 #include "utils/password_utils.hpp" // Für Argon2
@@ -10,15 +22,33 @@ void UserController::registerRoutes(crow::App<AuthMiddleware> &app) {
   // Nur eingeloggte User kommen hierhin.
   CROW_ROUTE(app, "/api/users")
   ([&](const crow::request &req) {
-    // Zugriff auf den Kontext (wer fragt an?)
     const auto &ctx = app.get_context<AuthMiddleware>(req);
 
-    // Optional: Sicherheitscheck - Nur Admins dürfen alle User sehen?
-    if (!ctx.currentUser.isAdmin) {
-      return crow::response(403, "Forbidden: Admin access required.");
-    }
+    // 1. Identität prüfen
+    if (ctx.currentUser.userId.isEmpty())
+      return crow::response(401);
 
-    auto users = User::getAll(); // Gibt std::vector<User> zurück
+    std::vector<User> users;
+
+    // FALL A: Global Admin -> Sieht ALLES
+    if (ctx.currentUser.isAdmin) {
+      users = User::getAll(); // Kein Filter
+    }
+    // FALL B: Prüfen auf Local Admin
+    else {
+      // Wir holen uns Gruppe und Rolle des Anfragenden
+      auto info = User::getGroupAndRole(ctx.currentUser.userId);
+      QString myGroupId = info.first;
+      QString myRole = info.second;
+
+      if (myRole == "admin" && !myGroupId.isEmpty()) {
+        // Local Admin -> Sieht nur SEINE Gruppe
+        users = User::getAll(myGroupId);
+      } else {
+        // FALL C: Normales Mitglied -> Darf Liste nicht sehen
+        return crow::response(403, "Forbidden: Insufficient rights.");
+      }
+    }
 
     crow::json::wvalue result = crow::json::wvalue::list();
     int i = 0;
@@ -115,43 +145,5 @@ void UserController::registerRoutes(crow::App<AuthMiddleware> &app) {
         } else {
           return crow::response(500, "Database error");
         }
-      });
-
-  // GET /api/admin/groups
-  CROW_ROUTE(app, "/api/admin/groups")
-  ([&](const crow::request &req) {
-    const auto &ctx = app.get_context<AuthMiddleware>(req);
-    if (!ctx.currentUser.isAdmin)
-      return crow::response(403);
-
-    auto groups = User::getAllGroups();
-    crow::json::wvalue json = crow::json::wvalue::list();
-    int i = 0;
-    for (const auto &g : groups) {
-      json[i]["id"] = g.first.toStdString();
-      json[i]["name"] = g.second.toStdString();
-      i++;
-    }
-    return crow::response(json);
-  });
-
-  // POST /api/admin/users/assign-group
-  CROW_ROUTE(app, "/api/admin/users/assign-group")
-      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
-        const auto &ctx = app.get_context<AuthMiddleware>(req);
-        if (!ctx.currentUser.isAdmin)
-          return crow::response(403);
-
-        auto json = crow::json::load(req.body);
-        if (!json || !json.has("userId") || !json.has("groupId"))
-          return crow::response(400);
-
-        QString uid = QString::fromStdString(json["userId"].s());
-        QString gid = QString::fromStdString(json["groupId"].s());
-
-        if (User::assignToGroup(uid, gid)) {
-          return crow::response(200);
-        }
-        return crow::response(500);
       });
 }

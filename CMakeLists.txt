@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.24)
 
 # Projektname und Sprache
 project(CakePlanner
-    VERSION 0.3.0
+    VERSION 0.4.0
     DESCRIPTION "Cake Planner Backend"
     HOMEPAGE_URL "https://github.com/Zheng-Bote/cake-planner-backend"
     LANGUAGES C CXX)
@@ -35,7 +35,7 @@ else()
 endif()
 
 # Generiert include/rz_config.hpp im Binary-Tree
-add_subdirectory(configure) 
+add_subdirectory(configure)
 
 include(FetchContent)
 
@@ -77,7 +77,7 @@ set(ARGON2_SRC
     ${argon2_SOURCE_DIR}/src/blake2/blake2b.c
     ${argon2_SOURCE_DIR}/src/thread.c
     ${argon2_SOURCE_DIR}/src/encoding.c
-    ${argon2_SOURCE_DIR}/src/opt.c 
+    ${argon2_SOURCE_DIR}/src/opt.c
 )
 
 add_library(argon2_lib STATIC ${ARGON2_SRC})
@@ -110,11 +110,11 @@ set(SOURCES
     src/database.cpp
     src/models/user_model.cpp
     src/controllers/user_controller.cpp
-    src/controllers/auth_controller.cpp 
+    src/controllers/auth_controller.cpp
     src/controllers/admin_controller.cpp
     src/models/event_model.cpp
     src/controllers/event_controller.cpp
-    src/utils/token_utils.cpp           
+    src/utils/token_utils.cpp
     src/utils/password_utils.cpp
     src/utils/env_loader.cpp
     src/utils/seeder.cpp
@@ -126,9 +126,9 @@ add_executable(CakePlanner ${SOURCES})
 
 # Include Directories
 # WICHTIG: CMAKE_BINARY_DIR hinzufügen, damit rz_config.hpp gefunden wird
-target_include_directories(CakePlanner PRIVATE 
+target_include_directories(CakePlanner PRIVATE
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/include 
+    ${CMAKE_BINARY_DIR}/include
     ${ASIO_INCLUDE_DIR}
 )
 
@@ -140,7 +140,7 @@ target_link_libraries(CakePlanner PRIVATE
     Qt6::Core
     Qt6::Sql
     argon2_lib
-    OpenSSL::SSL 
+    OpenSSL::SSL
     OpenSSL::Crypto
     jwt-cpp::jwt-cpp
     nlohmann_json::nlohmann_json
