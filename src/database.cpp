@@ -2,8 +2,8 @@
  * @file database.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @version 0.2.0
+ * @date 2026-01-02
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -30,7 +30,7 @@ DatabaseManager &DatabaseManager::instance() {
 void DatabaseManager::initialize(const QString &path) {
   m_dbPath = path;
 
-  // --- NEU: Ordner-Check ---
+  // Ordner-Check
   QFileInfo fileInfo(m_dbPath);
   QDir dir = fileInfo.absoluteDir();
 
@@ -41,38 +41,26 @@ void DatabaseManager::initialize(const QString &path) {
       qCritical()
           << "Kritischer Fehler: Konnte Datenbank-Ordner nicht erstellen:"
           << dir.absolutePath();
-      // Wir machen weiter, aber der nächste Schritt wird vermutlich crashen
     }
   }
-  // -------------------------
 
   qInfo() << "Datenbank-Pfad gesetzt auf:" << m_dbPath;
 }
 
 QSqlDatabase DatabaseManager::getDatabase() {
-  // 1. Eindeutige ID für den aktuellen Thread generieren
-  // Qt's QThread::currentThreadId() eignet sich gut als Suffix
   QString connectionName =
       QString("db_conn_%1")
           .arg(reinterpret_cast<quintptr>(QThread::currentThreadId()));
 
-  // 2. Prüfen, ob für diesen Thread schon eine Verbindung existiert
   if (QSqlDatabase::contains(connectionName)) {
     auto db = QSqlDatabase::database(connectionName);
-    if (db.isOpen()) {
-      return db;
-    }
-    // Falls sie existiert aber geschlossen ist, versuchen wir sie erneut zu
-    // öffnen
+    if (db.isOpen()) return db;
     if (!db.open()) {
-      qCritical()
-          << "Kritischer Fehler: Konnte existierende Verbindung nicht öffnen:"
-          << connectionName;
+      qCritical() << "Kritischer Fehler: Konnte existierende Verbindung nicht öffnen:" << connectionName;
     }
     return db;
   }
 
-  // 3. Neue Verbindung für diesen Thread erstellen
   QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
   db.setDatabaseName(m_dbPath);
 
@@ -80,10 +68,8 @@ QSqlDatabase DatabaseManager::getDatabase() {
     qCritical() << "Fehler beim Öffnen der DB in Thread" << connectionName
                 << ":" << db.lastError().text();
   } else {
-    // Performance-Tuning für SQLite (wichtig für Concurrent Access!)
     QSqlQuery query(db);
-    query.exec("PRAGMA journal_mode = WAL;"); // Write-Ahead Logging für bessere
-                                              // Concurrency
+    query.exec("PRAGMA journal_mode = WAL;");
     query.exec("PRAGMA synchronous = NORMAL;");
     query.exec("PRAGMA foreign_keys = ON;");
   }
@@ -91,17 +77,11 @@ QSqlDatabase DatabaseManager::getDatabase() {
   return db;
 }
 
-DatabaseManager::~DatabaseManager() {
-  // Optional: Aufräumen, obwohl Qt das beim Beenden der QCoreApplication meist
-  // selbst macht
-}
+DatabaseManager::~DatabaseManager() {}
 
-// Hier fügen wir das Schema ein, das wir vorhin erstellt haben
 bool DatabaseManager::migrate() {
-  // Wir holen uns eine temporäre Verbindung im Main-Thread
   auto db = getDatabase();
 
-  // Das SQL-Schema als Raw String Literal (C++11 feature, sehr praktisch hier)
   QString schemaSql = R"(
         CREATE TABLE IF NOT EXISTS users (
             id TEXT PRIMARY KEY,
@@ -156,30 +136,32 @@ bool DatabaseManager::migrate() {
             FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
             FOREIGN KEY (rater_id) REFERENCES users(id) ON DELETE CASCADE
         );
-        
-        -- Indizes fehlen hier noch der Kürze halber, können aber ergänzt werden
+
+        CREATE TABLE IF NOT EXISTS event_photos (
+            event_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            photo_path TEXT NOT NULL,
+            uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (event_id, user_id),
+            FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+
+        -- INDIZES für Performance
+        CREATE INDEX IF NOT EXISTS idx_ratings_event_id ON ratings(event_id);
+        CREATE INDEX IF NOT EXISTS idx_event_photos_event_id ON event_photos(event_id);
+        CREATE INDEX IF NOT EXISTS idx_events_group_date ON events(group_id, event_date);
     )";
 
-  // SQLite kann oft nicht mehrere Statements in einem "exec" ausführen,
-  // daher splitten wir am Semikolon (einfache Implementierung)
   QStringList statements = schemaSql.split(';', Qt::SkipEmptyParts);
-
   QSqlQuery query(db);
   bool success = true;
 
   db.transaction();
   for (const QString &stmt : statements) {
-    // 1. Leerzeichen entfernen
     QString trimmedStmt = stmt.trimmed();
+    if (trimmedStmt.isEmpty() || trimmedStmt.startsWith("--")) continue;
 
-    // 2. Leere Anweisungen überspringen
-    if (trimmedStmt.isEmpty())
-      continue;
-
-    if (trimmedStmt.startsWith("--"))
-      continue;
-
-    // 4. Ausführen (jetzt nutzen wir die gesäuberte 'trimmedStmt')
     if (!query.exec(trimmedStmt)) {
       qCritical() << "Migration Fehler bei Statement:" << trimmedStmt
                   << "\nGrund:" << query.lastError().text();

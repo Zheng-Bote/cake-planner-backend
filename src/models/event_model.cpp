@@ -2,8 +2,8 @@
  * @file event_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @version 0.3.1
+ * @date 2026-01-02
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -12,41 +12,58 @@
 
 #include "models/event_model.hpp"
 #include "database.hpp"
+
 #include <QSqlQuery>
-#include <QUuid> // Wichtig für createUuid
+#include <QUuid>
 #include <QVariant>
+#include <QSqlError>
+#include <QDate>
+#include <QDir>
+#include <QDebug>
+#include <sstream>
 
-crow::json::wvalue CakeEvent::toJson() const {
-  crow::json::wvalue json;
-  json["id"] = id.toStdString();
-  json["date"] = date.toStdString();
-  json["bakerName"] = bakerName.toStdString();
-  json["description"] = description.toStdString();
+// --- Methods ---
 
-  // Falls ein Foto existiert, URL generieren
-  if (!photoPath.isEmpty()) {
-    json["photoUrl"] = ("/static/uploads/" + photoPath).toStdString();
-  }
+crow::json::wvalue Event::toJson() const {
+    crow::json::wvalue json;
+    json["id"] = id.toStdString();
+    json["groupId"] = groupId.toStdString();
+    json["groupName"] = groupName.toStdString();
+    json["bakerName"] = bakerName.toStdString();
+    json["date"] = date.toStdString();
+    json["description"] = description.toStdString();
 
-  return json;
+    // Hauptfoto URL (vom Ersteller)
+    json["photoUrl"] = photoPath.isEmpty() ? "" : "/api/uploads/" + photoPath.toStdString();
+
+    // Berechtigungen & Status
+    json["isOwner"] = isOwner;
+    json["canDelete"] = isOwner && isFuture;
+
+    // Rating
+    json["rating"]["average"] = rating.average;
+    json["rating"]["count"] = rating.count;
+    json["rating"]["myRating"] = rating.myRating;
+
+    return json;
 }
 
-std::vector<CakeEvent> CakeEvent::getRange(const QString &start,
-                                           const QString &end,
-                                           const QString &userId) {
+std::vector<Event> Event::getRange(const QString &start,
+                                   const QString &end,
+                                   const QString &userId) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
-  std::vector<CakeEvent> events;
+  std::vector<Event> events;
 
-  // Wir holen Events inkl. photo_path
   QString sql = R"(
-        SELECT e.id, e.event_date, e.description, e.photo_path, u.full_name, g.name as group_name
+        SELECT e.id, e.event_date, e.description, e.photo_path, e.group_id,
+               u.full_name, u.id as baker_id, g.name as group_name
         FROM events e
         JOIN users u ON e.baker_id = u.id
         JOIN groups g ON e.group_id = g.id
         JOIN group_members gm ON e.group_id = gm.group_id
         WHERE gm.user_id = :userId
-          AND e.event_date >= :start 
+          AND e.event_date >= :start
           AND e.event_date <= :end
         ORDER BY e.event_date ASC
     )";
@@ -58,14 +75,18 @@ std::vector<CakeEvent> CakeEvent::getRange(const QString &start,
 
   if (query.exec()) {
     while (query.next()) {
-      CakeEvent e;
+      Event e;
       e.id = query.value("id").toString();
       e.date = query.value("event_date").toString();
+      e.bakerId = query.value("baker_id").toString();
       e.bakerName = query.value("full_name").toString();
+      e.groupId = query.value("group_id").toString();
       e.groupName = query.value("group_name").toString();
       e.description = query.value("description").toString();
-      // Hier auch beim Laden setzen:
       e.photoPath = query.value("photo_path").toString();
+
+      e.isOwner = (e.bakerId == userId);
+      e.isFuture = (QDate::fromString(e.date, "yyyy-MM-dd") >= QDate::currentDate());
 
       events.push_back(e);
     }
@@ -73,38 +94,177 @@ std::vector<CakeEvent> CakeEvent::getRange(const QString &start,
   return events;
 }
 
-bool CakeEvent::create(const QString &userId) {
+bool Event::create(const QString &userId) {
   auto db = DatabaseManager::instance().getDatabase();
 
   if (this->id.isEmpty()) {
     this->id = QUuid::createUuid().toString(QUuid::WithoutBraces);
   }
 
-  // Gruppe des Users finden
-  QSqlQuery groupQuery(db);
-  groupQuery.prepare(
-      "SELECT group_id FROM group_members WHERE user_id = :uid LIMIT 1");
-  groupQuery.bindValue(":uid", userId);
+  QSqlQuery userQuery(db);
+  userQuery.prepare(R"(
+    SELECT u.full_name, gm.group_id
+    FROM users u
+    JOIN group_members gm ON u.id = gm.user_id
+    WHERE u.id = :uid LIMIT 1
+  )");
+  userQuery.bindValue(":uid", userId);
 
-  QString groupId;
-  if (groupQuery.exec() && groupQuery.next()) {
-    groupId = groupQuery.value(0).toString();
+  if (userQuery.exec() && userQuery.next()) {
+    this->bakerName = userQuery.value("full_name").toString();
+    this->groupId = userQuery.value("group_id").toString();
+    this->bakerId = userId;
   } else {
     return false;
   }
 
   QSqlQuery query(db);
-  // WICHTIG: photo_path im INSERT
   query.prepare("INSERT INTO events (id, group_id, baker_id, event_date, "
                 "description, photo_path) "
                 "VALUES (:id, :gid, :bid, :date, :desc, :photo)");
 
   query.bindValue(":id", this->id);
-  query.bindValue(":gid", groupId);
+  query.bindValue(":gid", this->groupId);
   query.bindValue(":bid", userId);
   query.bindValue(":date", this->date);
   query.bindValue(":desc", this->description);
-  query.bindValue(":photo", this->photoPath); // Hier wird das Feld genutzt
+  query.bindValue(":photo", this->photoPath);
 
   return query.exec();
+}
+
+std::optional<Event> Event::getById(const QString& eventId, const QString& currentUserId) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+
+    query.prepare(R"(
+        SELECT e.*, u.full_name, g.name as group_name
+        FROM events e
+        JOIN users u ON e.baker_id = u.id
+        JOIN groups g ON e.group_id = g.id
+        WHERE e.id = :id
+    )");
+    query.bindValue(":id", eventId);
+
+    if (!query.exec() || !query.next()) return std::nullopt;
+
+    Event e;
+    e.id = query.value("id").toString();
+    e.groupId = query.value("group_id").toString();
+    e.groupName = query.value("group_name").toString();
+    e.bakerId = query.value("baker_id").toString();
+    e.bakerName = query.value("full_name").toString();
+    e.date = query.value("event_date").toString();
+    e.description = query.value("description").toString();
+    e.photoPath = query.value("photo_path").toString();
+
+    e.isOwner = (e.bakerId == currentUserId);
+    e.isFuture = (QDate::fromString(e.date, "yyyy-MM-dd") >= QDate::currentDate());
+
+    // Ratings laden
+    QSqlQuery rateQuery(db);
+    rateQuery.prepare("SELECT AVG(rating_value), COUNT(*) FROM ratings WHERE event_id = :eid");
+    rateQuery.bindValue(":eid", eventId);
+    if(rateQuery.exec() && rateQuery.next()) {
+        e.rating.average = rateQuery.value(0).toDouble();
+        e.rating.count = rateQuery.value(1).toInt();
+    }
+
+    // Mein Rating laden
+    QSqlQuery myRateQuery(db);
+    myRateQuery.prepare("SELECT rating_value FROM ratings WHERE event_id = :eid AND rater_id = :uid");
+    myRateQuery.bindValue(":eid", eventId);
+    myRateQuery.bindValue(":uid", currentUserId);
+    if(myRateQuery.exec() && myRateQuery.next()) {
+        e.rating.myRating = myRateQuery.value(0).toInt();
+    }
+
+    return e;
+}
+
+bool Event::deleteEvent(const QString& eventId, const QString& currentUserId) {
+    auto evt = getById(eventId, currentUserId);
+    if (!evt) return false;
+
+    if (!evt->isOwner || !evt->isFuture) return false;
+
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM events WHERE id = :id");
+    query.bindValue(":id", eventId);
+    return query.exec();
+}
+
+bool Event::rateEvent(const QString& eventId, const QString& userId, int stars, const QString& comment) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+    query.prepare(R"(
+        INSERT INTO ratings (id, event_id, rater_id, rating_value, comment)
+        VALUES (:id, :eid, :uid, :val, :comment)
+        ON CONFLICT(event_id, rater_id) DO UPDATE SET
+            rating_value = excluded.rating_value,
+            comment = excluded.comment
+    )");
+
+    query.bindValue(":id", QUuid::createUuid().toString(QUuid::WithoutBraces));
+    query.bindValue(":eid", eventId);
+    query.bindValue(":uid", userId);
+    query.bindValue(":val", stars);
+    query.bindValue(":comment", comment);
+
+    return query.exec();
+}
+
+// --- Foto Upload Implementierung ---
+bool Event::uploadPhoto(const QString& eventId, const QString& userId, const std::string& fileContent, const std::string& ext) {
+    // 1. Dateinamen generieren (EventID_UserID.ext)
+    // Damit überschreibt ein User automatisch sein altes Bild, wenn er ein neues hochlädt (1 Bild pro User Regel)
+    QString filename = QString("%1_%2.%3")
+                        .arg(eventId)
+                        .arg(userId)
+                        .arg(QString::fromStdString(ext));
+
+    // 2. Auf Festplatte speichern
+    QDir dir("data/uploads");
+    if (!dir.exists()) dir.mkpath(".");
+
+    QFile file(dir.filePath(filename));
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(fileContent.data(), fileContent.size());
+        file.close();
+
+        // 3. In die neue Tabelle 'event_photos' schreiben
+        auto db = DatabaseManager::instance().getDatabase();
+        QSqlQuery query(db);
+        // Wir nutzen INSERT OR REPLACE (Standard SQL) oder UPSERT Syntax
+        query.prepare(R"(
+            INSERT INTO event_photos (event_id, user_id, photo_path, uploaded_at)
+            VALUES (:eid, :uid, :path, CURRENT_TIMESTAMP)
+            ON CONFLICT(event_id, user_id) DO UPDATE SET
+                photo_path = excluded.photo_path,
+                uploaded_at = CURRENT_TIMESTAMP
+        )");
+        query.bindValue(":eid", eventId);
+        query.bindValue(":uid", userId);
+        query.bindValue(":path", filename);
+
+        return query.exec();
+    }
+    return false;
+}
+
+std::string Event::toIcsString() const {
+    std::stringstream ss;
+    ss << "BEGIN:VCALENDAR\r\n"
+       << "VERSION:2.0\r\n"
+       << "PRODID:-//CakePlanner//DE\r\n"
+       << "BEGIN:VEVENT\r\n"
+       << "UID:" << id.toStdString() << "\r\n"
+       << "DTSTAMP:" << QDateTime::currentDateTimeUtc().toString("yyyyMMdd'T'HHmmss'Z'").toStdString() << "\r\n"
+       << "DTSTART;VALUE=DATE:" << QDate::fromString(date, "yyyy-MM-dd").toString("yyyyMMdd").toStdString() << "\r\n"
+       << "SUMMARY:Kuchen: " << bakerName.toStdString() << "\r\n"
+       << "DESCRIPTION:" << description.toStdString() << "\r\n"
+       << "END:VEVENT\r\n"
+       << "END:VCALENDAR\r\n";
+    return ss.str();
 }
