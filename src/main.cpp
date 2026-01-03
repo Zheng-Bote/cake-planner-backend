@@ -1,9 +1,9 @@
 /**
  * @file main.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @brief Entry Point
+ * @version 0.3.5
+ * @date 2026-01-03
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -18,6 +18,7 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <thread> // Wichtig für Server-Thread
 
 // Middleware & Controller Includes
 #include "controllers/admin_controller.hpp"
@@ -26,59 +27,70 @@
 #include "controllers/user_controller.hpp"
 #include "middleware/auth_middleware.hpp"
 
+// SMTP & Models
+#include "models/config_model.hpp" // Achte auf Groß/Kleinschreibung im Dateinamen!
+#include "services/smtp_service.hpp"
+#include "services/notification_service.hpp"
+
 int main(int argc, char *argv[]) {
+  // 1. Qt Core Application (Startet die Event-Loop für SMTP)
   QCoreApplication qtApp(argc, argv);
 
-  // 1. App Info aus rz_config setzen
   qInfo() << "Starte" << rz::config::PROG_LONGNAME.data() << "v"
           << rz::config::VERSION.data();
 
-  // 2. Environment laden (CakePlanner.env)
-  EnvLoader::load("CakePlanner.env");
+  // 2. Environment laden
+  rz::utils::EnvLoader::load("CakePlanner.env");
+  int serverPort = rz::utils::EnvLoader::getInt("CAKE_SERVER_PORT", 8080);
 
-  // Konfigurationswerte abrufen
-  int serverPort = EnvLoader::getInt("CAKE_SERVER_PORT", 8080);
-  QString adminPwd = EnvLoader::get("CAKE_ADMIN_PASSWORD", "admin123");
-  // TODO: adminPwd später an den DatabaseManager oder AuthMiddleware übergeben
-
-  // 3. Datenbank Initialisieren
+  // 3. Datenbank
   DatabaseManager::instance().initialize("data/cakeplanner.sqlite");
-
-  // Auto-Migration beim Start
   if (!DatabaseManager::instance().migrate()) {
     qCritical() << "Abbruch: Datenbank-Migration fehlgeschlagen.";
     return -1;
   }
+  rz::utils::Seeder::ensureAdminExists();
 
-  // Stellt sicher, dass wir uns einloggen können
-  Seeder::ensureAdminExists();
+  // 4. Services Setup (Dependency Injection)
+  rz::model::ConfigModel configModel;
+  configModel.loadEnv("CakePlanner.env");
 
-  // --- CROW APP MIT MIDDLEWARE ---
-  crow::App<AuthMiddleware> app;
+  rz::service::SmtpService smtpService(configModel, &qtApp);
+  rz::service::NotificationService notifyService(&smtpService);
 
-  // Routen registrieren
-  // Achtung: UserController muss angepasst werden, um crow::App<AuthMiddleware>
-  // zu akzeptieren, oder wir machen registerRoutes zum Template.
-  AuthController::registerRoutes(app);
-  UserController::registerRoutes(app);
-  EventController::registerRoutes(app);
-  AdminController::registerRoutes(app);
+  // 5. Crow App mit Middleware (Namespace beachten!)
+  crow::App<rz::middleware::AuthMiddleware> app;
 
-  // Beispiel für geschützte Route (liest User aus Kontext):
+  // 6. Controller Registrierung
+
+  // A) AuthController muss instanziiert werden (für NotificationService)
+  rz::controller::AuthController authController(&notifyService);
+  authController.registerRoutes(app);
+
+  // B) Andere Controller (statisch) - Namespace explizit angeben
+rz::controller::UserController::registerRoutes(app);
+rz::controller::EventController::registerRoutes(app, &notifyService);
+  rz::controller::AdminController::registerRoutes(app);
+
+  // Test-Route
   CROW_ROUTE(app, "/api/profile")
   ([&](const crow::request &req) {
-    // Zugriff auf Middleware-Kontext
-    const auto &ctx = app.get_context<AuthMiddleware>(req);
-
+    const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
     crow::json::wvalue result;
     result["msg"] = "Hello authenticated user!";
     result["your_email"] = ctx.currentUser.email.toStdString();
     return result;
   });
 
-  // 5. Server starten
   qInfo() << "Server lauscht auf Port:" << serverPort;
-  app.port(serverPort).multithreaded().run();
 
-  return 0;
+  // Crow in eigenem Thread starten, damit Qt-Loop (für Mail) weiterläuft
+  std::thread serverThread([&app, serverPort](){
+    // Erhöhe Threads auf z.B. 20
+    // app.port(serverPort).concurrency(20).run();
+    app.port(serverPort).multithreaded().run();
+  });
+
+  // Qt Event Loop starten
+  return qtApp.exec();
 }

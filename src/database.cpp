@@ -2,10 +2,10 @@
  * @file database.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.2.0
- * @date 2026-01-02
+ * @version 0.3.0
+ * @date 2026-01-03
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -88,6 +88,7 @@ bool DatabaseManager::migrate() {
             full_name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
+            email_language TEXT DEFAULT 'en',
             totp_secret TEXT,
             is_active INTEGER DEFAULT 0,
             is_admin INTEGER DEFAULT 0,

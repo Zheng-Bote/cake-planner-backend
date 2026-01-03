@@ -1,9 +1,9 @@
 /**
  * @file event_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
- * @version 0.3.1
- * @date 2026-01-02
+ * @brief Event Model Implementation
+ * @version 0.3.5
+ * @date 2026-01-03
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -102,10 +102,12 @@ bool Event::create(const QString &userId) {
   }
 
   QSqlQuery userQuery(db);
+  // UPDATE: Join mit 'groups' Tabelle, um 'g.name' zu holen
   userQuery.prepare(R"(
-    SELECT u.full_name, gm.group_id
+    SELECT u.full_name, gm.group_id, g.name as group_name
     FROM users u
     JOIN group_members gm ON u.id = gm.user_id
+    JOIN groups g ON gm.group_id = g.id
     WHERE u.id = :uid LIMIT 1
   )");
   userQuery.bindValue(":uid", userId);
@@ -113,11 +115,13 @@ bool Event::create(const QString &userId) {
   if (userQuery.exec() && userQuery.next()) {
     this->bakerName = userQuery.value("full_name").toString();
     this->groupId = userQuery.value("group_id").toString();
+    this->groupName = userQuery.value("group_name").toString(); // NEU: Name setzen
     this->bakerId = userId;
   } else {
     return false;
   }
 
+  // Insert bleibt gleich (groupName wird nicht in events tabelle gespeichert, nur referenziert)
   QSqlQuery query(db);
   query.prepare("INSERT INTO events (id, group_id, baker_id, event_date, "
                 "description, photo_path) "

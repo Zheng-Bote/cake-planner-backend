@@ -2,8 +2,8 @@
  * @file token_utils.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @version 0.2.0
+ * @date 2026-01-03
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -14,6 +14,9 @@
 #include <QString>
 #include <jwt-cpp/jwt.h>
 #include <optional>
+
+namespace rz {
+namespace utils {
 
 struct TokenPayload {
   QString userId;
@@ -30,3 +33,6 @@ public:
   // Verifiziert das Token und gibt Payload zurück (oder nullopt bei Fehler)
   static std::optional<TokenPayload> verifyToken(const std::string &rawToken);
 };
+
+} // namespace utils
+} // namespace rz

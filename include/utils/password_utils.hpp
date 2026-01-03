@@ -2,8 +2,8 @@
  * @file password_utils.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @version 0.2.0
+ * @date 2026-01-03
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -13,6 +13,9 @@
 #pragma once
 #include <QString>
 #include <string>
+
+namespace rz {
+namespace utils {
 
 class PasswordUtils {
 public:
@@ -28,3 +31,6 @@ public:
   static bool verifyPassword(const QString &plainText,
                              const QString &encodedHash);
 };
+
+} // namespace utils
+} // namespace rz

@@ -2,8 +2,8 @@
  * @file env_loader.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @version 0.2.0
+ * @date 2026-01-03
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -13,9 +13,16 @@
 #pragma once
 #include <QString>
 
+// Namespace rz::utils
+namespace rz {
+namespace utils {
+
 class EnvLoader {
 public:
-  static void load(const QString &filename = "CakePlanner.env");
-  static QString get(const QString &key, const QString &defaultValue = "");
-  static int getInt(const QString &key, int defaultValue);
+    static void load(const std::string& path);
+    static QString get(const std::string& key, const std::string& defaultVal = "");
+    static int getInt(const std::string& key, int defaultVal = 0);
 };
+
+} // namespace utils
+} // namespace rz

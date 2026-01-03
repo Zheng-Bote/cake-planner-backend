@@ -1,9 +1,9 @@
 /**
  * @file auth_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @brief Auth Controller Implementation
+ * @version 0.2.0
+ * @date 2026-01-03
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -12,16 +12,24 @@
 
 #include "controllers/auth_controller.hpp"
 #include "models/user_model.hpp"
+#include "services/notification_service.hpp"
 #include "utils/password_utils.hpp"
 #include "utils/token_utils.hpp"
 #include "utils/totp_utils.hpp"
 #include <QDebug>
 
-void AuthController::registerRoutes(crow::App<AuthMiddleware> &app) {
+namespace rz {
+namespace controller {
+
+AuthController::AuthController(service::NotificationService* notifyService)
+    : m_notifyService(notifyService) {}
+
+// KORRIGIERT: Namespace rz::middleware::AuthMiddleware
+void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app) {
 
   // 1. REGISTRIERUNG
   CROW_ROUTE(app, "/api/auth/register")
-      .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
+      .methods(crow::HTTPMethod::POST)([this](const crow::request &req) {
         auto json = crow::json::load(req.body);
         if (!json || !json.has("email") || !json.has("password") ||
             !json.has("name")) {
@@ -30,15 +38,21 @@ void AuthController::registerRoutes(crow::App<AuthMiddleware> &app) {
 
         User user;
         user.email = QString::fromStdString(json["email"].s());
-        user.password_hash = PasswordUtils::hashPassword(
+        // Voll qualifizierter Aufruf für utils
+        user.password_hash = rz::utils::PasswordUtils::hashPassword(
             QString::fromStdString(json["password"].s()));
         user.full_name = QString::fromStdString(json["name"].s());
 
-        // Erster User wird Admin (Logik aus User Model)
         if (user.create()) {
-          return crow::response(201, "User created");
+            // Notification auslösen
+            if (m_notifyService) {
+                m_notifyService->notifyAdminsNewUser(user.full_name, user.email);
+            } else {
+                qWarning() << "NotificationService not available inside AuthController!";
+            }
+            return crow::response(201, "User created");
         } else {
-          return crow::response(400, "User already exists or database error");
+            return crow::response(400, "User already exists or database error");
         }
       });
 
@@ -62,7 +76,7 @@ void AuthController::registerRoutes(crow::App<AuthMiddleware> &app) {
           return crow::response(401, "Invalid credentials");
         User user = *userOpt;
 
-        if (!PasswordUtils::verifyPassword(password, user.password_hash)) {
+        if (!rz::utils::PasswordUtils::verifyPassword(password, user.password_hash)) {
           return crow::response(401, "Invalid credentials");
         }
 
@@ -73,7 +87,7 @@ void AuthController::registerRoutes(crow::App<AuthMiddleware> &app) {
             res["require2fa"] = true;
             return crow::response(200, res);
           }
-          if (!TotpUtils::validateCode(user.totp_secret, totpCode)) {
+          if (!rz::utils::TotpUtils::validateCode(user.totp_secret, totpCode)) {
             return crow::response(401, "Invalid 2FA code");
           }
         }
@@ -82,21 +96,21 @@ void AuthController::registerRoutes(crow::App<AuthMiddleware> &app) {
           return crow::response(403, "Account inactive");
 
         auto token =
-            TokenUtils::generateToken(user.id, user.email, user.is_admin);
+            rz::utils::TokenUtils::generateToken(user.id, user.email, user.is_admin);
         crow::json::wvalue res;
         res["token"] = token.toStdString();
         res["user"] = user.toJson();
         return crow::response(200, res);
       });
 
-  // 3. 2FA SETUP (Secret generieren)
+  // 3. 2FA SETUP
   CROW_ROUTE(app, "/api/auth/2fa/setup")
       .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
-        const auto &ctx = app.get_context<AuthMiddleware>(req);
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
 
-        QString secret = TotpUtils::generateSecret();
+        QString secret = rz::utils::TotpUtils::generateSecret();
         QString otpAuthUrl =
-            TotpUtils::getProvisioningUri(ctx.currentUser.email, secret);
+            rz::utils::TotpUtils::getProvisioningUri(ctx.currentUser.email, secret);
 
         crow::json::wvalue res;
         res["secret"] = secret.toStdString();
@@ -105,10 +119,10 @@ void AuthController::registerRoutes(crow::App<AuthMiddleware> &app) {
         return crow::response(res);
       });
 
-  // 4. 2FA AKTIVIEREN (Code prüfen und speichern)
+  // 4. 2FA AKTIVIEREN
   CROW_ROUTE(app, "/api/auth/2fa/activate")
       .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
-        const auto &ctx = app.get_context<AuthMiddleware>(req);
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         auto json = crow::json::load(req.body);
 
         if (!json || !json.has("secret") || !json.has("code")) {
@@ -118,10 +132,9 @@ void AuthController::registerRoutes(crow::App<AuthMiddleware> &app) {
         QString secret = QString::fromStdString(json["secret"].s());
         QString code = QString::fromStdString(json["code"].s());
 
-        if (TotpUtils::validateCode(secret, code)) {
+        if (rz::utils::TotpUtils::validateCode(secret, code)) {
           auto userOpt = User::getById(ctx.currentUser.userId);
           if (userOpt) {
-            // Wir müssen enable2FA auf der INSTANZ aufrufen
             User u = *userOpt;
             if (u.enable2FA(secret)) {
               return crow::response(200, "2FA enabled successfully");
@@ -133,3 +146,6 @@ void AuthController::registerRoutes(crow::App<AuthMiddleware> &app) {
         }
       });
 }
+
+} // namespace controller
+} // namespace rz

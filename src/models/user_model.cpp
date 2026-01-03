@@ -1,9 +1,9 @@
 /**
  * @file user_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
- * @version 0.2.0
- * @date 2026-01-01
+ * @brief User Model Implementation
+ * @version 0.3.6
+ * @date 2026-01-03
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -15,6 +15,8 @@
 #include <QSqlQuery>
 #include <QUuid>
 #include <QVariant>
+#include <QSqlError>
+#include <QDebug>
 
 // --- Helpers ---
 
@@ -38,11 +40,13 @@ crow::json::wvalue User::toJson() const {
   json["id"] = id.toStdString();
   json["name"] = full_name.toStdString();
   json["email"] = email.toStdString();
-  // WICHTIG: Hier muss es matchen!
-  json["isAdmin"] = is_admin;   // Nicht "is_admin"
-  json["isActive"] = is_active; // Nicht "is_active"
+
+  // FIX 1: Sprache mit ins JSON aufnehmen
+  json["emailLanguage"] = emailLanguage.toStdString();
+
+  json["isAdmin"] = is_admin;
+  json["isActive"] = is_active;
   json["mustChangePassword"] = must_change_password;
-  // Password Hash und TOTP Secret geben wir nicht raus
   json["has2FA"] = !totp_secret.isEmpty();
   json["groupId"] = groupId.toStdString();
   json["groupRole"] = groupRole.toStdString();
@@ -52,7 +56,8 @@ crow::json::wvalue User::toJson() const {
 std::optional<User> User::getByEmail(const QString &email) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
-  query.prepare("SELECT id, full_name, email, password_hash, is_active, "
+  // FIX 2: email_language im SELECT hinzufügen
+  query.prepare("SELECT id, full_name, email, email_language, password_hash, is_active, "
                 "is_admin, totp_secret, must_change_password FROM users WHERE "
                 "email = :email");
   query.bindValue(":email", email);
@@ -62,23 +67,25 @@ std::optional<User> User::getByEmail(const QString &email) {
     u.id = query.value("id").toString();
     u.full_name = query.value("full_name").toString();
     u.email = query.value("email").toString();
+
+    // Sprache auslesen
+    u.emailLanguage = query.value("email_language").toString();
+    if(u.emailLanguage.isEmpty()) u.emailLanguage = "en";
+
     u.password_hash = query.value("password_hash").toString();
     u.is_active = query.value("is_active").toBool();
     u.is_admin = query.value("is_admin").toBool();
     u.must_change_password = query.value("must_change_password").toBool();
     u.totp_secret = query.value("totp_secret").toString();
 
-    // --- FIX: Gruppen-Infos nachladen ---
-    // Das hat gefehlt! Wir holen manuell die Rolle aus der anderen Tabelle.
+    // Gruppen-Infos nachladen
     auto groupInfo = getGroupAndRole(u.id);
     u.groupId = groupInfo.first;
     u.groupRole = groupInfo.second;
 
-    // Fallback: Wenn in einer Gruppe, aber Rolle leer -> Member
     if (u.groupRole.isEmpty() && !u.groupId.isEmpty()) {
       u.groupRole = "member";
     }
-    // ------------------------------------
 
     return u;
   }
@@ -88,8 +95,9 @@ std::optional<User> User::getByEmail(const QString &email) {
 std::optional<User> User::getById(const QString &id) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
+  // FIX 3: email_language im SELECT hinzufügen
   query.prepare(
-      "SELECT id, full_name, email, password_hash, is_active, "
+      "SELECT id, full_name, email, email_language, password_hash, is_active, "
       "is_admin, totp_secret, must_change_password FROM users WHERE id = :id");
   query.bindValue(":id", id);
 
@@ -98,22 +106,25 @@ std::optional<User> User::getById(const QString &id) {
     u.id = query.value("id").toString();
     u.full_name = query.value("full_name").toString();
     u.email = query.value("email").toString();
+
+    // Sprache auslesen
+    u.emailLanguage = query.value("email_language").toString();
+    if(u.emailLanguage.isEmpty()) u.emailLanguage = "en";
+
     u.password_hash = query.value("password_hash").toString();
     u.is_active = query.value("is_active").toBool();
     u.is_admin = query.value("is_admin").toBool();
     u.must_change_password = query.value("must_change_password").toBool();
     u.totp_secret = query.value("totp_secret").toString();
 
-    // --- Gruppen-Infos nachladen ---
+    // Gruppen-Infos nachladen
     auto groupInfo = getGroupAndRole(u.id);
     u.groupId = groupInfo.first;
     u.groupRole = groupInfo.second;
 
-    // Fallback, falls Rolle leer ist, aber Gruppe existiert
     if (u.groupRole.isEmpty() && !u.groupId.isEmpty()) {
       u.groupRole = "member";
     }
-    // ------------------------------------
 
     return u;
   }
@@ -126,13 +137,12 @@ std::vector<User> User::getAll(const QString &filterGroupId) {
   std::vector<User> users;
 
   QString sql = R"(
-        SELECT u.id, u.full_name, u.email, u.is_active, u.is_admin, u.must_change_password,
+        SELECT u.id, u.full_name, u.email, u.email_language, u.is_active, u.is_admin, u.must_change_password,
                gm.group_id, gm.role
         FROM users u
         LEFT JOIN group_members gm ON u.id = gm.user_id
     )";
 
-  // Filter anwenden, falls gesetzt
   if (!filterGroupId.isEmpty()) {
     sql += " WHERE gm.group_id = :gid";
   }
@@ -153,7 +163,9 @@ std::vector<User> User::getAll(const QString &filterGroupId) {
       u.is_admin = query.value("is_admin").toBool();
       u.must_change_password = query.value("must_change_password").toBool();
 
-      // WICHTIG: Felder füllen für das Frontend-Dropdown
+      u.emailLanguage = query.value("email_language").toString();
+      if (u.emailLanguage.isEmpty()) u.emailLanguage = "en";
+
       u.groupId = query.value("group_id").toString();
       u.groupRole = query.value("role").toString();
       if (u.groupRole.isEmpty())
@@ -167,7 +179,6 @@ std::vector<User> User::getAll(const QString &filterGroupId) {
   return users;
 }
 
-// Hier ist die Implementierung für den Seeder
 bool User::existsAnyAdmin() {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
@@ -186,15 +197,19 @@ bool User::create() {
   }
 
   QSqlQuery query(db);
+  // FIX 4: email_language speichern
   query.prepare("INSERT INTO users (id, full_name, email, password_hash, "
-                "is_active, is_admin) "
-                "VALUES (:id, :name, :email, :pass, :active, :admin)");
+                "is_active, is_admin, email_language) "
+                "VALUES (:id, :name, :email, :pass, :active, :admin, :lang)");
   query.bindValue(":id", this->id);
   query.bindValue(":name", this->full_name);
   query.bindValue(":email", this->email);
   query.bindValue(":pass", this->password_hash);
   query.bindValue(":active", this->is_active ? 1 : 0);
   query.bindValue(":admin", this->is_admin ? 1 : 0);
+
+  // Default Sprache beim Erstellen setzen
+  query.bindValue(":lang", this->emailLanguage.isEmpty() ? "en" : this->emailLanguage);
 
   return query.exec();
 }
@@ -207,7 +222,7 @@ bool User::enable2FA(const QString &secret) {
   query.bindValue(":id", this->id);
 
   if (query.exec()) {
-    this->totp_secret = secret; // Lokal updaten
+    this->totp_secret = secret;
     return true;
   }
   return false;
@@ -237,7 +252,6 @@ bool User::updatePassword(const QString &userId, const QString &newHash) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
 
-  // LOGIK: Neues Passwort setzen UND Flag löschen
   query.prepare("UPDATE users SET password_hash = :hash, must_change_password "
                 "= 0 WHERE id = :id");
   query.bindValue(":hash", newHash);
@@ -246,7 +260,6 @@ bool User::updatePassword(const QString &userId, const QString &newHash) {
   return query.exec();
 }
 
-// getAllGroups Implementierung
 std::vector<std::pair<QString, QString>> User::getAllGroups() {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
@@ -261,18 +274,14 @@ std::vector<std::pair<QString, QString>> User::getAllGroups() {
   return groups;
 }
 
-// assignToGroup Implementierung
 bool User::assignToGroup(const QString &userId, const QString &groupId) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
 
-  // Zuerst: Alte Zuweisungen löschen (Wir erlauben erstmal nur 1 Gruppe pro
-  // User)
   query.prepare("DELETE FROM group_members WHERE user_id = :uid");
   query.bindValue(":uid", userId);
   query.exec();
 
-  // Dann: Neu zuweisen
   query.prepare(
       "INSERT INTO group_members (group_id, user_id) VALUES (:gid, :uid)");
   query.bindValue(":gid", groupId);
@@ -286,7 +295,6 @@ bool User::setGroupRole(const QString &userId, const QString &groupId,
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
 
-  // Wir nutzen UPDATE, da der User schon Mitglied sein muss
   query.prepare("UPDATE group_members SET role = :role WHERE user_id = :uid "
                 "AND group_id = :gid");
   query.bindValue(":role", role);
@@ -294,8 +302,6 @@ bool User::setGroupRole(const QString &userId, const QString &groupId,
   query.bindValue(":gid", groupId);
 
   if (query.exec()) {
-    // Prüfen, ob wirklich eine Zeile geändert wurde (User war also in der
-    // Gruppe)
     return query.numRowsAffected() > 0;
   }
   return false;
@@ -312,5 +318,30 @@ QString User::getGroupRole(const QString &userId, const QString &groupId) {
   if (query.exec() && query.next()) {
     return query.value("role").toString();
   }
-  return ""; // Nicht in der Gruppe
+  return "";
+}
+
+bool User::softDelete(const QString& userId) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+    query.prepare(R"(
+        UPDATE users
+        SET is_active = 0,
+            full_name = 'Deleted User',
+            email = 'deleted_' || id || '@cakeplanner.local',
+            password_hash = '',
+            totp_secret = NULL
+        WHERE id = :id
+    )");
+    query.bindValue(":id", userId);
+    return query.exec();
+}
+
+bool User::updateSettings(const QString& userId, const QString& lang) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+    query.prepare("UPDATE users SET email_language = :lang WHERE id = :id");
+    query.bindValue(":lang", lang);
+    query.bindValue(":id", userId);
+    return query.exec();
 }

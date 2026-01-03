@@ -22,6 +22,7 @@ struct User {
   QString full_name;
   QString email;
   QString password_hash;
+  QString emailLanguage = "en";
   QString totp_secret;
   QString groupId;
   QString groupName;
@@ -46,6 +47,7 @@ struct User {
 
   static bool updateStatus(const QString &userId, bool isActive);
   static bool updatePassword(const QString &userId, const QString &newHash);
+  static bool updateSettings(const QString& userId, const QString& lang);
 
   static std::vector<std::pair<QString, QString>>
   getAllGroups(); // Gibt ID + Name zurück
@@ -54,6 +56,8 @@ struct User {
   static bool setGroupRole(const QString &userId, const QString &groupId,
                            const QString &role);
   static QString getGroupRole(const QString &userId, const QString &groupId);
+
+static bool softDelete(const QString& userId);
 
   static bool existsAnyAdmin();
 

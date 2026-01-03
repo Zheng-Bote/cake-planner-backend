@@ -10,42 +10,38 @@
  * SPDX-License-Identifier: MIT
  */
 
+
 #include "controllers/user_controller.hpp"
 #include "models/user_model.hpp"
-#include "utils/password_utils.hpp" // Für Argon2
-#include "utils/token_utils.hpp"    // Falls wir später Tokens brauchen
+#include "utils/password_utils.hpp"
+#include "utils/token_utils.hpp"
 
-void UserController::registerRoutes(crow::App<AuthMiddleware> &app) {
+namespace rz {
+namespace controller {
+
+// WICHTIG: Signatur muss rz::middleware::AuthMiddleware enthalten
+void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app) {
 
   // --- GET /api/users ---
-  // Dies ist eine geschützte Route (dank AuthMiddleware in main.cpp)
-  // Nur eingeloggte User kommen hierhin.
   CROW_ROUTE(app, "/api/users")
   ([&](const crow::request &req) {
-    const auto &ctx = app.get_context<AuthMiddleware>(req);
+    const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
 
-    // 1. Identität prüfen
     if (ctx.currentUser.userId.isEmpty())
       return crow::response(401);
 
     std::vector<User> users;
 
-    // FALL A: Global Admin -> Sieht ALLES
     if (ctx.currentUser.isAdmin) {
-      users = User::getAll(); // Kein Filter
-    }
-    // FALL B: Prüfen auf Local Admin
-    else {
-      // Wir holen uns Gruppe und Rolle des Anfragenden
+      users = User::getAll();
+    } else {
       auto info = User::getGroupAndRole(ctx.currentUser.userId);
       QString myGroupId = info.first;
       QString myRole = info.second;
 
       if (myRole == "admin" && !myGroupId.isEmpty()) {
-        // Local Admin -> Sieht nur SEINE Gruppe
         users = User::getAll(myGroupId);
       } else {
-        // FALL C: Normales Mitglied -> Darf Liste nicht sehen
         return crow::response(403, "Forbidden: Insufficient rights.");
       }
     }
@@ -59,91 +55,90 @@ void UserController::registerRoutes(crow::App<AuthMiddleware> &app) {
   });
 
   // --- POST /api/register ---
-  // Dies ist öffentlich (in AuthMiddleware Whitelist eingetragen)
   CROW_ROUTE(app, "/api/register")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         auto json = crow::json::load(req.body);
-
-        // 1. Validierung
-        if (!json) {
-          return crow::response(400, "Invalid JSON");
-        }
-        if (!json.has("email") || !json.has("password") || !json.has("name")) {
-          return crow::response(400, "Missing fields (email, password, name)");
+        if (!json || !json.has("email") || !json.has("password") || !json.has("name")) {
+          return crow::response(400, "Missing fields");
         }
 
         QString email = QString::fromStdString(json["email"].s());
         QString plainPassword = QString::fromStdString(json["password"].s());
         QString name = QString::fromStdString(json["name"].s());
 
-        // 2. Dubletten-Check
         if (User::getByEmail(email).has_value()) {
           return crow::response(409, "User already exists");
         }
 
-        // 3. User Objekt vorbereiten
         User newUser;
         newUser.full_name = name;
         newUser.email = email;
 
-        // 4. Argon2 Hashing
-        newUser.password_hash = PasswordUtils::hashPassword(plainPassword);
+        // Namespace rz::utils nutzen!
+        newUser.password_hash = rz::utils::PasswordUtils::hashPassword(plainPassword);
 
-        if (newUser.password_hash.isEmpty()) {
-          return crow::response(500, "Internal Error: Hashing failed");
-        }
+        if (newUser.password_hash.isEmpty()) return crow::response(500, "Hashing failed");
 
-        // Standardmäßig inaktiv, außer es ist der allererste User (Seeding
-        // übernimmt das aber meist)
         newUser.is_active = false;
         newUser.is_admin = false;
 
-        // 5. In DB speichern
         if (newUser.create()) {
           crow::json::wvalue resJson;
-          resJson["message"] =
-              "Registration successful. Please wait for admin activation.";
+          resJson["message"] = "Registration successful.";
           resJson["userId"] = newUser.id.toStdString();
           return crow::response(201, resJson);
         } else {
-          return crow::response(500, "Database error during registration");
+          return crow::response(500, "Database error");
         }
       });
 
   // --- POST /api/user/change-password ---
   CROW_ROUTE(app, "/api/user/change-password")
       .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
-        // 1. Auth Check (Middleware nutzen)
-        const auto &ctx = app.get_context<AuthMiddleware>(req);
-        if (ctx.currentUser.userId.isEmpty()) {
-          return crow::response(401, "Unauthorized");
-        }
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        if (ctx.currentUser.userId.isEmpty()) return crow::response(401);
 
-        // 2. Input parsen
         auto json = crow::json::load(req.body);
-        if (!json || !json.has("newPassword")) {
-          return crow::response(400, "Missing parameter: newPassword");
-        }
+        if (!json || !json.has("newPassword")) return crow::response(400);
 
         std::string newPassRaw = json["newPassword"].s();
+        if (newPassRaw.length() < 8) return crow::response(400, "Min 8 chars");
 
-        // 3. Validierung (Minimalanforderung)
-        if (newPassRaw.length() < 8) {
-          return crow::response(400, "Password must be at least 8 chars");
-        }
+        QString newHash = rz::utils::PasswordUtils::hashPassword(QString::fromStdString(newPassRaw));
+        if (newHash.isEmpty()) return crow::response(500);
 
-        // 4. Hashing (PasswordUtils nutzen)
-        QString newHash =
-            PasswordUtils::hashPassword(QString::fromStdString(newPassRaw));
-        if (newHash.isEmpty()) {
-          return crow::response(500, "Hashing failed");
-        }
-
-        // 5. Model aufrufen (MVC)
         if (User::updatePassword(ctx.currentUser.userId, newHash)) {
-          return crow::response(200, "Password changed successfully");
-        } else {
-          return crow::response(500, "Database error");
+          return crow::response(200, "Password changed");
         }
+        return crow::response(500, "DB Error");
       });
+
+    // Profil-Update (Sprache)
+    CROW_ROUTE(app, "/api/user/settings")
+    .methods(crow::HTTPMethod::POST)
+    ([&](const crow::request& req){
+        const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        auto json = crow::json::load(req.body);
+        if (!json) return crow::response(400);
+
+        std::string lang = json["language"].s();
+        if (User::updateSettings(ctx.currentUser.userId, QString::fromStdString(lang))) {
+            return crow::response(200);
+        }
+        return crow::response(500);
+    });
+
+    // Account Löschen
+    CROW_ROUTE(app, "/api/user")
+    .methods(crow::HTTPMethod::DELETE)
+    ([&](const crow::request& req){
+        const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        if (User::softDelete(ctx.currentUser.userId)) {
+            return crow::response(200, "Account deleted");
+        }
+        return crow::response(500);
+    });
 }
+
+} // namespace controller
+} // namespace rz

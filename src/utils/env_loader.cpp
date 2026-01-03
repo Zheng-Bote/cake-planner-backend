@@ -1,9 +1,9 @@
 /**
  * @file env_loader.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @brief Environment Loader Implementation
+ * @version 0.1.2
+ * @date 2026-01-03
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -17,11 +17,13 @@
 #include <QFile>
 #include <QTextStream>
 
-// Speichert die geladenen Werte temporär im Prozess-Environment
-void EnvLoader::load(const QString &filename) {
-  // Suchstrategie:
-  // 1. Neben dem Executable (AppImage Ordner)
-  // 2. Im aktuellen Arbeitsverzeichnis (Docker Workdir)
+namespace rz {
+namespace utils {
+
+// KORREKTUR: Signatur matcht jetzt Header (std::string)
+void EnvLoader::load(const std::string &filenameStd) {
+  QString filename = QString::fromStdString(filenameStd);
+
   QStringList searchPaths = {QCoreApplication::applicationDirPath(),
                              QDir::currentPath()};
 
@@ -54,26 +56,32 @@ void EnvLoader::load(const QString &filename) {
         QString key = line.left(splitIndex).trimmed();
         QString value = line.mid(splitIndex + 1).trimmed();
 
-        // Anführungszeichen entfernen falls vorhanden
         if (value.startsWith('"') && value.endsWith('"')) {
           value = value.mid(1, value.length() - 2);
         }
-
-        // In das Prozess-Environment setzen (für qEnvironmentVariable)
         qputenv(key.toUtf8(), value.toUtf8());
       }
     }
   }
 }
 
-QString EnvLoader::get(const QString &key, const QString &defaultValue) {
+// KORREKTUR: Signatur matcht jetzt Header (std::string)
+QString EnvLoader::get(const std::string &keyStd, const std::string &defaultValueStd) {
+  QString key = QString::fromStdString(keyStd);
   QString val = qEnvironmentVariable(key.toUtf8());
-  return val.isEmpty() ? defaultValue : val;
+
+  return val.isEmpty() ? QString::fromStdString(defaultValueStd) : val;
 }
 
-int EnvLoader::getInt(const QString &key, int defaultValue) {
+// KORREKTUR: Signatur matcht jetzt Header (std::string)
+int EnvLoader::getInt(const std::string &keyStd, int defaultValue) {
+  QString key = QString::fromStdString(keyStd);
   QString val = qEnvironmentVariable(key.toUtf8());
+
   bool ok;
   int num = val.toInt(&ok);
   return ok ? num : defaultValue;
 }
+
+} // namespace utils
+} // namespace rz
