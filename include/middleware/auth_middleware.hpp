@@ -2,8 +2,8 @@
  * @file auth_middleware.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Auth Middleware
- * @version 0.2.1
- * @date 2026-01-03
+ * @version 0.2.2
+ * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -28,8 +28,14 @@ struct AuthMiddleware {
     // 1. Whitelist
     std::string url = req.url;
     if (url == "/api/login" || url == "/api/register" || url == "/api/status" ||
-        url.starts_with("/static")) {
+        url.starts_with("/static") || url.starts_with("/api/events/stream") ||
+        url.starts_with("/api/uploads/")) {
       return;
+    }
+
+    // CORS Preflight immer erlauben
+    if (req.method == crow::HTTPMethod::OPTIONS) {
+        return;
     }
 
     // 2. Header prüfen

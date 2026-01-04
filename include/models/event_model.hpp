@@ -2,8 +2,8 @@
  * @file event_model.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Unified Event Model
- * @version 0.3.0
- * @date 2026-01-02
+ * @version 0.3.9
+ * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -31,7 +31,7 @@ struct Event {
     QString bakerName;
     QString date;      // YYYY-MM-DD
     QString description;
-    QString photoPath;
+    QString photoPath; // Haupt-Foto (Cover)
 
     // Dynamische Felder
     bool isOwner = false;
@@ -41,20 +41,17 @@ struct Event {
     // --- Methoden ---
     crow::json::wvalue toJson() const;
 
-    // Core Actions
     bool create(const QString& userId);
 
-    // Static Fetchers
     static std::vector<Event> getRange(const QString &start, const QString &end, const QString &userId);
     static std::optional<Event> getById(const QString& eventId, const QString& currentUserId);
 
-    // Actions
     static bool deleteEvent(const QString& eventId, const QString& currentUserId);
     static bool rateEvent(const QString& eventId, const QString& userId, int stars, const QString& comment);
 
-    // Foto Upload
-    static bool uploadPhoto(const QString& eventId, const QString& userId, const std::string& fileContent, const std::string& ext);
+    // KORRIGIERT: Methode für Gallery Upload (DB Update)
+    // Controller hat das File schon gespeichert, wir brauchen nur den Dateinamen.
+    static bool uploadPhoto(const QString& eventId, const QString& userId, const QString& filename);
 
-    // ICS
     std::string toIcsString() const;
 };

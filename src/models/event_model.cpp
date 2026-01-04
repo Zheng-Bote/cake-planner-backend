@@ -2,8 +2,8 @@
  * @file event_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Model Implementation
- * @version 0.3.5
- * @date 2026-01-03
+ * @version 0.3.9
+ * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -33,7 +33,8 @@ crow::json::wvalue Event::toJson() const {
     json["date"] = date.toStdString();
     json["description"] = description.toStdString();
 
-    // Hauptfoto URL (vom Ersteller)
+    // Hauptfoto URL
+    // Wir bauen den Pfad für das Frontend zusammen: /api/uploads/<filename>
     json["photoUrl"] = photoPath.isEmpty() ? "" : "/api/uploads/" + photoPath.toStdString();
 
     // Berechtigungen & Status
@@ -55,6 +56,7 @@ std::vector<Event> Event::getRange(const QString &start,
   QSqlQuery query(db);
   std::vector<Event> events;
 
+  // Wir holen das 'photo_path' aus der 'events' Tabelle (das Cover-Bild)
   QString sql = R"(
         SELECT e.id, e.event_date, e.description, e.photo_path, e.group_id,
                u.full_name, u.id as baker_id, g.name as group_name
@@ -102,7 +104,6 @@ bool Event::create(const QString &userId) {
   }
 
   QSqlQuery userQuery(db);
-  // UPDATE: Join mit 'groups' Tabelle, um 'g.name' zu holen
   userQuery.prepare(R"(
     SELECT u.full_name, gm.group_id, g.name as group_name
     FROM users u
@@ -115,14 +116,14 @@ bool Event::create(const QString &userId) {
   if (userQuery.exec() && userQuery.next()) {
     this->bakerName = userQuery.value("full_name").toString();
     this->groupId = userQuery.value("group_id").toString();
-    this->groupName = userQuery.value("group_name").toString(); // NEU: Name setzen
+    this->groupName = userQuery.value("group_name").toString();
     this->bakerId = userId;
   } else {
     return false;
   }
 
-  // Insert bleibt gleich (groupName wird nicht in events tabelle gespeichert, nur referenziert)
   QSqlQuery query(db);
+  // Speichert das Cover-Bild direkt in events
   query.prepare("INSERT INTO events (id, group_id, baker_id, event_date, "
                 "description, photo_path) "
                 "VALUES (:id, :gid, :bid, :date, :desc, :photo)");
@@ -141,6 +142,7 @@ std::optional<Event> Event::getById(const QString& eventId, const QString& curre
     auto db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
 
+    // Lädt das Event inkl. dem Cover-Bild (photo_path)
     query.prepare(R"(
         SELECT e.*, u.full_name, g.name as group_name
         FROM events e
@@ -219,42 +221,50 @@ bool Event::rateEvent(const QString& eventId, const QString& userId, int stars, 
     return query.exec();
 }
 
-// --- Foto Upload Implementierung ---
-bool Event::uploadPhoto(const QString& eventId, const QString& userId, const std::string& fileContent, const std::string& ext) {
-    // 1. Dateinamen generieren (EventID_UserID.ext)
-    // Damit überschreibt ein User automatisch sein altes Bild, wenn er ein neues hochlädt (1 Bild pro User Regel)
-    QString filename = QString("%1_%2.%3")
-                        .arg(eventId)
-                        .arg(userId)
-                        .arg(QString::fromStdString(ext));
+// NEUE METHODE: Speichert Eintrag in event_photos und updatet optional events.photo_path
+bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QString& filename) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
 
-    // 2. Auf Festplatte speichern
-    QDir dir("data/uploads");
-    if (!dir.exists()) dir.mkpath(".");
+    // 1. In event_photos Tabelle eintragen (1 Foto pro User per Event)
+    // Wir nutzen ON CONFLICT DO UPDATE (Upsert)
+    query.prepare(R"(
+        INSERT INTO event_photos (event_id, user_id, photo_path, uploaded_at)
+        VALUES (:eid, :uid, :path, CURRENT_TIMESTAMP)
+        ON CONFLICT(event_id, user_id) DO UPDATE SET
+            photo_path = excluded.photo_path,
+            uploaded_at = CURRENT_TIMESTAMP
+    )");
+    query.bindValue(":eid", eventId);
+    query.bindValue(":uid", userId);
+    query.bindValue(":path", filename);
 
-    QFile file(dir.filePath(filename));
-    if (file.open(QIODevice::WriteOnly)) {
-        file.write(fileContent.data(), fileContent.size());
-        file.close();
-
-        // 3. In die neue Tabelle 'event_photos' schreiben
-        auto db = DatabaseManager::instance().getDatabase();
-        QSqlQuery query(db);
-        // Wir nutzen INSERT OR REPLACE (Standard SQL) oder UPSERT Syntax
-        query.prepare(R"(
-            INSERT INTO event_photos (event_id, user_id, photo_path, uploaded_at)
-            VALUES (:eid, :uid, :path, CURRENT_TIMESTAMP)
-            ON CONFLICT(event_id, user_id) DO UPDATE SET
-                photo_path = excluded.photo_path,
-                uploaded_at = CURRENT_TIMESTAMP
-        )");
-        query.bindValue(":eid", eventId);
-        query.bindValue(":uid", userId);
-        query.bindValue(":path", filename);
-
-        return query.exec();
+    if (!query.exec()) {
+        qDebug() << "SQL Error uploadPhoto:" << query.lastError().text();
+        return false;
     }
-    return false;
+
+    // 2. Prüfen, ob der User der Bäcker (Owner) ist
+    QSqlQuery ownerQuery(db);
+    ownerQuery.prepare("SELECT baker_id FROM events WHERE id = :id");
+    ownerQuery.bindValue(":id", eventId);
+
+    if (ownerQuery.exec() && ownerQuery.next()) {
+        QString bakerId = ownerQuery.value("baker_id").toString();
+
+        // 3. Wenn ja, aktualisieren wir das Cover-Bild in der events-Tabelle
+        if (bakerId == userId) {
+            QSqlQuery updateCover(db);
+            updateCover.prepare("UPDATE events SET photo_path = :path WHERE id = :id");
+            updateCover.bindValue(":path", filename);
+            updateCover.bindValue(":id", eventId);
+            if (!updateCover.exec()) {
+                 qDebug() << "SQL Error updateCover:" << updateCover.lastError().text();
+            }
+        }
+    }
+
+    return true;
 }
 
 std::string Event::toIcsString() const {
