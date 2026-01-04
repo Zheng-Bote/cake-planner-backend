@@ -2,7 +2,7 @@
  * @file event_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Model Implementation
- * @version 0.3.9
+ * @version 0.3.10
  * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
@@ -33,9 +33,19 @@ crow::json::wvalue Event::toJson() const {
     json["date"] = date.toStdString();
     json["description"] = description.toStdString();
 
-    // Hauptfoto URL
-    // Wir bauen den Pfad für das Frontend zusammen: /api/uploads/<filename>
+    // Cover Bild (Falls leer -> Frontend nimmt Logo)
     json["photoUrl"] = photoPath.isEmpty() ? "" : "/api/uploads/" + photoPath.toStdString();
+
+    // Galerie Array
+    crow::json::wvalue galleryJson = crow::json::wvalue::list();
+    for (size_t i = 0; i < gallery.size(); ++i) {
+        crow::json::wvalue item;
+        item["userName"] = gallery[i].userName.toStdString();
+        item["url"] = gallery[i].photoUrl.toStdString();
+        item["isMine"] = gallery[i].isMine;
+        galleryJson[i] = std::move(item);
+    }
+    json["gallery"] = std::move(galleryJson);
 
     // Berechtigungen & Status
     json["isOwner"] = isOwner;
@@ -183,6 +193,29 @@ std::optional<Event> Event::getById(const QString& eventId, const QString& curre
     myRateQuery.bindValue(":uid", currentUserId);
     if(myRateQuery.exec() && myRateQuery.next()) {
         e.rating.myRating = myRateQuery.value(0).toInt();
+    }
+
+    // NEU: Query 3 (Galerie)
+    QSqlQuery galleryQuery(db);
+    galleryQuery.prepare(R"(
+        SELECT ep.photo_path, u.full_name, ep.user_id
+        FROM event_photos ep
+        JOIN users u ON ep.user_id = u.id
+        WHERE ep.event_id = :eid
+        ORDER BY ep.uploaded_at DESC
+    )");
+    galleryQuery.bindValue(":eid", eventId);
+
+    if (galleryQuery.exec()) {
+        while (galleryQuery.next()) {
+            GalleryItem item;
+            QString path = galleryQuery.value("photo_path").toString();
+            item.photoUrl = "/api/uploads/" + path;
+            item.userName = galleryQuery.value("full_name").toString();
+            item.userId = galleryQuery.value("user_id").toString();
+            item.isMine = (item.userId == currentUserId);
+            e.gallery.push_back(item);
+        }
     }
 
     return e;

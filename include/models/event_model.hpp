@@ -2,7 +2,7 @@
  * @file event_model.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Unified Event Model
- * @version 0.3.9
+ * @version 0.3.10
  * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
@@ -23,6 +23,14 @@ struct EventRating {
     int myRating = 0;
 };
 
+// Struktur für Galerie-Einträge
+struct GalleryItem {
+    QString userId;
+    QString userName;
+    QString photoUrl;
+    bool isMine;
+};
+
 struct Event {
     QString id;
     QString groupId;
@@ -37,6 +45,7 @@ struct Event {
     bool isOwner = false;
     bool isFuture = false;
     EventRating rating;
+    std::vector<GalleryItem> gallery;
 
     // --- Methoden ---
     crow::json::wvalue toJson() const;
