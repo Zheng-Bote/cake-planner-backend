@@ -20,7 +20,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core Sql Gui)
 find_package(OpenSSL REQUIRED)
 
 set(EXECUTABLE_NAME "${PROJECT_NAME}")
@@ -124,6 +124,7 @@ set(HEADERS
     include/utils/env_loader.hpp
     include/utils/seeder.hpp
     include/utils/totp_utils.hpp
+    include/utils/image_processor.hpp
     include/services/smtp_service.hpp
     include/services/notification_service.hpp
 )
@@ -143,6 +144,7 @@ set(SOURCES
     src/utils/env_loader.cpp
     src/utils/seeder.cpp
     src/utils/totp_utils.cpp
+    src/utils/image_processor.cpp
     src/services/smtp_service.cpp
     src/services/notification_service.cpp
 )
@@ -162,6 +164,7 @@ target_link_libraries(CakePlanner PRIVATE
     Crow::Crow
     Qt6::Core
     Qt6::Sql
+    Qt6::Gui
     SimpleMail3Qt6
     argon2_lib
     OpenSSL::SSL

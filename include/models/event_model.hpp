@@ -2,7 +2,7 @@
  * @file event_model.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Unified Event Model
- * @version 0.3.10
+ * @version 0.3.11
  * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
@@ -58,9 +58,11 @@ struct Event {
     static bool deleteEvent(const QString& eventId, const QString& currentUserId);
     static bool rateEvent(const QString& eventId, const QString& userId, int stars, const QString& comment);
 
-    // KORRIGIERT: Methode für Gallery Upload (DB Update)
+    // Methode für Gallery Upload (DB Update)
     // Controller hat das File schon gespeichert, wir brauchen nur den Dateinamen.
     static bool uploadPhoto(const QString& eventId, const QString& userId, const QString& filename);
+
+    static std::vector<Event> getRanked(const QString& userId, int limit = 50);
 
     std::string toIcsString() const;
 };

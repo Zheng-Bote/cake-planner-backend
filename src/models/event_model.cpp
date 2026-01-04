@@ -2,7 +2,7 @@
  * @file event_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Model Implementation
- * @version 0.3.10
+ * @version 0.3.11
  * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
@@ -314,4 +314,67 @@ std::string Event::toIcsString() const {
        << "END:VEVENT\r\n"
        << "END:VCALENDAR\r\n";
     return ss.str();
+}
+
+std::vector<Event> Event::getRanked(const QString& userId, int limit) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+
+    // Wir joinen ratings, berechnen den Durchschnitt und sortieren danach
+    // COALESCE(AVG(...), 0) sorgt dafür, dass Events ohne Rating als 0 gewertet werden
+    QString sql = R"(
+        SELECT e.id, e.event_date, e.description, e.photo_path, e.group_id,
+               u.full_name, u.id as baker_id, g.name as group_name,
+               COALESCE(AVG(r.rating_value), 0) as avg_rating
+        FROM events e
+        JOIN users u ON e.baker_id = u.id
+        JOIN groups g ON e.group_id = g.id
+        JOIN group_members gm ON e.group_id = gm.group_id
+        LEFT JOIN ratings r ON e.id = r.event_id
+        WHERE gm.user_id = :userId
+        GROUP BY e.id
+        ORDER BY avg_rating DESC, e.event_date DESC
+        LIMIT :limit
+    )";
+
+    query.prepare(sql);
+    query.bindValue(":userId", userId);
+    query.bindValue(":limit", limit);
+
+    std::vector<Event> events;
+
+    if (query.exec()) {
+        while (query.next()) {
+            Event e;
+            // ... Mappen der Basisdaten (id, date, bakerName etc.) wie in getRange ...
+            e.id = query.value("id").toString();
+            e.bakerName = query.value("full_name").toString();
+            e.date = query.value("event_date").toString();
+            e.description = query.value("description").toString();
+            e.photoPath = query.value("photo_path").toString();
+            e.rating.average = query.value("avg_rating").toDouble(); // Das sortierte Rating
+
+            // WICHTIG: Jetzt die Gallery Photos für dieses Event laden
+            // (Hier machen wir es simpel per Loop, für High-Performance wäre ein JOIN besser, aber komplexer zu mappen)
+            QSqlQuery galQuery(db);
+            galQuery.prepare("SELECT photo_path, user_id FROM event_photos WHERE event_id = :eid");
+            galQuery.bindValue(":eid", e.id);
+            if(galQuery.exec()) {
+                while(galQuery.next()){
+                    GalleryItem item;
+                    item.photoUrl = "/api/uploads/" + galQuery.value("photo_path").toString();
+                    item.userId = galQuery.value("user_id").toString();
+                    // isMine checken wir hier simpel
+                    item.isMine = (item.userId == userId);
+                    e.gallery.push_back(item);
+                }
+            }
+
+            // Auch das Cover-Bild in die Gallery Logik integrieren, falls gewünscht?
+            // Aktuell ist e.gallery nur die Community-Fotos.
+
+            events.push_back(e);
+        }
+    }
+    return events;
 }
