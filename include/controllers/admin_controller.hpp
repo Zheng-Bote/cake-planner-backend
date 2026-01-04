@@ -1,9 +1,9 @@
 /**
  * @file admin_controller.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
+ * @brief Admin Controller
  * @version 0.2.0
- * @date 2026-01-03
+ * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -14,14 +14,21 @@
 #include "crow.h"
 #include "middleware/auth_middleware.hpp" // WICHTIG: Middleware einbinden
 
+// Forward Declaration
+namespace rz {
+namespace service {
+    class NotificationService;
+}
+}
+
 // Namespace rz::controller
 namespace rz {
 namespace controller {
 
 class AdminController {
 public:
-  // Wir akzeptieren jetzt spezifisch die App MIT AuthMiddleware
-  static void registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app);
+  // Signatur Update: Nimmt jetzt NotificationService* entgegen
+    static void registerRoutes(crow::App<rz::middleware::AuthMiddleware>& app, service::NotificationService* notifyService);
 };
 
 } // namespace controller

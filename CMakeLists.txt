@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.24)
 # cmake --build build -j$(nproc)
 
 project(CakePlanner
-    VERSION 0.5.0
+    VERSION 0.6.0
     DESCRIPTION "Cake Planner Backend"
     HOMEPAGE_URL "https://github.com/Zheng-Bote/cake-planner-backend"
     LANGUAGES C CXX)

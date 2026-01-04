@@ -1,25 +1,26 @@
 /**
  * @file admin_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
- * @version 0.4.0
- * @date 2026-01-03
+ * @brief Admin Controller Implementation with Notifications
+ * @version 0.3.1
+ * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
 
-
 #include "controllers/admin_controller.hpp"
 #include "middleware/auth_middleware.hpp"
 #include "models/user_model.hpp"
-#include "database.hpp" // Global namespace
+#include "services/notification_service.hpp" // WICHTIG: Für E-Mails
+#include "database.hpp"
 
 namespace rz {
 namespace controller {
 
-void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app) {
+// Signatur angepasst: Nimmt notifyService entgegen
+void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app, service::NotificationService* notifyService) {
 
   // --- GET /api/admin/users ---
   CROW_ROUTE(app, "/api/admin/users")
@@ -50,9 +51,82 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
     return crow::response(result);
   });
 
+  // --- PUT /api/admin/users/<id>/status (Status ändern & E-Mail senden) ---
+  // Ersetzt das alte "toggle-active"
+  CROW_ROUTE(app, "/api/admin/users/<string>/status")
+      .methods(crow::HTTPMethod::PUT)([&, notifyService](const crow::request &req, std::string userId) {
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        if (!ctx.currentUser.isAdmin) return crow::response(403);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("isActive")) return crow::response(400);
+
+        bool newActiveStatus = json["isActive"].b();
+        QString qUserId = QString::fromStdString(userId);
+
+        // 1. User laden um alten Status und E-Mail zu bekommen
+        auto user = User::getById(qUserId);
+        if (!user) return crow::response(404, "User not found");
+
+        bool oldStatus = user->is_active;
+
+        // 2. Update durchführen
+        if (User::updateStatus(qUserId, newActiveStatus)) {
+
+            // 3. E-Mail senden bei Statusänderung
+            if (notifyService && oldStatus != newActiveStatus) {
+                if (newActiveStatus) {
+                    // Aktiviert
+                    notifyService->notifyAccountActivated(user->email, user->full_name, user->emailLanguage);
+                } else {
+                    // Deaktiviert
+                    notifyService->notifyAccountDeactivated(user->email, user->full_name, user->emailLanguage);
+                }
+            }
+
+            crow::json::wvalue res;
+            res["message"] = "Status updated";
+            return crow::response(200, res);
+        }
+        return crow::response(500);
+      });
+
+  // --- DELETE /api/admin/users/<id> (Löschen & E-Mail senden) ---
+  // NEU HINZUGEFÜGT
+  CROW_ROUTE(app, "/api/admin/users/<string>")
+      .methods(crow::HTTPMethod::DELETE)([&, notifyService](const crow::request &req, std::string userId) {
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        if (!ctx.currentUser.isAdmin) return crow::response(403);
+
+        QString qUserId = QString::fromStdString(userId);
+
+        // 1. User vorher laden (Daten sichern)
+        auto user = User::getById(qUserId);
+        if (!user) return crow::response(404);
+
+        QString email = user->email;
+        QString name = user->full_name;
+        QString lang = user->emailLanguage;
+
+        // 2. Soft Delete ausführen
+        if (User::softDelete(qUserId)) {
+
+            // 3. E-Mail senden
+            if (notifyService) {
+                notifyService->notifyAccountDeleted(email, name, lang);
+            }
+            return crow::response(200);
+        }
+        return crow::response(500);
+      });
+
+  // ==========================================
+  // LEGACY ROUTES (Fix für 405 Error im Admin-Panel)
+  // ==========================================
+
   // --- POST /api/admin/users/toggle-active ---
   CROW_ROUTE(app, "/api/admin/users/toggle-active")
-      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
+      .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         if (!ctx.currentUser.isAdmin) return crow::response(403);
 
@@ -60,14 +134,33 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         if (!json || !json.has("userId") || !json.has("isActive")) return crow::response(400);
 
         QString userId = QString::fromStdString(json["userId"].s());
-        bool isActive = json["isActive"].b();
+        bool newActiveStatus = json["isActive"].b();
 
-        if (User::updateStatus(userId, isActive)) {
-          crow::json::wvalue res; res["message"] = "Status updated";
-          return crow::response(200, res);
+        // 1. User laden (für E-Mail Check)
+        auto user = User::getById(userId);
+        if (!user) return crow::response(404, "User not found");
+
+        bool oldStatus = user->is_active;
+
+        // 2. Status Update
+        if (User::updateStatus(userId, newActiveStatus)) {
+            // 3. E-Mail Trigger
+            if (notifyService && oldStatus != newActiveStatus) {
+                if (newActiveStatus) {
+                    notifyService->notifyAccountActivated(user->email, user->full_name, user->emailLanguage);
+                } else {
+                    notifyService->notifyAccountDeactivated(user->email, user->full_name, user->emailLanguage);
+                }
+            }
+            crow::json::wvalue res; res["message"] = "Status updated";
+            return crow::response(200, res);
         }
         return crow::response(500);
       });
+
+  // ==========================================
+  // LEGACY ROUTES (Fix für 405 Error im Admin-Panel)
+  // ==========================================
 
   // --- POST /api/admin/users/force-password-change ---
   CROW_ROUTE(app, "/api/admin/users/force-password-change")

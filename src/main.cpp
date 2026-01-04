@@ -2,8 +2,8 @@
  * @file main.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Entry Point
- * @version 0.3.5
- * @date 2026-01-03
+ * @version 0.3.6
+ * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -68,9 +68,9 @@ int main(int argc, char *argv[]) {
   authController.registerRoutes(app);
 
   // B) Andere Controller (statisch) - Namespace explizit angeben
-rz::controller::UserController::registerRoutes(app);
-rz::controller::EventController::registerRoutes(app, &notifyService);
-  rz::controller::AdminController::registerRoutes(app);
+rz::controller::UserController::registerRoutes(app, &notifyService);
+  rz::controller::EventController::registerRoutes(app, &notifyService);
+  rz::controller::AdminController::registerRoutes(app, &notifyService);
 
   // Test-Route
   CROW_ROUTE(app, "/api/profile")

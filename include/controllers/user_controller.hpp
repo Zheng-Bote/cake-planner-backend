@@ -1,9 +1,9 @@
 /**
  * @file user_controller.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
- * @version 0.2.0
- * @date 2026-01-03
+ * @brief User Controller with Email Notifications
+ * @version 0.2.1
+ * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -14,13 +14,20 @@
 #include "crow.h"
 #include "middleware/auth_middleware.hpp" // WICHTIG: Middleware einbinden
 
+// Forward Declaration
+namespace rz {
+namespace service {
+    class NotificationService;
+}
+}
+
 // Namespace rz::controller
 namespace rz {
 namespace controller {
 
 class UserController {
 public:
-    static void registerRoutes(crow::App<rz::middleware::AuthMiddleware>& app);
+    static void registerRoutes(crow::App<rz::middleware::AuthMiddleware>& app, service::NotificationService* notifyService);
 };
 
 } // namespace controller

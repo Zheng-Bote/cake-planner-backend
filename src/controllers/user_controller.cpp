@@ -1,26 +1,26 @@
 /**
  * @file user_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief No description provided
- * @version 0.4.0
- * @date 2026-01-01
+ * @brief User Controller with Email Notifications
+ * @version 0.4.2
+ * @date 2026-01-04
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
 
-
 #include "controllers/user_controller.hpp"
 #include "models/user_model.hpp"
 #include "utils/password_utils.hpp"
 #include "utils/token_utils.hpp"
+#include "services/notification_service.hpp" // NEU: Include
 
 namespace rz {
 namespace controller {
 
-// WICHTIG: Signatur muss rz::middleware::AuthMiddleware enthalten
-void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app) {
+// Signatur Update: notifyService
+void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app, service::NotificationService* notifyService) {
 
   // --- GET /api/users ---
   CROW_ROUTE(app, "/api/users")
@@ -73,8 +73,6 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         User newUser;
         newUser.full_name = name;
         newUser.email = email;
-
-        // Namespace rz::utils nutzen!
         newUser.password_hash = rz::utils::PasswordUtils::hashPassword(plainPassword);
 
         if (newUser.password_hash.isEmpty()) return crow::response(500, "Hashing failed");
@@ -94,12 +92,16 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
 
   // --- POST /api/user/change-password ---
   CROW_ROUTE(app, "/api/user/change-password")
-      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
+      .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) { // notifyService capturen
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         if (ctx.currentUser.userId.isEmpty()) return crow::response(401);
 
         auto json = crow::json::load(req.body);
         if (!json || !json.has("newPassword")) return crow::response(400);
+
+        // 1. User für E-Mail laden
+        auto user = User::getById(ctx.currentUser.userId);
+        if (!user) return crow::response(404, "User not found");
 
         std::string newPassRaw = json["newPassword"].s();
         if (newPassRaw.length() < 8) return crow::response(400, "Min 8 chars");
@@ -108,7 +110,15 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         if (newHash.isEmpty()) return crow::response(500);
 
         if (User::updatePassword(ctx.currentUser.userId, newHash)) {
-          return crow::response(200, "Password changed");
+
+            // 2. E-Mail senden
+            if (notifyService) {
+                notifyService->notifyPasswordChanged(user->email, user->full_name, user->emailLanguage);
+            }
+
+            crow::json::wvalue res;
+            res["message"] = "Password changed";
+            return crow::response(200, res);
         }
         return crow::response(500, "DB Error");
       });
@@ -128,13 +138,23 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         return crow::response(500);
     });
 
-    // Account Löschen
+    // Account Löschen (Self-Delete)
     CROW_ROUTE(app, "/api/user")
     .methods(crow::HTTPMethod::DELETE)
-    ([&](const crow::request& req){
+    ([&, notifyService](const crow::request& req){ // notifyService capturen
         const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+
+        // Daten für E-Mail sichern
+        auto user = User::getById(ctx.currentUser.userId);
+
         if (User::softDelete(ctx.currentUser.userId)) {
-            return crow::response(200, "Account deleted");
+            // E-Mail senden (Account Deleted)
+            if (notifyService && user) {
+                notifyService->notifyAccountDeleted(user->email, user->full_name, user->emailLanguage);
+            }
+            crow::json::wvalue res;
+            res["message"] = "Account deleted";
+            return crow::response(200, res);
         }
         return crow::response(500);
     });
