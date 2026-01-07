@@ -205,35 +205,31 @@ CMD ["./squashfs-root/AppRun"]
 Diese Datei steuert die Konfiguration.
 
 ```env
-# --- Server Konfiguration ---
-# Der Port, auf dem Crow lauscht
-PORT=8080
+# CakePlanner.env
 
-# --- Pfade (Innerhalb des Containers!) ---
-# Siehe event_controller.cpp: rz::utils::EnvLoader::get("UPLOAD_DIR", ...)
-# Wir mappen das auf den Ordner, den wir im Dockerfile erstellt haben.
-UPLOAD_DIR=public/uploads
+# Server
+CAKE_SERVER_PORT=8080
+CAKE_ADMIN_PASSWORD=TopSecret123!
+CAKE_JWT_SECRET=MeinSuperGeheimesLangesSecretFürJWTs
 
-# Pfad zur SQLite Datenbank
-# (Dein Code nutzt wahrscheinlich DatabaseManager::instance, prüf den Pfad dort!)
-# Empfehlung: Leg die DB in einen Ordner, den wir als Volume mounten können.
-DB_PATH=data/cake.db
+# SMTP
+SMTP_SERVER="smtp.server.com"
+SMTP_PORT="587"
+SMTP_USERNAME="admin@server.com"
+SMTP_PASSWORD="TopSecret123!"
+SMTP_FROM="admin@server.com"
+SMTP_STARTTLS="true"
 
-# --- Security ---
-# Falls du JWTs signierst (AuthMiddleware), ändere das hier unbedingt!
-JWT_SECRET=ChangeMeToSomethingSuperSecretAndLong123!
+# Filesystem (INTERNAL DOCKER PATHS)
+## Logging
+LOG_DIR=/app/logs
+LOG_LEVEL=info
 
-# --- Email / Notifications (Optional) ---
-# Für den NotificationService
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=no-reply@cake-planner.dev
-SMTP_PASS=secret_password
-SMTP_FROM=CakePlanner <no-reply@cake-planner.dev>
+## Photo Uploads
+UPLOAD_DIR=/app/public/uploads
 
-# --- App spezifisch ---
-# Logging Level (falls implementiert: DEBUG, INFO, WARNING, ERROR)
-LOG_LEVEL=INFO
+## Database
+DB_DIR=/app/data/cakeplanner.sqlite
 ```
 
 ## Build & Run Befehle

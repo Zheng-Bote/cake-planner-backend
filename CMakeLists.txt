@@ -3,18 +3,20 @@ cmake_minimum_required(VERSION 3.24)
 # cmake -S . -B build
 # cmake --build build -j$(nproc)
 
+# pkill CakePlanner
+# or
+# killall CakePlanner
+
 project(CakePlanner
-    VERSION 0.6.0
+    VERSION 0.7.4
     DESCRIPTION "Cake Planner Backend"
     HOMEPAGE_URL "https://github.com/Zheng-Bote/cake-planner-backend"
     LANGUAGES C CXX)
 
-# --- WICHTIG: Qt MOC aktivieren ---
-# Dies behebt den "undefined reference to vtable" Fehler!
+# --- IMPORTANT: Activate Qt MOC ---
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-# ----------------------------------
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,6 +24,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Sql Gui)
 find_package(OpenSSL REQUIRED)
+find_package(Threads REQUIRED)
 
 set(EXECUTABLE_NAME "${PROJECT_NAME}")
 set(PROG_LONGNAME "Crow Cake Planner Backend")
@@ -57,6 +60,14 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(asio)
 set(ASIO_INCLUDE_DIR ${asio_SOURCE_DIR}/asio/include)
 
+# --- SPDLOG ---
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG        v1.12.0
+)
+FetchContent_MakeAvailable(spdlog)
+
 FetchContent_Declare(
     dotenv-cpp
     GIT_REPOSITORY https://github.com/laserpants/dotenv-cpp.git
@@ -81,7 +92,6 @@ set(ARGON2_SRC
 )
 add_library(argon2_lib STATIC ${ARGON2_SRC})
 target_include_directories(argon2_lib PUBLIC ${argon2_SOURCE_DIR}/include)
-find_package(Threads REQUIRED)
 target_link_libraries(argon2_lib PRIVATE Threads::Threads)
 
 FetchContent_Declare(
@@ -98,7 +108,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Crow)
 
-# SMTP Library
 FetchContent_Declare(
     SimpleMail
     GIT_REPOSITORY https://github.com/cutelyst/simple-mail.git
@@ -108,7 +117,6 @@ FetchContent_MakeAvailable(SimpleMail)
 
 # --- Sources & Headers ---
 
-# Header müssen gelistet sein, damit AUTOMOC sie scannt (insb. smtp_service.hpp)
 set(HEADERS
     include/database.hpp
     include/middleware/auth_middleware.hpp
@@ -119,14 +127,17 @@ set(HEADERS
     include/controllers/auth_controller.hpp
     include/controllers/admin_controller.hpp
     include/controllers/event_controller.hpp
+    include/controllers/system_controller.hpp
     include/utils/token_utils.hpp
     include/utils/password_utils.hpp
     include/utils/env_loader.hpp
     include/utils/seeder.hpp
     include/utils/totp_utils.hpp
     include/utils/image_processor.hpp
+    include/utils/app_helpers.hpp
     include/services/smtp_service.hpp
     include/services/notification_service.hpp
+    include/rz_config.hpp
 )
 
 set(SOURCES
@@ -139,6 +150,7 @@ set(SOURCES
     src/controllers/auth_controller.cpp
     src/controllers/admin_controller.cpp
     src/controllers/event_controller.cpp
+    src/controllers/system_controller.cpp
     src/utils/token_utils.cpp
     src/utils/password_utils.cpp
     src/utils/env_loader.cpp
@@ -155,7 +167,7 @@ target_include_directories(CakePlanner PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_BINARY_DIR}/include
     ${ASIO_INCLUDE_DIR}
-    ${simplemail_SOURCE_DIR}/src  # Zugriff auf die SimpleMail Header
+    ${simplemail_SOURCE_DIR}/src
 )
 
 target_compile_features(CakePlanner PUBLIC cxx_std_23)
@@ -172,6 +184,7 @@ target_link_libraries(CakePlanner PRIVATE
     jwt-cpp::jwt-cpp
     nlohmann_json::nlohmann_json
     dotenv
+    spdlog::spdlog
 )
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")

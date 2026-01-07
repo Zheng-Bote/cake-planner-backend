@@ -2,14 +2,13 @@
  * @file event_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Controller Implementation (Safe Blocking Long Polling)
- * @version 0.3.15
- * @date 2026-01-04
+ * @version 0.3.17
+ * @date 2026-01-07
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
-
 
 #include "controllers/event_controller.hpp"
 #include "models/event_model.hpp"
@@ -57,24 +56,24 @@ namespace controller {
 void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app, service::NotificationService* notifyService) {
 
     // -------------------------------------------------------------------------
-    // FIX: Locale auf "C" setzen, damit Zahlen im JSON als "4.5"
-    // und nicht als "4,5" (ungültig) serialisiert werden.
+    // FIX: Set locale to "C" so that numbers in JSON are serialized as "4.5"
+    // and not as "4,5" (which is invalid JSON).
     // -------------------------------------------------------------------------
     std::setlocale(LC_NUMERIC, "C");
 
     // A. LEGACY STATIC ROUTE
     CROW_ROUTE(app, "/api/uploads/<string>")
     ([](crow::response& res, std::string filename){
-        std::string baseDir = rz::utils::EnvLoader::get("UPLOAD_DIR", "public/uploads").toStdString();
+        std::string baseDir = rz::utils::EnvLoader::getString("UPLOAD_DIR", "public/uploads");
         if (filename.find("..") != std::string::npos) { res.code = 403; res.end(); return; }
         res.set_static_file_info(baseDir + "/" + filename);
         res.end();
     });
 
-    // B. NEUE STATIC ROUTE (Event Ordner)
+    // B. NEW STATIC ROUTE (Event Folder)
     CROW_ROUTE(app, "/api/uploads/<string>/<string>")
     ([](crow::response& res, std::string eventId, std::string filename){
-        std::string baseDir = rz::utils::EnvLoader::get("UPLOAD_DIR", "public/uploads").toStdString();
+        std::string baseDir = rz::utils::EnvLoader::getString("UPLOAD_DIR", "public/uploads");
         if (eventId.find("..") != std::string::npos || filename.find("..") != std::string::npos) {
             res.code = 403; res.end(); return;
         }
@@ -108,19 +107,11 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         res.end();
     });
 
-    // -------------------------------------------------------------------------
-    // WICHTIG: Spezifische Routen MÜSSEN vor generischen Parametern kommen!
-    // "/api/events/ranked" muss VOR "/api/events/<string>" stehen.
-    // -------------------------------------------------------------------------
-
     // GET /api/events/ranked (Hall of Fame)
     CROW_ROUTE(app, "/api/events/ranked")
     ([&](const crow::request& req){
         const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
-
-        // Hole Top 50 Ranked Events
         auto events = Event::getRanked(ctx.currentUser.userId, 50);
-
         crow::json::wvalue result = crow::json::wvalue::list();
         int i = 0;
         for(const auto& e : events) {
@@ -129,7 +120,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         return crow::response(result);
     });
 
-    // 1. GET /api/events (Liste für Kalender)
+    // 1. GET /api/events (List for Calendar)
     CROW_ROUTE(app, "/api/events")
     ([&](const crow::request &req) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
@@ -147,14 +138,14 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         return crow::response(result);
     });
 
-    // 2. POST /api/events (Erstellen)
+    // 2. POST /api/events (Create)
     CROW_ROUTE(app, "/api/events")
     .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         crow::multipart::message msg(req);
         QString date, description, savedRelativePath;
 
-        QString baseUploadDir = rz::utils::EnvLoader::get("UPLOAD_DIR", "public/uploads");
+        QString baseUploadDir = QString::fromStdString(rz::utils::EnvLoader::getString("UPLOAD_DIR", "public/uploads"));
         QString newEventId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
         for (const auto &part : msg.parts) {
@@ -185,9 +176,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
                             file.write(part.body.data(), part.body.size());
                             file.close();
 
-                            // WebP Generierung (1 Argument!)
                             ImageProcessor::generateWebPVersions(fullPath);
-
                             savedRelativePath = newEventId + "/" + fileName;
                         }
                     }
@@ -208,7 +197,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
                 Event::uploadPhoto(e.id, ctx.currentUser.userId, savedRelativePath);
             }
             broadcastNewEvent(e);
-            // ... Notifications ...
+
             if (notifyService && !e.groupId.isEmpty()) {
                 auto members = User::getAll(e.groupId);
                 std::vector<QString> de, en;
@@ -229,7 +218,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         return crow::response(500, "Error creating event");
     });
 
-    // 3. GET Single (Generische Route - muss nach 'ranked' kommen!)
+    // 3. GET Single
     CROW_ROUTE(app, "/api/events/<string>")
     ([&](const crow::request& req, std::string eventId){
         const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
@@ -279,7 +268,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         return res;
     });
 
-    // 7. Photo Upload (Nachträglich / Gallery)
+    // 7. Photo Upload (Post-hoc / Gallery)
     CROW_ROUTE(app, "/api/events/<string>/photo")
     .methods(crow::HTTPMethod::POST)([&](const crow::request& req, std::string eventId){
         const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
@@ -302,7 +291,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
 
         if (fileContent.empty()) return crow::response(400, "No file provided");
 
-        QString baseUploadDir = rz::utils::EnvLoader::get("UPLOAD_DIR", "public/uploads");
+        QString baseUploadDir = QString::fromStdString(rz::utils::EnvLoader::getString("UPLOAD_DIR", "public/uploads"));
         QString qEventId = QString::fromStdString(eventId);
         QString ext = ".jpg";
         QString fileName = QUuid::createUuid().toString(QUuid::WithoutBraces) + ext;
@@ -317,7 +306,6 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
             file.write(fileContent.data(), fileContent.size());
             file.close();
 
-            // WebP Generierung (1 Argument!)
             ImageProcessor::generateWebPVersions(fullPath);
 
             QString dbPath = qEventId + "/" + fileName;

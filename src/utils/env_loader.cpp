@@ -2,8 +2,8 @@
  * @file env_loader.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Environment Loader Implementation
- * @version 0.1.2
- * @date 2026-01-03
+ * @version 0.1.3
+ * @date 2026-01-07
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -20,7 +20,6 @@
 namespace rz {
 namespace utils {
 
-// KORREKTUR: Signatur matcht jetzt Header (std::string)
 void EnvLoader::load(const std::string &filenameStd) {
   QString filename = QString::fromStdString(filenameStd);
 
@@ -37,12 +36,12 @@ void EnvLoader::load(const std::string &filenameStd) {
   }
 
   if (foundPath.isEmpty()) {
-    qWarning() << "Warnung: .env Datei nicht gefunden:" << filename
-               << "- Verwende Standardwerte.";
+    qWarning() << "Warning: .env file not found:" << filename
+               << "- Using default/system values.";
     return;
   }
 
-  qInfo() << "Lade Konfiguration aus:" << foundPath;
+  qInfo() << "Loading configuration from:" << foundPath;
   QFile file(foundPath);
   if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QTextStream in(&file);
@@ -65,7 +64,6 @@ void EnvLoader::load(const std::string &filenameStd) {
   }
 }
 
-// KORREKTUR: Signatur matcht jetzt Header (std::string)
 QString EnvLoader::get(const std::string &keyStd, const std::string &defaultValueStd) {
   QString key = QString::fromStdString(keyStd);
   QString val = qEnvironmentVariable(key.toUtf8());
@@ -73,7 +71,14 @@ QString EnvLoader::get(const std::string &keyStd, const std::string &defaultValu
   return val.isEmpty() ? QString::fromStdString(defaultValueStd) : val;
 }
 
-// KORREKTUR: Signatur matcht jetzt Header (std::string)
+// IMPLEMENTIERUNG getString
+std::string EnvLoader::getString(const std::string &keyStd, const std::string &defaultValueStd) {
+  QString key = QString::fromStdString(keyStd);
+  QString val = qEnvironmentVariable(key.toUtf8());
+
+  return val.isEmpty() ? defaultValueStd : val.toStdString();
+}
+
 int EnvLoader::getInt(const std::string &keyStd, int defaultValue) {
   QString key = QString::fromStdString(keyStd);
   QString val = qEnvironmentVariable(key.toUtf8());

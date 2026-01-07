@@ -201,6 +201,42 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         return crow::response(500);
       });
 
+// --- POST /api/admin/groups (Create Group) ---
+  CROW_ROUTE(app, "/api/admin/groups")
+      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        if (!ctx.currentUser.isAdmin) return crow::response(403);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("name")) return crow::response(400);
+
+        QString groupName = QString::fromStdString(json["name"].s());
+
+        // HINWEIS: Du musst User::createGroup(name) noch im UserModel implementieren!
+        QString newGroupId = User::createGroup(groupName);
+
+        if (!newGroupId.isEmpty()) {
+            crow::json::wvalue res;
+            res["id"] = newGroupId.toStdString();
+            res["name"] = groupName.toStdString();
+            return crow::response(201, res);
+        }
+        return crow::response(500, "Could not create group");
+      });
+
+  // --- DELETE /api/admin/groups/<id> ---
+  CROW_ROUTE(app, "/api/admin/groups/<string>")
+      .methods(crow::HTTPMethod::DELETE)([&](const crow::request &req, std::string groupId) {
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        if (!ctx.currentUser.isAdmin) return crow::response(403);
+
+        // HINWEIS: Du musst User::deleteGroup(id) noch im UserModel implementieren!
+        if (User::deleteGroup(QString::fromStdString(groupId))) {
+            return crow::response(200);
+        }
+        return crow::response(404);
+      });
+
   // --- GET /api/admin/groups ---
   CROW_ROUTE(app, "/api/admin/groups")
   ([&](const crow::request &req) {
