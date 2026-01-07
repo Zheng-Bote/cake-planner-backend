@@ -22,6 +22,8 @@
 #include <sstream>
 #include <thread>
 
+#include "spdlog/spdlog.h"
+
 DatabaseManager &DatabaseManager::instance() {
   static DatabaseManager instance;
   return instance;
@@ -166,6 +168,7 @@ bool DatabaseManager::migrate() {
     if (!query.exec(trimmedStmt)) {
       qCritical() << "Migration Fehler bei Statement:" << trimmedStmt
                   << "\nGrund:" << query.lastError().text();
+    spdlog::error("Failed to create groups table: {}", query.lastError().text().toStdString());
       success = false;
       break;
     }

@@ -1,9 +1,9 @@
 /**
  * @file admin_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
- * @brief Admin Controller Implementation with Notifications
- * @version 0.3.1
- * @date 2026-01-04
+ * @brief Admin Controller Implementation with Group Management
+ * @version 0.4.1
+ * @date 2026-01-07
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -13,13 +13,11 @@
 #include "controllers/admin_controller.hpp"
 #include "middleware/auth_middleware.hpp"
 #include "models/user_model.hpp"
-#include "services/notification_service.hpp" // WICHTIG: Für E-Mails
+#include "services/notification_service.hpp"
 #include "database.hpp"
 
-namespace rz {
-namespace controller {
+namespace rz::controller {
 
-// Signatur angepasst: Nimmt notifyService entgegen
 void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app, service::NotificationService* notifyService) {
 
   // --- GET /api/admin/users ---
@@ -29,16 +27,12 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
     if (ctx.currentUser.userId.isEmpty()) return crow::response(401);
 
     std::vector<User> users;
-
     if (ctx.currentUser.isAdmin) {
       users = User::getAll();
     } else {
       auto info = User::getGroupAndRole(ctx.currentUser.userId);
-      QString myGroupId = info.first;
-      QString myRole = info.second;
-
-      if (myRole == "admin" && !myGroupId.isEmpty()) {
-        users = User::getAll(myGroupId);
+      if (info.second == "admin" && !info.first.isEmpty()) {
+        users = User::getAll(info.first);
       } else {
         return crow::response(403);
       }
@@ -51,8 +45,7 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
     return crow::response(result);
   });
 
-  // --- PUT /api/admin/users/<id>/status (Status ändern & E-Mail senden) ---
-  // Ersetzt das alte "toggle-active"
+  // --- PUT /api/admin/users/<id>/status ---
   CROW_ROUTE(app, "/api/admin/users/<string>/status")
       .methods(crow::HTTPMethod::PUT)([&, notifyService](const crow::request &req, std::string userId) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
@@ -63,145 +56,37 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
 
         bool newActiveStatus = json["isActive"].b();
         QString qUserId = QString::fromStdString(userId);
-
-        // 1. User laden um alten Status und E-Mail zu bekommen
         auto user = User::getById(qUserId);
-        if (!user) return crow::response(404, "User not found");
+        if (!user) return crow::response(404);
 
-        bool oldStatus = user->is_active;
-
-        // 2. Update durchführen
         if (User::updateStatus(qUserId, newActiveStatus)) {
-
-            // 3. E-Mail senden bei Statusänderung
-            if (notifyService && oldStatus != newActiveStatus) {
-                if (newActiveStatus) {
-                    // Aktiviert
-                    notifyService->notifyAccountActivated(user->email, user->full_name, user->emailLanguage);
-                } else {
-                    // Deaktiviert
-                    notifyService->notifyAccountDeactivated(user->email, user->full_name, user->emailLanguage);
-                }
+            if (notifyService && user->is_active != newActiveStatus) {
+                if (newActiveStatus) notifyService->notifyAccountActivated(user->email, user->full_name, user->emailLanguage);
+                else notifyService->notifyAccountDeactivated(user->email, user->full_name, user->emailLanguage);
             }
-
-            crow::json::wvalue res;
-            res["message"] = "Status updated";
-            return crow::response(200, res);
+            return crow::response(200, crow::json::wvalue({{"message", "Status updated"}}));
         }
         return crow::response(500);
       });
 
-  // --- DELETE /api/admin/users/<id> (Löschen & E-Mail senden) ---
-  // NEU HINZUGEFÜGT
+  // --- DELETE /api/admin/users/<id> ---
   CROW_ROUTE(app, "/api/admin/users/<string>")
       .methods(crow::HTTPMethod::DELETE)([&, notifyService](const crow::request &req, std::string userId) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         if (!ctx.currentUser.isAdmin) return crow::response(403);
 
         QString qUserId = QString::fromStdString(userId);
-
-        // 1. User vorher laden (Daten sichern)
         auto user = User::getById(qUserId);
         if (!user) return crow::response(404);
 
-        QString email = user->email;
-        QString name = user->full_name;
-        QString lang = user->emailLanguage;
-
-        // 2. Soft Delete ausführen
         if (User::softDelete(qUserId)) {
-
-            // 3. E-Mail senden
-            if (notifyService) {
-                notifyService->notifyAccountDeleted(email, name, lang);
-            }
+            if (notifyService) notifyService->notifyAccountDeleted(user->email, user->full_name, user->emailLanguage);
             return crow::response(200);
         }
         return crow::response(500);
       });
 
-  // ==========================================
-  // LEGACY ROUTES (Fix für 405 Error im Admin-Panel)
-  // ==========================================
-
-  // --- POST /api/admin/users/toggle-active ---
-  CROW_ROUTE(app, "/api/admin/users/toggle-active")
-      .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) {
-        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
-        if (!ctx.currentUser.isAdmin) return crow::response(403);
-
-        auto json = crow::json::load(req.body);
-        if (!json || !json.has("userId") || !json.has("isActive")) return crow::response(400);
-
-        QString userId = QString::fromStdString(json["userId"].s());
-        bool newActiveStatus = json["isActive"].b();
-
-        // 1. User laden (für E-Mail Check)
-        auto user = User::getById(userId);
-        if (!user) return crow::response(404, "User not found");
-
-        bool oldStatus = user->is_active;
-
-        // 2. Status Update
-        if (User::updateStatus(userId, newActiveStatus)) {
-            // 3. E-Mail Trigger
-            if (notifyService && oldStatus != newActiveStatus) {
-                if (newActiveStatus) {
-                    notifyService->notifyAccountActivated(user->email, user->full_name, user->emailLanguage);
-                } else {
-                    notifyService->notifyAccountDeactivated(user->email, user->full_name, user->emailLanguage);
-                }
-            }
-            crow::json::wvalue res; res["message"] = "Status updated";
-            return crow::response(200, res);
-        }
-        return crow::response(500);
-      });
-
-  // ==========================================
-  // LEGACY ROUTES (Fix für 405 Error im Admin-Panel)
-  // ==========================================
-
-  // --- POST /api/admin/users/force-password-change ---
-  CROW_ROUTE(app, "/api/admin/users/force-password-change")
-      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
-        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
-        if (!ctx.currentUser.isAdmin) return crow::response(403);
-
-        auto json = crow::json::load(req.body);
-        if (!json || !json.has("userId") || !json.has("mustChange")) return crow::response(400);
-
-        QString userId = QString::fromStdString(json["userId"].s());
-        bool mustChange = json["mustChange"].b();
-
-        if (User::setMustChangePassword(userId, mustChange)) {
-          crow::json::wvalue res; res["message"] = "Flag updated";
-          return crow::response(200, res);
-        }
-        return crow::response(500);
-      });
-
-  // --- POST /api/admin/groups/set-role ---
-  CROW_ROUTE(app, "/api/admin/groups/set-role")
-      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
-        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
-        if (!ctx.currentUser.isAdmin) return crow::response(403);
-
-        auto json = crow::json::load(req.body);
-        if (!json) return crow::response(400);
-
-        QString uid = QString::fromStdString(json["userId"].s());
-        QString gid = QString::fromStdString(json["groupId"].s());
-        QString role = QString::fromStdString(json["role"].s());
-
-        if (User::setGroupRole(uid, gid, role)) {
-          crow::json::wvalue res; res["message"] = "Role updated";
-          return crow::response(200, res);
-        }
-        return crow::response(500);
-      });
-
-// --- POST /api/admin/groups (Create Group) ---
+  // --- POST /api/admin/groups (ADMIN ONLY: Create Group) ---
   CROW_ROUTE(app, "/api/admin/groups")
       .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
@@ -211,8 +96,6 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         if (!json || !json.has("name")) return crow::response(400);
 
         QString groupName = QString::fromStdString(json["name"].s());
-
-        // HINWEIS: Du musst User::createGroup(name) noch im UserModel implementieren!
         QString newGroupId = User::createGroup(groupName);
 
         if (!newGroupId.isEmpty()) {
@@ -221,20 +104,19 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
             res["name"] = groupName.toStdString();
             return crow::response(201, res);
         }
-        return crow::response(500, "Could not create group");
+        return crow::response(500, "Group creation failed");
       });
 
-  // --- DELETE /api/admin/groups/<id> ---
+  // --- DELETE /api/admin/groups/<id> (ADMIN ONLY: Delete Group) ---
   CROW_ROUTE(app, "/api/admin/groups/<string>")
       .methods(crow::HTTPMethod::DELETE)([&](const crow::request &req, std::string groupId) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         if (!ctx.currentUser.isAdmin) return crow::response(403);
 
-        // HINWEIS: Du musst User::deleteGroup(id) noch im UserModel implementieren!
         if (User::deleteGroup(QString::fromStdString(groupId))) {
             return crow::response(200);
         }
-        return crow::response(404);
+        return crow::response(404, "Group not found or not empty");
       });
 
   // --- GET /api/admin/groups ---
@@ -255,12 +137,9 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
       }
     } else {
       auto info = User::getGroupAndRole(ctx.currentUser.userId);
-      QString myGroupId = info.first;
-      QString myRole = info.second;
-
-      if (myRole == "admin" && !myGroupId.isEmpty()) {
+      if (info.second == "admin" && !info.first.isEmpty()) {
         for (const auto &g : allGroups) {
-          if (g.first == myGroupId) {
+          if (g.first == info.first) {
             json[idx]["id"] = g.first.toStdString();
             json[idx]["name"] = g.second.toStdString();
             idx++;
@@ -282,16 +161,28 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         auto json = crow::json::load(req.body);
         if (!json || !json.has("userId") || !json.has("groupId")) return crow::response(400);
 
-        QString uid = QString::fromStdString(json["userId"].s());
-        QString gid = QString::fromStdString(json["groupId"].s());
+        if (User::assignToGroup(QString::fromStdString(json["userId"].s()), QString::fromStdString(json["groupId"].s()))) {
+          return crow::response(200, crow::json::wvalue({{"message", "Group assigned"}}));
+        }
+        return crow::response(500);
+      });
 
-        if (User::assignToGroup(uid, gid)) {
-          crow::json::wvalue res; res["message"] = "Group assigned";
-          return crow::response(200, res);
+  // --- POST /api/admin/groups/set-role ---
+  CROW_ROUTE(app, "/api/admin/groups/set-role")
+      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        if (!ctx.currentUser.isAdmin) return crow::response(403);
+
+        auto json = crow::json::load(req.body);
+        if (!json) return crow::response(400);
+
+        if (User::setGroupRole(QString::fromStdString(json["userId"].s()),
+                              QString::fromStdString(json["groupId"].s()),
+                              QString::fromStdString(json["role"].s()))) {
+          return crow::response(200, crow::json::wvalue({{"message", "Role updated"}}));
         }
         return crow::response(500);
       });
 }
 
-} // namespace controller
-} // namespace rz
+} // namespace rz::controller

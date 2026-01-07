@@ -2,8 +2,8 @@
  * @file user_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Model Implementation
- * @version 0.3.6
- * @date 2026-01-03
+ * @version 0.4.1
+ * @date 2026-01-07
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -17,6 +17,8 @@
 #include <QVariant>
 #include <QSqlError>
 #include <QDebug>
+
+#include "spdlog/spdlog.h"
 
 // --- Helpers ---
 
@@ -344,4 +346,85 @@ bool User::updateSettings(const QString& userId, const QString& lang) {
     query.bindValue(":lang", lang);
     query.bindValue(":id", userId);
     return query.exec();
+}
+
+/**
+ * @brief Erstellt eine neue Gruppe in der Datenbank.
+ * @param name Der Name der Gruppe.
+ * @return Die neue Gruppen-ID (UUID) oder ein leerer String bei Fehler.
+ */
+QString User::createGroup(const QString &name) {
+    QString trimmedName = name.trimmed();
+    if (trimmedName.isEmpty()) {
+        spdlog::warn("createGroup abgebrochen: Name ist leer.");
+        return "";
+    }
+
+    // Datenbankverbindung holen (Thread-Safe über DatabaseManager)
+    QSqlDatabase db = DatabaseManager::instance().getDatabase();
+    QString newGroupId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO groups (id, name) VALUES (:id, :name)");
+    query.bindValue(":id", newGroupId);
+    query.bindValue(":name", trimmedName);
+
+    if (!query.exec()) {
+        spdlog::error("Fehler beim Erstellen der Gruppe '{}': {}",
+                      trimmedName.toStdString(),
+                      query.lastError().text().toStdString());
+        return "";
+    }
+
+    spdlog::info("Gruppe erfolgreich erstellt: {} (ID: {})",
+                 trimmedName.toStdString(),
+                 newGroupId.toStdString());
+
+    return newGroupId;
+}
+
+/**
+ * @brief Löscht eine Gruppe aus der Datenbank.
+ * Prüft vorher, ob noch Benutzer dieser Gruppe zugeordnet sind.
+ * @param groupId Die ID der zu löschenden Gruppe.
+ * @return true wenn gelöscht, false wenn Gruppe nicht leer oder DB-Fehler.
+ */
+bool User::deleteGroup(const QString &groupId) {
+    if (groupId.isEmpty()) return false;
+
+    QSqlDatabase db = DatabaseManager::instance().getDatabase();
+
+    // 1. Integritätsprüfung: Sind noch User in der Gruppe?
+    QSqlQuery checkQuery(db);
+    checkQuery.prepare("SELECT COUNT(*) FROM users WHERE group_id = :gid");
+    checkQuery.bindValue(":gid", groupId);
+
+    if (checkQuery.exec() && checkQuery.next()) {
+        int userCount = checkQuery.value(0).toInt();
+        if (userCount > 0) {
+            spdlog::warn("Löschen der Gruppe {} verweigert: {} Benutzer sind noch zugeordnet.",
+                         groupId.toStdString(), userCount);
+            return false; // Verhindert verwaiste User-Einträge
+        }
+    }
+
+    // 2. Eigentliches Löschen
+    QSqlQuery deleteQuery(db);
+    deleteQuery.prepare("DELETE FROM groups WHERE id = :id");
+    deleteQuery.bindValue(":id", groupId);
+
+    if (!deleteQuery.exec()) {
+        spdlog::error("Fehler beim Löschen der Gruppe {}: {}",
+                      groupId.toStdString(),
+                      deleteQuery.lastError().text().toStdString());
+        return false;
+    }
+
+    if (deleteQuery.numRowsAffected() == 0) {
+        spdlog::warn("Löschen fehlgeschlagen: Gruppe {} existiert nicht.", groupId.toStdString());
+        return false;
+    }
+
+    spdlog::info("Gruppe {} erfolgreich gelöscht.", groupId.toStdString());
+    return true;
 }
