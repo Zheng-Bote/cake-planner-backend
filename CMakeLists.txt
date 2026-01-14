@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.24)
 # killall CakePlanner
 
 project(CakePlanner
-    VERSION 0.7.4
+    VERSION 0.9.0
     DESCRIPTION "Cake Planner Backend"
     HOMEPAGE_URL "https://github.com/Zheng-Bote/cake-planner-backend"
     LANGUAGES C CXX)

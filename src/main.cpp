@@ -180,7 +180,15 @@ int main(int argc, char *argv[]) {
     std::signal(SIGTERM, signalHandler);
 
     std::thread serverThread([&app, serverPort, &qtApp](){
-        app.port(serverPort).multithreaded().run();
+        int serverThreads = rz::utils::EnvLoader::getInt("CAKE_THREADS", 0);
+        if (serverThreads > 0) {
+            spdlog::info("Using {} threads for server", serverThreads);
+            app.port(serverPort).concurrency(serverThreads).run();
+        } else {
+            const auto processor_count = std::thread::hardware_concurrency();
+            spdlog::info("Using {} threads for server", processor_count);
+            app.port(serverPort).multithreaded().run();
+        }
         // Fallback, falls Crow von selbst stoppt (ohne Signal)
         qtApp.quit();
     });

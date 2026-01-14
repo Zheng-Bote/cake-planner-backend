@@ -2,8 +2,8 @@
  * @file user_model.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Model with Group Management Extensions
- * @version 0.2.1
- * @date 2026-01-07
+ * @version 0.2.2
+ * @date 2026-01-14
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -22,6 +22,7 @@ struct User {
   QString full_name;
   QString email;
   QString password_hash;
+  QString language = "en";
   QString emailLanguage = "en";
   QString totp_secret;
   QString groupId;
@@ -45,7 +46,8 @@ struct User {
 
   static bool updateStatus(const QString &userId, bool isActive);
   static bool updatePassword(const QString &userId, const QString &newHash);
-  static bool updateSettings(const QString& userId, const QString& lang);
+  static bool updateLanguage(const QString& userId, const QString& lang);
+  static bool updateEmailLanguage(const QString& userId, const QString& lang);
 
   // --- Group Management ---
   static std::vector<std::pair<QString, QString>> getAllGroups();

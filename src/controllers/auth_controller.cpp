@@ -2,8 +2,8 @@
  * @file auth_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Auth Controller Implementation
- * @version 0.2.0
- * @date 2026-01-03
+ * @version 0.4.5
+ * @date 2026-01-14
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -42,6 +42,18 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         user.password_hash = rz::utils::PasswordUtils::hashPassword(
             QString::fromStdString(json["password"].s()));
         user.full_name = QString::fromStdString(json["name"].s());
+
+        if(json.has("language")) {
+            user.language = QString::fromStdString(json["language"].s());
+        } else {
+            user.language = "en";
+        }
+
+        if(json.has("languageEmail")) {
+            user.emailLanguage = QString::fromStdString(json["languageEmail"].s());
+        } else {
+            user.emailLanguage = user.language;
+        }
 
         if (user.create()) {
             // Notification auslösen
@@ -124,9 +136,12 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
       .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         auto json = crow::json::load(req.body);
+        crow::json::wvalue res;
 
         if (!json || !json.has("secret") || !json.has("code")) {
-          return crow::response(400, "Missing secret or code");
+
+            res["error"] = "Missing secret or code";
+          return crow::response(400, res);
         }
 
         QString secret = QString::fromStdString(json["secret"].s());
@@ -137,12 +152,15 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
           if (userOpt) {
             User u = *userOpt;
             if (u.enable2FA(secret)) {
-              return crow::response(200, "2FA enabled successfully");
+                res["message"] = "2FA enabled successfully";
+              return crow::response(200, res);
             }
           }
-          return crow::response(500, "Database error");
+          res["message"] = "Database error";
+          return crow::response(500, res);
         } else {
-          return crow::response(400, "Invalid code");
+            res["error"] = "Invalid code";
+          return crow::response(400, res);
         }
       });
 }

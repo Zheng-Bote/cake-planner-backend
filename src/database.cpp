@@ -2,8 +2,8 @@
  * @file database.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.3.0
- * @date 2026-01-03
+ * @version 0.3.1
+ * @date 2026-01-14
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -37,7 +37,7 @@ void DatabaseManager::initialize(const QString &path) {
   QDir dir = fileInfo.absoluteDir();
 
   if (!dir.exists()) {
-    qInfo() << "Datenbank-Ordner existiert nicht. Erstelle:"
+    qDebug() << "Datenbank-Ordner existiert nicht. Erstelle:"
             << dir.absolutePath();
     if (!dir.mkpath(".")) {
       qCritical()
@@ -46,7 +46,7 @@ void DatabaseManager::initialize(const QString &path) {
     }
   }
 
-  qInfo() << "Datenbank-Pfad gesetzt auf:" << m_dbPath;
+  qDebug() << "Datenbank-Pfad gesetzt auf:" << m_dbPath;
 }
 
 QSqlDatabase DatabaseManager::getDatabase() {
@@ -90,6 +90,7 @@ bool DatabaseManager::migrate() {
             full_name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
+            language TEXT DEFAULT 'en',
             email_language TEXT DEFAULT 'en',
             totp_secret TEXT,
             is_active INTEGER DEFAULT 0,
@@ -176,7 +177,7 @@ bool DatabaseManager::migrate() {
 
   if (success) {
     db.commit();
-    qInfo() << "Datenbank-Migration erfolgreich abgeschlossen.";
+    qDebug() << "Datenbank-Migration erfolgreich abgeschlossen.";
   } else {
     db.rollback();
   }

@@ -21,10 +21,10 @@ constexpr std::string_view PROJECT_DESCRIPTION = "Cake Planner Backend";
 
 constexpr std::string_view EXECUTABLE_NAME = "CakePlanner";
 
-constexpr std::string_view VERSION = "0.7.4";
+constexpr std::string_view VERSION = "0.9.0";
 constexpr std::int32_t PROJECT_VERSION_MAJOR { 0 };
-constexpr std::int32_t PROJECT_VERSION_MINOR { 7 };
-constexpr std::int32_t PROJECT_VERSION_PATCH { 4 };
+constexpr std::int32_t PROJECT_VERSION_MINOR { 9 };
+constexpr std::int32_t PROJECT_VERSION_PATCH { 0 };
 
 constexpr std::string_view PROJECT_HOMEPAGE_URL = "https://github.com/Zheng-Bote/cake-planner-backend";
 constexpr std::string_view AUTHOR = "ZHENG Bote";

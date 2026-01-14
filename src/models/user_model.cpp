@@ -44,6 +44,7 @@ crow::json::wvalue User::toJson() const {
   json["email"] = email.toStdString();
 
   // FIX 1: Sprache mit ins JSON aufnehmen
+  json["language"] = language.toStdString();
   json["emailLanguage"] = emailLanguage.toStdString();
 
   json["isAdmin"] = is_admin;
@@ -59,7 +60,7 @@ std::optional<User> User::getByEmail(const QString &email) {
   auto db = DatabaseManager::instance().getDatabase();
   QSqlQuery query(db);
   // FIX 2: email_language im SELECT hinzufügen
-  query.prepare("SELECT id, full_name, email, email_language, password_hash, is_active, "
+  query.prepare("SELECT id, full_name, email, language, email_language, password_hash, is_active, "
                 "is_admin, totp_secret, must_change_password FROM users WHERE "
                 "email = :email");
   query.bindValue(":email", email);
@@ -71,6 +72,8 @@ std::optional<User> User::getByEmail(const QString &email) {
     u.email = query.value("email").toString();
 
     // Sprache auslesen
+    u.language = query.value("language").toString();
+    if(u.language.isEmpty()) u.language = "en";
     u.emailLanguage = query.value("email_language").toString();
     if(u.emailLanguage.isEmpty()) u.emailLanguage = "en";
 
@@ -99,7 +102,7 @@ std::optional<User> User::getById(const QString &id) {
   QSqlQuery query(db);
   // FIX 3: email_language im SELECT hinzufügen
   query.prepare(
-      "SELECT id, full_name, email, email_language, password_hash, is_active, "
+      "SELECT id, full_name, email, language, email_language, password_hash, is_active, "
       "is_admin, totp_secret, must_change_password FROM users WHERE id = :id");
   query.bindValue(":id", id);
 
@@ -110,6 +113,8 @@ std::optional<User> User::getById(const QString &id) {
     u.email = query.value("email").toString();
 
     // Sprache auslesen
+    u.language = query.value("language").toString();
+    if(u.language.isEmpty()) u.language = "en";
     u.emailLanguage = query.value("email_language").toString();
     if(u.emailLanguage.isEmpty()) u.emailLanguage = "en";
 
@@ -139,7 +144,7 @@ std::vector<User> User::getAll(const QString &filterGroupId) {
   std::vector<User> users;
 
   QString sql = R"(
-        SELECT u.id, u.full_name, u.email, u.email_language, u.is_active, u.is_admin, u.must_change_password,
+        SELECT u.id, u.full_name, u.email, u.language, u.email_language, u.is_active, u.is_admin, u.must_change_password,
                gm.group_id, gm.role
         FROM users u
         LEFT JOIN group_members gm ON u.id = gm.user_id
@@ -165,6 +170,8 @@ std::vector<User> User::getAll(const QString &filterGroupId) {
       u.is_admin = query.value("is_admin").toBool();
       u.must_change_password = query.value("must_change_password").toBool();
 
+      u.language = query.value("language").toString();
+      if (u.language.isEmpty()) u.language = "en";
       u.emailLanguage = query.value("email_language").toString();
       if (u.emailLanguage.isEmpty()) u.emailLanguage = "en";
 
@@ -201,8 +208,8 @@ bool User::create() {
   QSqlQuery query(db);
   // FIX 4: email_language speichern
   query.prepare("INSERT INTO users (id, full_name, email, password_hash, "
-                "is_active, is_admin, email_language) "
-                "VALUES (:id, :name, :email, :pass, :active, :admin, :lang)");
+                "is_active, is_admin, email_language, language) "
+                "VALUES (:id, :name, :email, :pass, :active, :admin, :emaillang, :lang)");
   query.bindValue(":id", this->id);
   query.bindValue(":name", this->full_name);
   query.bindValue(":email", this->email);
@@ -211,7 +218,8 @@ bool User::create() {
   query.bindValue(":admin", this->is_admin ? 1 : 0);
 
   // Default Sprache beim Erstellen setzen
-  query.bindValue(":lang", this->emailLanguage.isEmpty() ? "en" : this->emailLanguage);
+  query.bindValue(":emaillang", this->emailLanguage.isEmpty() ? "en" : this->emailLanguage);
+  query.bindValue(":lang", this->language.isEmpty() ? "en" : this->language);
 
   return query.exec();
 }
@@ -339,10 +347,19 @@ bool User::softDelete(const QString& userId) {
     return query.exec();
 }
 
-bool User::updateSettings(const QString& userId, const QString& lang) {
+bool User::updateEmailLanguage(const QString& userId, const QString& lang) {
     auto db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
     query.prepare("UPDATE users SET email_language = :lang WHERE id = :id");
+    query.bindValue(":lang", lang);
+    query.bindValue(":id", userId);
+    return query.exec();
+}
+
+bool User::updateLanguage(const QString& userId, const QString& lang) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+    query.prepare("UPDATE users SET language = :lang WHERE id = :id");
     query.bindValue(":lang", lang);
     query.bindValue(":id", userId);
     return query.exec();

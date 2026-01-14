@@ -2,8 +2,8 @@
  * @file user_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Controller with Email Notifications
- * @version 0.4.2
- * @date 2026-01-04
+ * @version 0.4.5
+ * @date 2026-01-14
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -56,23 +56,37 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
 
   // --- POST /api/register ---
   CROW_ROUTE(app, "/api/register")
-      .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
+      .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) {
         auto json = crow::json::load(req.body);
-        if (!json || !json.has("email") || !json.has("password") || !json.has("name")) {
-          return crow::response(400, "Missing fields");
+        if (!json || !json.has("email") || !json.has("password") || !json.has("name") || !json.has("language") || !json.has("email")) {
+          crow::json::wvalue res;
+          res["message"] = "Missing fields";
+          return crow::response(400, res);
         }
 
         QString email = QString::fromStdString(json["email"].s());
         QString plainPassword = QString::fromStdString(json["password"].s());
         QString name = QString::fromStdString(json["name"].s());
+        QString language = QString::fromStdString(json["language"].s());
+        QString languageEmail;
+
+        if(json.has("languageEmail")) {
+            languageEmail = QString::fromStdString(json["languageEmail"].s());
+        } else {
+            languageEmail = language;
+        }
 
         if (User::getByEmail(email).has_value()) {
-          return crow::response(409, "User already exists");
+            crow::json::wvalue res;
+            res["message"] = "User already exists";
+            return crow::response(409, res);
         }
 
         User newUser;
         newUser.full_name = name;
         newUser.email = email;
+        newUser.language = language;
+        newUser.emailLanguage = languageEmail;
         newUser.password_hash = rz::utils::PasswordUtils::hashPassword(plainPassword);
 
         if (newUser.password_hash.isEmpty()) return crow::response(500, "Hashing failed");
@@ -80,14 +94,22 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         newUser.is_active = false;
         newUser.is_admin = false;
 
+        crow::json::wvalue resJson;
         if (newUser.create()) {
-          crow::json::wvalue resJson;
           resJson["message"] = "Registration successful.";
           resJson["userId"] = newUser.id.toStdString();
-          return crow::response(201, resJson);
+            // Notification auslösen
+            if (notifyService) {
+                notifyService->notifyAdminsNewUser(newUser.full_name, newUser.email);
+            } else {
+                qWarning() << "NotificationService not available inside UserController!";
+            }
+            return crow::response(201, resJson);
         } else {
-          return crow::response(500, "Database error");
+            resJson["message"] = "User already exists or database error";
+            return crow::response(400, resJson);
         }
+
       });
 
   // --- POST /api/user/change-password ---
@@ -131,11 +153,26 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         auto json = crow::json::load(req.body);
         if (!json) return crow::response(400);
 
-        std::string lang = json["language"].s();
-        if (User::updateSettings(ctx.currentUser.userId, QString::fromStdString(lang))) {
-            return crow::response(200);
+        std::string langEmail;
+        std::string lang;
+        crow::json::wvalue res;
+
+        if(json.has("languageEmail")) {
+            langEmail = json["languageEmail"].s();
+            if (User::updateEmailLanguage(ctx.currentUser.userId, QString::fromStdString(langEmail))) {
+                res["message"] = "Language email changed";
+                return crow::response(200, res);
+            }
         }
-        return crow::response(500);
+        if(json.has("language")) {
+            lang = json["language"].s();
+            if (User::updateLanguage(ctx.currentUser.userId, QString::fromStdString(lang))) {
+                res["message"] = "Language changed";
+                return crow::response(200, res);
+            }
+        }
+        res["message"] = "Settings not changed";
+        return crow::response(500, res);
     });
 
     // Account Löschen (Self-Delete)

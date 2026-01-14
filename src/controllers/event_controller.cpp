@@ -74,6 +74,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
     CROW_ROUTE(app, "/api/uploads/<string>/<string>")
     ([](crow::response& res, std::string eventId, std::string filename){
         std::string baseDir = rz::utils::EnvLoader::getString("UPLOAD_DIR", "public/uploads");
+
         if (eventId.find("..") != std::string::npos || filename.find("..") != std::string::npos) {
             res.code = 403; res.end(); return;
         }
