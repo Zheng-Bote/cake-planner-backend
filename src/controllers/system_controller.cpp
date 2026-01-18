@@ -31,6 +31,7 @@ void SystemController::registerRoutes(crow::App<rz::middleware::AuthMiddleware>&
         info["executable"] = std::string(rz::config::EXECUTABLE_NAME);
 
         info["version"] = std::string(rz::config::VERSION);
+        info["license"] = std::string(rz::config::PROG_LICENSE);
 
         // Integers (Crow wvalue can handle int directly)
         info["version_major"] = rz::config::PROJECT_VERSION_MAJOR;

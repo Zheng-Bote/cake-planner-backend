@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.24)
 # killall CakePlanner
 
 project(CakePlanner
-    VERSION 0.9.0
+    VERSION 0.11.1
     DESCRIPTION "Cake Planner Backend"
     HOMEPAGE_URL "https://github.com/Zheng-Bote/cake-planner-backend"
     LANGUAGES C CXX)
@@ -28,10 +28,11 @@ find_package(Threads REQUIRED)
 
 set(EXECUTABLE_NAME "${PROJECT_NAME}")
 set(PROG_LONGNAME "Crow Cake Planner Backend")
-set(PROG_CREATED "2025")
+set(PROG_CREATED "2026")
 set(PROG_AUTHOR "ZHENG Bote")
 set(PROG_ORGANIZATION_NAME "ZHENG Robert")
 set(PROG_ORGANIZATION_DOMAIN "net.hase-zheng")
+set(PROG_LICENSE "MIT")
 
 if(Qt6_FOUND)
     set(CMAKE_QTV "${Qt6_VERSION}")

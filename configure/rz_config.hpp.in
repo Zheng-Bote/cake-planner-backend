@@ -18,6 +18,7 @@ namespace config {
 constexpr std::string_view PROJECT_NAME = "@PROJECT_NAME@";
 constexpr std::string_view PROG_LONGNAME = "@PROG_LONGNAME@";
 constexpr std::string_view PROJECT_DESCRIPTION = "@PROJECT_DESCRIPTION@";
+constexpr std::string_view PROG_LICENSE = "@PROG_LICENSE@";
 
 constexpr std::string_view EXECUTABLE_NAME = "@EXECUTABLE_NAME@";
 

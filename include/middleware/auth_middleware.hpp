@@ -2,8 +2,8 @@
  * @file auth_middleware.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Auth Middleware
- * @version 0.2.2
- * @date 2026-01-04
+ * @version 0.3.0
+ * @date 2026-01-17
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -27,7 +27,7 @@ struct AuthMiddleware {
   void before_handle(crow::request &req, crow::response &res, context &ctx) {
     // 1. Whitelist
     std::string url = req.url;
-    if (url == "/api/login" || url == "/api/register" || url == "/api/status" ||
+    if (url == "/api/login" || url == "/api/register" || url == "/api/auth/register" || url == "/api/system/sysinfo" || url == "/api/system/healthcheck" ||
         url.starts_with("/static") || url.starts_with("/api/events/stream") ||
         url.starts_with("/api/uploads/")) {
       return;
