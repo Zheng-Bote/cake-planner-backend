@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CakePlanner | backend_security</title>
+
+    <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon" />
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header>
+      <div class="header_left">
+        <img src="../assets/img/favicon.svg" alt="Logo" loading="eager" />
+        <h1>CakePlanner</h1>
+      </div>
+      <div class="header_middle">
+        <span>System Status: Active</span>
+      </div>
+      <div class="header_right">
+        <button class="tron-btn">Login</button>
+        <button class="tron-btn" style="margin-left: 10px">Sync</button>
+      </div>
+    </header>
+
+    <aside class="aside">
+      <nav class="nav"><ul class="nav-list">
+  <li><strong>architecture</strong>
+<ul class="nav-list">
+  <li><a href="../architecture/class_diagrams.html">class_diagrams</a></li>
+  <li><a href="../architecture/crow_server.html">crow_server</a></li>
+  <li><a href="../architecture/database.html">database</a></li>
+</ul>
+  </li>
+  <li><strong>deployment</strong>
+<ul class="nav-list">
+  <li><a href="../deployment/CakePlanner.env.html">CakePlanner.env</a></li>
+  <li><a href="../deployment/Dockerfile.appimage.html">Dockerfile.appimage</a></li>
+  <li><a href="../deployment/Dockerfile.nginx.html">Dockerfile.nginx</a></li>
+  <li><a href="../deployment/deployment_guide.html">deployment_guide</a></li>
+  <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
+  <li><a href="../deployment/nginx.conf.html">nginx.conf</a></li>
+</ul>
+  </li>
+  <li><strong>development</strong>
+<ul class="nav-list">
+  <li><a href="../development/build_process.html">build_process</a></li>
+</ul>
+  </li>
+  <li><strong>security</strong>
+<ul class="nav-list">
+  <li><a href="../security/backend_security.html" class="active">backend_security</a></li>
+</ul>
+  </li>
+</ul>
+</nav>
+    </aside>
+
+    <main class="main"><!-- DOCTOC SKIP -->
+<h1>Backend Security</h1>
+<p>This document outlines the security measures implemented in the Cake Planner Backend to protect user data, ensure integrity, and prevent common vulnerabilities.</p>
+<h2>1. Authentication &amp; Authorization</h2>
+<h3>JSON Web Tokens (JWT)</h3>
+<p>The application uses <strong>JWT (JSON Web Tokens)</strong> for stateless authentication.</p>
+<ul>
+<li><strong>Library</strong>: <code>token_utils.hpp</code> handles token generation and verification.</li>
+<li><strong>Structure</strong>: Tokens contain a payload with the User ID, Email, and Roles (Admin/User).</li>
+<li><strong>Transport</strong>: Tokens must be sent in the <code>Authorization</code> header: <code>Authorization: Bearer &lt;TOKEN&gt;</code>.</li>
+<li><strong>Validation</strong>:<ul>
+<li>The <code>AuthMiddleware</code> verifies the token signature on every protected request.</li>
+<li>Expired or tampered tokens result in <code>401 Unauthorized</code> or <code>403 Forbidden</code>.</li>
+</ul>
+</li>
+</ul>
+<h3>Role-Based Access Control (RBAC)</h3>
+<ul>
+<li><strong>Middleware</strong>: <code>AuthMiddleware</code> injects the current user context into the request.</li>
+<li><strong>Controllers</strong>: Individual controllers (e.g., <code>AdminController</code>) check <code>user.is_admin</code> to restrict access to sensitive endpoints.</li>
+</ul>
+<h2>2. Password Security</h2>
+<p>User passwords are <strong>never</strong> stored in plain text.</p>
+<h3>Hashing Algorithm: Argon2id</h3>
+<p>The application uses <strong>Argon2id</strong>, the winner of the Password Hashing Competition (PHC) and currently recommended by OWASP.</p>
+<ul>
+<li><strong>Implementation</strong>: <code>src/utils/password_utils.cpp</code></li>
+<li><strong>Parameters</strong>:<ul>
+<li><strong>T-Cost (Iterations)</strong>: 3</li>
+<li><strong>M-Cost (Memory)</strong>: 64 MB (Hardens against GPU/ASIC attacks)</li>
+<li><strong>Parallelism</strong>: 4 Threads</li>
+<li><strong>Salt</strong>: 16 Bytes random salt generated per password.</li>
+<li><strong>Hash Length</strong>: 32 Bytes.</li>
+</ul>
+</li>
+</ul>
+<h2>3. Data Protection</h2>
+<h3>SQL Injection Prevention</h3>
+<p>All database interactions via <code>DatabaseManager</code> and Models use <strong>Prepared Statements</strong> (via <code>QSqlQuery</code>).</p>
+<ul>
+<li><strong>Mechanism</strong>: Inputs are bound using <code>bindValue()</code> (e.g., <code>:email</code>, <code>:id</code>) instead of string concatenation.</li>
+<li><strong>Benefit</strong>: This effectively neutralizes SQL injection attacks.</li>
+</ul>
+<h3>Input Validation</h3>
+<ul>
+<li><strong>Strong Typing</strong>: The use of C++ struct models (<code>User</code>, <code>Event</code>) ensures data types are respected.</li>
+<li><strong>Crow Routing</strong>: Route parameters are typed (e.g., <code>&lt;string&gt;</code>, <code>&lt;int&gt;</code>), preventing basic malformed URL attacks.</li>
+</ul>
+<h2>4. Transport Security</h2>
+<h3>HTTPS / TLS</h3>
+<p>The Crow server runs on <strong>HTTP</strong> internally (default port 8080).</p>
+<ul>
+<li><strong>Recommendation</strong>: For production, <strong>ALWAYS</strong> sit the application behind a Reverse Proxy (Nginx, Apache, Traefik).</li>
+<li><strong>SSL Termination</strong>: The reverse proxy should handle SSL/TLS encryption (HTTPS) and forward requests to the backend via localhost.</li>
+</ul>
+<h3>CORS (Cross-Origin Resource Sharing)</h3>
+<ul>
+<li>The application implements CORS handling in middleware to allow requests from the frontend application.</li>
+<li><strong>Preflight Checks</strong>: <code>OPTIONS</code> requests are handled globally to support browser preflight checks.</li>
+</ul>
+<h2>5. Security Best Practices</h2>
+<ul>
+<li><strong>2FA (Two-Factor Authentication)</strong>: The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security (<code>totp_utils.hpp</code>).</li>
+<li><strong>Rate Limiting</strong>: Currently not implemented in the application layer. It is recommended to configure Rate Limiting on the <strong>Reverse Proxy</strong> level (e.g., <code>limit_req</code> in Nginx) to prevent Brute Force or DDoS attacks.</li>
+<li><strong>Environment Variables</strong>: Sensitive secrets (Database path, API keys, SMTP credentials) are loaded from <code>.env</code> and <strong>not</strong> hardcoded.</li>
+</ul>
+</main>
+
+    <footer class="footer">
+      <div class="footer-section_left">SOURCE: MCP_v2</div>
+      <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
+      <div class="footer-section_right">CLEARANCE_LEVEL: 5</div>
+    </footer>
+
+    <script src="../assets/js/main.js" defer></script>
+  </body>
+</html>

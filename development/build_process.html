@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CakePlanner | build_process</title>
+
+    <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon" />
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header>
+      <div class="header_left">
+        <img src="../assets/img/favicon.svg" alt="Logo" loading="eager" />
+        <h1>CakePlanner</h1>
+      </div>
+      <div class="header_middle">
+        <span>System Status: Active</span>
+      </div>
+      <div class="header_right">
+        <button class="tron-btn">Login</button>
+        <button class="tron-btn" style="margin-left: 10px">Sync</button>
+      </div>
+    </header>
+
+    <aside class="aside">
+      <nav class="nav"><ul class="nav-list">
+  <li><strong>architecture</strong>
+<ul class="nav-list">
+  <li><a href="../architecture/class_diagrams.html">class_diagrams</a></li>
+  <li><a href="../architecture/crow_server.html">crow_server</a></li>
+  <li><a href="../architecture/database.html">database</a></li>
+</ul>
+  </li>
+  <li><strong>deployment</strong>
+<ul class="nav-list">
+  <li><a href="../deployment/CakePlanner.env.html">CakePlanner.env</a></li>
+  <li><a href="../deployment/Dockerfile.appimage.html">Dockerfile.appimage</a></li>
+  <li><a href="../deployment/Dockerfile.nginx.html">Dockerfile.nginx</a></li>
+  <li><a href="../deployment/deployment_guide.html">deployment_guide</a></li>
+  <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
+  <li><a href="../deployment/nginx.conf.html">nginx.conf</a></li>
+</ul>
+  </li>
+  <li><strong>development</strong>
+<ul class="nav-list">
+  <li><a href="../development/build_process.html" class="active">build_process</a></li>
+</ul>
+  </li>
+  <li><strong>security</strong>
+<ul class="nav-list">
+  <li><a href="../security/backend_security.html">backend_security</a></li>
+</ul>
+  </li>
+</ul>
+</nav>
+    </aside>
+
+    <main class="main"><!-- DOCTOC SKIP -->
+<h1>Build Process &amp; Development Guide</h1>
+<p>This guide explains how to build the Cake Planner Backend from source and how to package it as an AppImage.</p>
+<h2>Prerequisites</h2>
+<p>The project requires a modern Linux environment with C++23 support.</p>
+<h3>System Requirements</h3>
+<ul>
+<li><strong>Compiler</strong>: GCC 13+ or Clang 16+ (Must support <strong>C++23</strong>).</li>
+<li><strong>Build System</strong>: CMake 3.24 or newer.</li>
+<li><strong>Dependencies</strong>:<ul>
+<li><strong>Qt6</strong>: Modules <code>Core</code>, <code>Sql</code>, <code>Gui</code>.</li>
+<li><strong>OpenSSL</strong>: <code>libssl-dev</code>.</li>
+<li><strong>Git</strong>, <strong>Make</strong>, <strong>wget</strong> (for fetching resources).</li>
+</ul>
+</li>
+</ul>
+<h3>Installing Dependencies (Ubuntu/Debian)</h3>
+<pre><code class="language-bash">sudo apt update
+sudo apt install build-essential cmake git
+sudo apt install qt6-base-dev libqt6sql6-sqlite libssl-dev
+</code></pre>
+<h2>Building from Source</h2>
+<p>The project uses CMake as its build system.</p>
+<ol>
+<li><p><strong>Clone the Repository</strong>:</p>
+<pre><code class="language-bash">git clone https://github.com/Zheng-Bote/cake-planner-backend.git
+cd cake-planner-backend
+</code></pre>
+</li>
+<li><p><strong>Create a Build Directory</strong>:</p>
+<pre><code class="language-bash">mkdir build
+cd build
+</code></pre>
+</li>
+<li><p><strong>Configure the Project</strong>:</p>
+<pre><code class="language-bash">cmake ..
+</code></pre>
+<p><em>Note: Dependencies like Crow, spdlog, etc., are automatically fetched via CMake <code>FetchContent</code>.</em></p>
+</li>
+<li><p><strong>Compile</strong>:</p>
+<pre><code class="language-bash">make -j$(nproc)
+</code></pre>
+</li>
+<li><p><strong>Run</strong>:</p>
+<pre><code class="language-bash">./CakePlanner
+</code></pre>
+</li>
+</ol>
+<h2>creating an AppImage</h2>
+<p>The project includes a script to package the application as a standalone <strong>AppImage</strong>.</p>
+<h3>Script: <code>create_appimage.sh</code></h3>
+<p>This script automates the following steps:</p>
+<ol>
+<li>Rebuilds the project in <code>Release</code> mode.</li>
+<li>Creates an <code>AppDir</code> structure.</li>
+<li>Copies binaries, icons, and <code>.desktop</code> files.</li>
+<li>Downloads <code>linuxdeploy</code> and the <code>qt-plugin</code>.</li>
+<li>Generates the final <code>.AppImage</code> file.</li>
+</ol>
+<h3>Usage</h3>
+<p>Run the script from the project root:</p>
+<pre><code class="language-bash">chmod +x create_appimage.sh
+./create_appimage.sh
+</code></pre>
+<h3>Result</h3>
+<p>After successful execution, you will find <code>CakePlanner-x86_64.AppImage</code> in the root directory. You can run it directly:</p>
+<pre><code class="language-bash">./CakePlanner-x86_64.AppImage
+</code></pre>
+<blockquote>
+<p><strong>Note</strong>: AppImages require FUSE to run. On newer Ubuntu versions (22.04+), you might need to install <code>libfuse2</code>:
+<code>sudo apt install libfuse2</code></p>
+</blockquote>
+</main>
+
+    <footer class="footer">
+      <div class="footer-section_left">SOURCE: MCP_v2</div>
+      <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
+      <div class="footer-section_right">CLEARANCE_LEVEL: 5</div>
+    </footer>
+
+    <script src="../assets/js/main.js" defer></script>
+  </body>
+</html>

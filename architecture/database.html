@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CakePlanner | database</title>
+
+    <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon" />
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header>
+      <div class="header_left">
+        <img src="../assets/img/favicon.svg" alt="Logo" loading="eager" />
+        <h1>CakePlanner</h1>
+      </div>
+      <div class="header_middle">
+        <span>System Status: Active</span>
+      </div>
+      <div class="header_right">
+        <button class="tron-btn">Login</button>
+        <button class="tron-btn" style="margin-left: 10px">Sync</button>
+      </div>
+    </header>
+
+    <aside class="aside">
+      <nav class="nav"><ul class="nav-list">
+  <li><strong>architecture</strong>
+<ul class="nav-list">
+  <li><a href="../architecture/class_diagrams.html">class_diagrams</a></li>
+  <li><a href="../architecture/crow_server.html">crow_server</a></li>
+  <li><a href="../architecture/database.html" class="active">database</a></li>
+</ul>
+  </li>
+  <li><strong>deployment</strong>
+<ul class="nav-list">
+  <li><a href="../deployment/CakePlanner.env.html">CakePlanner.env</a></li>
+  <li><a href="../deployment/Dockerfile.appimage.html">Dockerfile.appimage</a></li>
+  <li><a href="../deployment/Dockerfile.nginx.html">Dockerfile.nginx</a></li>
+  <li><a href="../deployment/deployment_guide.html">deployment_guide</a></li>
+  <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
+  <li><a href="../deployment/nginx.conf.html">nginx.conf</a></li>
+</ul>
+  </li>
+  <li><strong>development</strong>
+<ul class="nav-list">
+  <li><a href="../development/build_process.html">build_process</a></li>
+</ul>
+  </li>
+  <li><strong>security</strong>
+<ul class="nav-list">
+  <li><a href="../security/backend_security.html">backend_security</a></li>
+</ul>
+  </li>
+</ul>
+</nav>
+    </aside>
+
+    <main class="main"><!-- DOCTOC SKIP -->
+<h1>Database Schema</h1>
+<p>The Cake Planner Backend uses <strong>SQLite</strong> as its relational database. The database file is typically located at <code>data/cakeplanner.sqlite</code>.</p>
+<h2>Entity-Relationship Diagram (ERD)</h2>
+<p>The following diagram shows the database tables and their relationships.</p>
+<pre><code class="language-mermaid">erDiagram
+    USERS ||--o{ GROUP_MEMBERS : &quot;is member of&quot;
+    GROUPS ||--o{ GROUP_MEMBERS : &quot;has members&quot;
+    GROUPS ||--o{ EVENTS : &quot;hosts&quot;
+    USERS ||--o{ EVENTS : &quot;bakes for (baker_id)&quot;
+    EVENTS ||--o{ RATINGS : &quot;has&quot;
+    USERS ||--o{ RATINGS : &quot;creates&quot;
+    EVENTS ||--o{ EVENT_PHOTOS : &quot;contains&quot;
+    USERS ||--o{ EVENT_PHOTOS : &quot;uploads&quot;
+
+    USERS {
+        TEXT id PK
+        TEXT full_name
+        TEXT email uk
+        TEXT password_hash
+        TEXT language &quot;default 'en'&quot;
+        TEXT email_language &quot;default 'en'&quot;
+        TEXT totp_secret
+        INTEGER is_active &quot;0 or 1&quot;
+        INTEGER is_admin &quot;0 or 1&quot;
+        INTEGER must_change_password &quot;0 or 1&quot;
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    GROUPS {
+        TEXT id PK
+        TEXT name
+        TEXT description
+        TEXT created_at
+    }
+
+    GROUP_MEMBERS {
+        TEXT user_id PK, FK
+        TEXT group_id PK, FK
+        TEXT role &quot;member, etc.&quot;
+        TEXT joined_at
+    }
+
+    EVENTS {
+        TEXT id PK
+        TEXT group_id FK
+        TEXT baker_id FK
+        TEXT event_date
+        TEXT description
+        TEXT photo_path
+        TEXT created_at
+    }
+
+    RATINGS {
+        TEXT id PK
+        TEXT event_id FK
+        TEXT rater_id FK
+        INTEGER rating_value &quot;1-5&quot;
+        TEXT comment
+        TEXT created_at
+    }
+
+    EVENT_PHOTOS {
+        TEXT event_id PK, FK
+        TEXT user_id PK, FK
+        TEXT photo_path
+        TEXT uploaded_at
+    }
+</code></pre>
+<h2>Table Definitions</h2>
+<h3><code>users</code></h3>
+<p>Stores user account information.</p>
+<ul>
+<li><strong>Primary Key</strong>: <code>id</code> (UUID as Text)</li>
+<li><strong>Unique</strong>: <code>email</code></li>
+</ul>
+<h3><code>groups</code></h3>
+<p>Represents groups (e.g., departments, teams) that organize cake events.</p>
+<ul>
+<li><strong>Primary Key</strong>: <code>id</code></li>
+</ul>
+<h3><code>group_members</code></h3>
+<p>Many-to-Many link between <code>users</code> and <code>groups</code>.</p>
+<ul>
+<li><strong>Composite Primary Key</strong>: (<code>user_id</code>, <code>group_id</code>)</li>
+<li><strong>Foreign Keys</strong>: Cascade delete on both user and group.</li>
+</ul>
+<h3><code>events</code></h3>
+<p>Represents a cake bringing event on a specific date.</p>
+<ul>
+<li><strong>Primary Key</strong>: <code>id</code></li>
+<li><strong>Foreign Keys</strong>:<ul>
+<li><code>group_id</code>: The group this event belongs to.</li>
+<li><code>baker_id</code>: The user responsible for baking.</li>
+</ul>
+</li>
+</ul>
+<h3><code>ratings</code></h3>
+<p>Allows users to rate and comment on events.</p>
+<ul>
+<li><strong>Unique Constraint</strong>: A user can only rate an event once (<code>event_id</code>, <code>rater_id</code>).</li>
+<li><strong>Check Constraint</strong>: <code>rating_value</code> must be between 1 and 5.</li>
+</ul>
+<h3><code>event_photos</code></h3>
+<p>Additional photos uploaded to an event gallery.</p>
+<ul>
+<li><strong>Composite Primary Key</strong>: (<code>event_id</code>, <code>user_id</code>) - <em>Note: Schema implies one photo per user per event based on PK, or just efficient linking.</em></li>
+</ul>
+<h2>Migration System</h2>
+<p>Database migrations are handled automatically in <code>DatabaseManager::migrate()</code>.</p>
+<ul>
+<li>On startup, the application checks if tables exist.</li>
+<li>If not, it executes <code>CREATE TABLE IF NOT EXISTS</code> statements.</li>
+<li>Uses <code>PRAGMA foreign_keys = ON</code> to enforce integrity.</li>
+</ul>
+</main>
+
+    <footer class="footer">
+      <div class="footer-section_left">SOURCE: MCP_v2</div>
+      <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
+      <div class="footer-section_right">CLEARANCE_LEVEL: 5</div>
+    </footer>
+
+    <script src="../assets/js/main.js" defer></script>
+  </body>
+</html>
