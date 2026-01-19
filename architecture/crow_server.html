@@ -69,46 +69,7 @@
 <p>The server acts as a RESTful API backend providing services for the Cake Planner frontend. It manages user authentication, event planning, and system administration. The application relies on <strong>Qt</strong> for core functionalities (Event Loop, Strings) and <strong>SQLite</strong> for data persistence.</p>
 <h2>High-Level Architecture</h2>
 <p>The following diagram illustrates the high-level components and their interactions:</p>
-<pre><code class="language-mermaid">classDiagram
-    direction TB
-    class Main {
-        +Entry Point
-        +Initialize Qt/Logging
-        +Setup Database
-        +Start Crow App
-    }
-
-    class CrowApp[&quot;Crow::App&quot;] {
-        +AuthMiddleware
-        +Routes
-    }
-
-    class Controllers {
-        +SystemController
-        +AuthController
-        +UserController
-        +EventController
-        +AdminController
-    }
-
-    class Services {
-        +SmtpService
-        +NotificationService
-    }
-
-    class Infrastructure {
-        +DatabaseManager (SQLite)
-        +EnvLoader
-        +SpdLog (Logging)
-    }
-
-    Main --&gt; Infrastructure : initializes
-    Main --&gt; Services : initializes
-    Main --&gt; CrowApp : configures
-    CrowApp o-- Controllers : registers
-    Controllers --&gt; Services : uses
-    Controllers ..&gt; Infrastructure : uses
-</code></pre>
+<p><img src="../assets/img/architecture/backend/high-level_architecture.png" alt="High Level Architecture"></p>
 <h2>Key Components</h2>
 <h3>1. Entry Point (<code>src/main.cpp</code>)</h3>
 <p>The <code>main.cpp</code> file is the bootstrap of the application. It performs the following steps:</p>
@@ -181,24 +142,7 @@
 </ul>
 <h2>Request Flow</h2>
 <p>The following sequence diagram demonstrates the flow of an authenticated API request (e.g., &quot;Get User Profile&quot;):</p>
-<pre><code class="language-mermaid">sequenceDiagram
-    participant Client
-    participant Middleware as AuthMiddleware
-    participant Controller as UserController
-    participant Service as DatabaseManager
-
-    Client-&gt;&gt;Middleware: GET /api/user/profile (Header: Bearer Token)
-    Middleware-&gt;&gt;Middleware: Check Whitelist
-    Middleware-&gt;&gt;Middleware: Verify JWT Token
-    alt Token Invalid
-        Middleware--&gt;&gt;Client: 401 Unauthorized
-    else Token Valid
-        Middleware-&gt;&gt;Controller: Forward Request (User Context)
-        Controller-&gt;&gt;Service: Query User Data (ID from Context)
-        Service--&gt;&gt;Controller: Return User Model
-        Controller--&gt;&gt;Client: 200 OK (JSON)
-    end
-</code></pre>
+<p><img src="../assets/img/architecture/backend/request_flow.png" alt="Request Flow"></p>
 <h2>Configuration</h2>
 <p>The application uses a dual configuration strategy:</p>
 <ol>

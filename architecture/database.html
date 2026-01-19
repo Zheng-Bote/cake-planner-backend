@@ -67,71 +67,7 @@
 <p>The Cake Planner Backend uses <strong>SQLite</strong> as its relational database. The database file is typically located at <code>data/cakeplanner.sqlite</code>.</p>
 <h2>Entity-Relationship Diagram (ERD)</h2>
 <p>The following diagram shows the database tables and their relationships.</p>
-<pre><code class="language-mermaid">erDiagram
-    USERS ||--o{ GROUP_MEMBERS : &quot;is member of&quot;
-    GROUPS ||--o{ GROUP_MEMBERS : &quot;has members&quot;
-    GROUPS ||--o{ EVENTS : &quot;hosts&quot;
-    USERS ||--o{ EVENTS : &quot;bakes for (baker_id)&quot;
-    EVENTS ||--o{ RATINGS : &quot;has&quot;
-    USERS ||--o{ RATINGS : &quot;creates&quot;
-    EVENTS ||--o{ EVENT_PHOTOS : &quot;contains&quot;
-    USERS ||--o{ EVENT_PHOTOS : &quot;uploads&quot;
-
-    USERS {
-        TEXT id PK
-        TEXT full_name
-        TEXT email uk
-        TEXT password_hash
-        TEXT language &quot;default 'en'&quot;
-        TEXT email_language &quot;default 'en'&quot;
-        TEXT totp_secret
-        INTEGER is_active &quot;0 or 1&quot;
-        INTEGER is_admin &quot;0 or 1&quot;
-        INTEGER must_change_password &quot;0 or 1&quot;
-        TEXT created_at
-        TEXT updated_at
-    }
-
-    GROUPS {
-        TEXT id PK
-        TEXT name
-        TEXT description
-        TEXT created_at
-    }
-
-    GROUP_MEMBERS {
-        TEXT user_id PK, FK
-        TEXT group_id PK, FK
-        TEXT role &quot;member, etc.&quot;
-        TEXT joined_at
-    }
-
-    EVENTS {
-        TEXT id PK
-        TEXT group_id FK
-        TEXT baker_id FK
-        TEXT event_date
-        TEXT description
-        TEXT photo_path
-        TEXT created_at
-    }
-
-    RATINGS {
-        TEXT id PK
-        TEXT event_id FK
-        TEXT rater_id FK
-        INTEGER rating_value &quot;1-5&quot;
-        TEXT comment
-        TEXT created_at
-    }
-
-    EVENT_PHOTOS {
-        TEXT event_id PK, FK
-        TEXT user_id PK, FK
-        TEXT photo_path
-        TEXT uploaded_at
-    }
-</code></pre>
+<p><img src="../assets/img/architecture/backend/db_erp.png" alt="ERD"></p>
 <h2>Table Definitions</h2>
 <h3><code>users</code></h3>
 <p>Stores user account information.</p>
