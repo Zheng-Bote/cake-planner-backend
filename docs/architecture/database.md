@@ -8,72 +8,7 @@ The Cake Planner Backend uses **SQLite** as its relational database. The databas
 
 The following diagram shows the database tables and their relationships.
 
-```mermaid
-erDiagram
-    USERS ||--o{ GROUP_MEMBERS : "is member of"
-    GROUPS ||--o{ GROUP_MEMBERS : "has members"
-    GROUPS ||--o{ EVENTS : "hosts"
-    USERS ||--o{ EVENTS : "bakes for (baker_id)"
-    EVENTS ||--o{ RATINGS : "has"
-    USERS ||--o{ RATINGS : "creates"
-    EVENTS ||--o{ EVENT_PHOTOS : "contains"
-    USERS ||--o{ EVENT_PHOTOS : "uploads"
-
-    USERS {
-        TEXT id PK
-        TEXT full_name
-        TEXT email uk
-        TEXT password_hash
-        TEXT language "default 'en'"
-        TEXT email_language "default 'en'"
-        TEXT totp_secret
-        INTEGER is_active "0 or 1"
-        INTEGER is_admin "0 or 1"
-        INTEGER must_change_password "0 or 1"
-        TEXT created_at
-        TEXT updated_at
-    }
-
-    GROUPS {
-        TEXT id PK
-        TEXT name
-        TEXT description
-        TEXT created_at
-    }
-
-    GROUP_MEMBERS {
-        TEXT user_id PK, FK
-        TEXT group_id PK, FK
-        TEXT role "member, etc."
-        TEXT joined_at
-    }
-
-    EVENTS {
-        TEXT id PK
-        TEXT group_id FK
-        TEXT baker_id FK
-        TEXT event_date
-        TEXT description
-        TEXT photo_path
-        TEXT created_at
-    }
-
-    RATINGS {
-        TEXT id PK
-        TEXT event_id FK
-        TEXT rater_id FK
-        INTEGER rating_value "1-5"
-        TEXT comment
-        TEXT created_at
-    }
-
-    EVENT_PHOTOS {
-        TEXT event_id PK, FK
-        TEXT user_id PK, FK
-        TEXT photo_path
-        TEXT uploaded_at
-    }
-```
+![ERD](../assets/img/architecture/backend/db_erp.png)
 
 ## Table Definitions
 

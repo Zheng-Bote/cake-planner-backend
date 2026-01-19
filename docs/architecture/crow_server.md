@@ -12,47 +12,8 @@ The server acts as a RESTful API backend providing services for the Cake Planner
 
 The following diagram illustrates the high-level components and their interactions:
 
-```mermaid
-classDiagram
-    direction TB
-    class Main {
-        +Entry Point
-        +Initialize Qt/Logging
-        +Setup Database
-        +Start Crow App
-    }
+![High Level Architecture](../assets/img/architecture/backend/high-level_architecture.png)
 
-    class CrowApp["Crow::App"] {
-        +AuthMiddleware
-        +Routes
-    }
-
-    class Controllers {
-        +SystemController
-        +AuthController
-        +UserController
-        +EventController
-        +AdminController
-    }
-
-    class Services {
-        +SmtpService
-        +NotificationService
-    }
-
-    class Infrastructure {
-        +DatabaseManager (SQLite)
-        +EnvLoader
-        +SpdLog (Logging)
-    }
-
-    Main --> Infrastructure : initializes
-    Main --> Services : initializes
-    Main --> CrowApp : configures
-    CrowApp o-- Controllers : registers
-    Controllers --> Services : uses
-    Controllers ..> Infrastructure : uses
-```
 
 ## Key Components
 
@@ -104,25 +65,7 @@ Data persistence is handled by `DatabaseManager` (Singleton).
 
 The following sequence diagram demonstrates the flow of an authenticated API request (e.g., "Get User Profile"):
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Middleware as AuthMiddleware
-    participant Controller as UserController
-    participant Service as DatabaseManager
-
-    Client->>Middleware: GET /api/user/profile (Header: Bearer Token)
-    Middleware->>Middleware: Check Whitelist
-    Middleware->>Middleware: Verify JWT Token
-    alt Token Invalid
-        Middleware-->>Client: 401 Unauthorized
-    else Token Valid
-        Middleware->>Controller: Forward Request (User Context)
-        Controller->>Service: Query User Data (ID from Context)
-        Service-->>Controller: Return User Model
-        Controller-->>Client: 200 OK (JSON)
-    end
-```
+![Request Flow](../assets/img/architecture/backend/request_flow.png)
 
 ## Configuration
 
