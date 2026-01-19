@@ -12,7 +12,7 @@ The server acts as a RESTful API backend providing services for the Cake Planner
 
 The following diagram illustrates the high-level components and their interactions:
 
-![High Level Architecture](../assets/img/architecture/backend/high-level_architecture.png)
+![High Level Architecture](../../assets/img/architecture/backend/high-level_architecture.png)
 
 
 ## Key Components
@@ -65,7 +65,7 @@ Data persistence is handled by `DatabaseManager` (Singleton).
 
 The following sequence diagram demonstrates the flow of an authenticated API request (e.g., "Get User Profile"):
 
-![Request Flow](../assets/img/architecture/backend/request_flow.png)
+![Request Flow](../../assets/img/architecture/backend/request_flow.png)
 
 ## Configuration
 

@@ -38,7 +38,7 @@
     <tr>
       <td>Backend</td>
       <td>C++23 (Crow)</td>
-      <td>REST API, Business Logic, Image Processing.</td>
+      <td>REST API, Business Logic, Security.</td>
     </tr>
     <tr>
       <td>Database</td>
@@ -97,25 +97,3 @@
   </li>
 </ol>
 
-<h2>4. Key Workflows</h2>
-
-<p><strong>📸 Image Upload & Optimization Pipeline</strong></p>
-<p>
-  One of the key technical features is the automatic optimization of user uploads to ensure fast
-  loading times in the "Hall of Fame".
-</p>
-
-<img src="../assets/img/architecture/workflow.png" alt="Workflow" />
-
-<h2>5. Database Schema (Simplified)</h2>
-
-<p>The database is normalized to ensure data integrity.</p>
-
-<ul>
-  <li><strong>users</strong>: Stores credentials and profile data.</li>
-  <li><strong>groups</strong>: Manages baking circles.</li>
-  <li><strong>group_members</strong>: Links users to groups (n:m).</li>
-  <li><strong>events</strong>: The core entity (Date, Baker, Description).</li>
-  <li><strong>ratings</strong>: Links users to events with a score (1-5).</li>
-  <li><strong>event_photos</strong>: Stores paths to community uploads linked to events.</li>
-</ul>

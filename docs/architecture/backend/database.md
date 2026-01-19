@@ -19,7 +19,7 @@ The database is normalized to ensure data integrity.
 
 The following diagram shows the database tables and their relationships.
 
-![ERD](../assets/img/architecture/backend/db_erp.png)
+![ERD](../../assets/img/architecture/backend/db_erp.png)
 
 ## Table Definitions
 
