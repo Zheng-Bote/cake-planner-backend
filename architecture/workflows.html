@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CakePlanner | build_process</title>
+    <title>CakePlanner | workflows</title>
 
     <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon" />
     <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
@@ -39,7 +39,7 @@
   <li><strong>architecture</strong>
 <ul class="nav-list">
   <li><a href="../architecture/overview.html">overview</a></li>
-  <li><a href="../architecture/workflows.html">workflows</a></li>
+  <li><a href="../architecture/workflows.html" class="active">workflows</a></li>
   <li><strong>backend</strong>
 <ul class="nav-list">
   <li><a href="../architecture/backend/class_diagrams.html">class_diagrams</a></li>
@@ -62,7 +62,7 @@
   </li>
   <li><strong>development</strong>
 <ul class="nav-list">
-  <li><a href="../development/build_process.html" class="active">build_process</a></li>
+  <li><a href="../development/build_process.html">build_process</a></li>
 </ul>
   </li>
   <li><strong>security</strong>
@@ -75,80 +75,23 @@
 </nav>
     </aside>
 
-    <main class="main"><!-- DOCTOC SKIP -->
-<h1>Build Process &amp; Development Guide</h1>
-<p>This guide explains how to build the Cake Planner Backend from source and how to package it as an AppImage.</p>
-<h2>Prerequisites</h2>
-<p>The project requires a modern Linux environment with C++23 support.</p>
-<h3>System Requirements</h3>
-<ul>
-<li><strong>Linux</strong>: (Ubuntu 24.04 recommended)</li>
-<li><strong>CMake</strong>: 3.23+</li>
-<li><strong>Compiler</strong>: GCC 13+ or Clang 16+ (Must support <strong>C++23</strong>).</li>
-<li><strong>Build System</strong>: CMake 3.24 or newer.</li>
-<li><strong>Dependencies</strong>:<ul>
-<li><strong>Qt6</strong>: Modules <code>Core</code>, <code>Sql</code>, <code>Gui</code>.</li>
-<li><strong>OpenSSL</strong>: <code>libssl-dev</code>.</li>
-<li><strong>Git</strong>, <strong>Make</strong>, <strong>wget</strong> (for fetching resources).</li>
-</ul>
-</li>
-</ul>
-<h3>Installing Dependencies (Ubuntu/Debian)</h3>
-<pre><code class="language-bash">sudo apt update
-sudo apt install build-essential cmake git
-sudo apt install qt6-base-dev libqt6sql6-sqlite libssl-dev
-</code></pre>
-<h2>Building from Source</h2>
-<p>The project uses CMake as its build system.</p>
-<ol>
-<li><p><strong>Clone the Repository</strong>:</p>
-<pre><code class="language-bash">git clone https://github.com/Zheng-Bote/cake-planner-backend.git
-cd cake-planner-backend
-</code></pre>
-</li>
-<li><p><strong>Create a Build Directory</strong>:</p>
-<pre><code class="language-bash">mkdir build
-cd build
-</code></pre>
-</li>
-<li><p><strong>Configure the Project</strong>:</p>
-<pre><code class="language-bash">cmake ..
-</code></pre>
-<p><em>Note: Dependencies like Crow, spdlog, etc., are automatically fetched via CMake <code>FetchContent</code>.</em></p>
-</li>
-<li><p><strong>Compile</strong>:</p>
-<pre><code class="language-bash">make -j$(nproc)
-</code></pre>
-</li>
-<li><p><strong>Run</strong>:</p>
-<pre><code class="language-bash">./CakePlanner
-</code></pre>
-</li>
-</ol>
-<h2>creating an AppImage</h2>
-<p>The project includes a script to package the application as a standalone <strong>AppImage</strong>.</p>
-<h3>Script: <code>create_appimage.sh</code></h3>
-<p>This script automates the following steps:</p>
-<ol>
-<li>Rebuilds the project in <code>Release</code> mode.</li>
-<li>Creates an <code>AppDir</code> structure.</li>
-<li>Copies binaries, icons, and <code>.desktop</code> files.</li>
-<li>Downloads <code>linuxdeploy</code> and the <code>qt-plugin</code>.</li>
-<li>Generates the final <code>.AppImage</code> file.</li>
-</ol>
-<h3>Usage</h3>
-<p>Run the script from the project root:</p>
-<pre><code class="language-bash">chmod +x create_appimage.sh
-./create_appimage.sh
-</code></pre>
-<h3>Result</h3>
-<p>After successful execution, you will find <code>CakePlanner-x86_64.AppImage</code> in the root directory. You can run it directly:</p>
-<pre><code class="language-bash">./CakePlanner-x86_64.AppImage
-</code></pre>
-<blockquote>
-<p><strong>Note</strong>: AppImages require FUSE to run. On newer Ubuntu versions (22.04+), you might need to install <code>libfuse2</code>:
-<code>sudo apt install libfuse2</code></p>
-</blockquote>
+    <main class="main"><h1>Backend Workflows</h1>
+
+<h2>Image Workflow</h2>
+
+<p><strong>📸 Image Upload & Optimization Pipeline</strong></p>
+<p>
+  One of the key technical features is the automatic optimization of user uploads to ensure fast
+  loading times in the "Hall of Fame".
+</p>
+
+<img src="../assets/img/architecture/image_workflow.png" alt="Workflow" />
+
+
+<h2>Request Workflow</h2>
+<p><strong>HTTP Request Workflow</strong></p>
+<img src="../assets/img/architecture/request_flow.png" alt="Request Workflow" />
+
 </main>
 
     <footer class="footer">

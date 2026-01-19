@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CakePlanner | crow_server</title>
 
-    <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon" />
-    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+    <link rel="shortcut icon" href="../../assets/favicon.ico" type="image/x-icon" />
+    <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg" />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
   </head>
   <body>
     <header>
       <div class="header_left">
-        <img src="../assets/img/favicon.svg" alt="Logo" title="Home" loading="eager" />
+        <img src="../../assets/img/favicon.svg" alt="Logo" title="Home" loading="eager" />
         <h1>CakePlanner</h1>
       </div>
       <div class="header_middle">
@@ -38,30 +38,37 @@
       <nav class="nav"><ul class="nav-list">
   <li><strong>architecture</strong>
 <ul class="nav-list">
-  <li><a href="../architecture/class_diagrams.html">class_diagrams</a></li>
-  <li><a href="../architecture/crow_server.html" class="active">crow_server</a></li>
-  <li><a href="../architecture/database.html">database</a></li>
-  <li><a href="../architecture/overview.html">overview</a></li>
+  <li><a href="../../architecture/overview.html">overview</a></li>
+  <li><a href="../../architecture/workflows.html">workflows</a></li>
+  <li><strong>backend</strong>
+<ul class="nav-list">
+  <li><a href="../../architecture/backend/class_diagrams.html">class_diagrams</a></li>
+  <li><a href="../../architecture/backend/crow_server.html" class="active">crow_server</a></li>
+  <li><a href="../../architecture/backend/database.html">database</a></li>
+</ul>
+  </li>
 </ul>
   </li>
   <li><strong>deployment</strong>
 <ul class="nav-list">
-  <li><a href="../deployment/CakePlanner.env.html">CakePlanner.env</a></li>
-  <li><a href="../deployment/Dockerfile.appimage.html">Dockerfile.appimage</a></li>
-  <li><a href="../deployment/Dockerfile.nginx.html">Dockerfile.nginx</a></li>
-  <li><a href="../deployment/deployment_guide.html">deployment_guide</a></li>
-  <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
-  <li><a href="../deployment/nginx.conf.html">nginx.conf</a></li>
+  <li><a href="../../deployment/CakePlanner.env.html">CakePlanner.env</a></li>
+  <li><a href="../../deployment/Dockerfile.appimage.html">Dockerfile.appimage</a></li>
+  <li><a href="../../deployment/Dockerfile.nginx.html">Dockerfile.nginx</a></li>
+  <li><a href="../../deployment/deployment_guide.html">deployment_guide</a></li>
+  <li><a href="../../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
+  <li><a href="../../deployment/nginx.conf.html">nginx.conf</a></li>
+  <li><a href="../../deployment/overview.html">overview</a></li>
 </ul>
   </li>
   <li><strong>development</strong>
 <ul class="nav-list">
-  <li><a href="../development/build_process.html">build_process</a></li>
+  <li><a href="../../development/build_process.html">build_process</a></li>
 </ul>
   </li>
   <li><strong>security</strong>
 <ul class="nav-list">
-  <li><a href="../security/backend_security.html">backend_security</a></li>
+  <li><a href="../../security/backend_security.html">backend_security</a></li>
+  <li><a href="../../security/overview.html">overview</a></li>
 </ul>
   </li>
 </ul>
@@ -75,7 +82,7 @@
 <p>The server acts as a RESTful API backend providing services for the Cake Planner frontend. It manages user authentication, event planning, and system administration. The application relies on <strong>Qt</strong> for core functionalities (Event Loop, Strings) and <strong>SQLite</strong> for data persistence.</p>
 <h2>High-Level Architecture</h2>
 <p>The following diagram illustrates the high-level components and their interactions:</p>
-<p><img src="../assets/img/architecture/backend/high-level_architecture.png" alt="High Level Architecture"></p>
+<p><img src="../../assets/img/architecture/backend/high-level_architecture.png" alt="High Level Architecture"></p>
 <h2>Key Components</h2>
 <h3>1. Entry Point (<code>src/main.cpp</code>)</h3>
 <p>The <code>main.cpp</code> file is the bootstrap of the application. It performs the following steps:</p>
@@ -148,7 +155,7 @@
 </ul>
 <h2>Request Flow</h2>
 <p>The following sequence diagram demonstrates the flow of an authenticated API request (e.g., &quot;Get User Profile&quot;):</p>
-<p><img src="../assets/img/architecture/backend/request_flow.png" alt="Request Flow"></p>
+<p><img src="../../assets/img/architecture/backend/request_flow.png" alt="Request Flow"></p>
 <h2>Configuration</h2>
 <p>The application uses a dual configuration strategy:</p>
 <ol>
@@ -178,6 +185,6 @@
       <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
     </footer>
 
-    <script src="../assets/js/main.js" defer></script>
+    <script src="../../assets/js/main.js" defer></script>
   </body>
 </html>
