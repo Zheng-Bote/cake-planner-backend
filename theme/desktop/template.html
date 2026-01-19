@@ -21,11 +21,16 @@
         <h1>CakePlanner</h1>
       </div>
       <div class="header_middle">
-        <span>System Status: Active</span>
+        <span>&nbsp;</span>
       </div>
       <div class="header_right">
-        <button class="tron-btn">Login</button>
-        <button class="tron-btn" style="margin-left: 10px">Sync</button>
+        <label class="theme-switch" for="checkbox" title="Switch Light/Dark Mode">
+          <input type="checkbox" id="checkbox" />
+          <div class="slider round">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </div>
+        </label>
       </div>
     </header>
 
@@ -36,9 +41,9 @@
     <main class="main">{{ content }}</main>
 
     <footer class="footer">
-      <div class="footer-section_left">SOURCE: MCP_v2</div>
+      <div class="footer-section_left">v0.12.0</div>
       <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
-      <div class="footer-section_right">CLEARANCE_LEVEL: 5</div>
+      <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend">&lt;/&gt;</a></div>
     </footer>
 
     <script src="{{ base_path }}assets/js/main.js" defer></script>
