@@ -476,3 +476,82 @@ td a:hover {
     padding: 0 40px;
   }
 }
+
+/* --- dark mode toggle --- */
+/* --- THEME TOGGLE SWITCH --- */
+.theme-switch {
+  display: inline-block;
+  height: 28px;
+  position: relative;
+  width: 54px;
+  margin-left: 15px; /* Abstand zu anderen Header-Elementen */
+}
+
+.theme-switch input {
+  display: none; /* Checkbox verstecken */
+}
+
+.slider {
+  background-color: var(--border-color); /* Inaktiv: Grau/Border-Farbe */
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+}
+
+.slider.round {
+  border-radius: 34px;
+  border: 1px solid var(--border-color);
+}
+
+/* Der runde "Knopf" */
+.slider:before {
+  background-color: #fff;
+  bottom: 3px; /* Etwas Abstand zum Rand */
+  content: "";
+  height: 20px;
+  left: 4px;
+  position: absolute;
+  transition: .4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 20px;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Wenn Checkbox aktiv (Dark Mode) */
+input:checked + .slider {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px); /* Schiebt den Knopf nach rechts */
+}
+
+/* Icons Styling */
+.slider .icon-sun,
+.slider .icon-moon {
+  color: var(--font-color);
+  z-index: 1;
+  transition: opacity 0.3s;
+  width: 14px;
+  height: 14px;
+}
+
+/* Icons Farbe anpassen, wenn aktiv */
+input:checked + .slider .icon-sun {
+  opacity: 0.5;
+  color: rgba(255,255,255,0.8);
+}
+input:checked + .slider .icon-moon {
+  opacity: 1;
+  color: white;
+}
