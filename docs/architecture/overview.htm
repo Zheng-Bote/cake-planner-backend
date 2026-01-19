@@ -1,0 +1,121 @@
+<h1>🏗️ CakePlanner Architecture</h1>
+
+<p>
+  This document provides a high-level overview of the <strong>CakePlanner</strong> architecture,
+  covering the system design, domain boundaries, and key technical workflows.
+</p>
+
+<h2>1. System Context (The Big Picture)</h2>
+
+<p>
+  CakePlanner is designed as a monolithic application that serves baking groups (companies, clubs,
+  friends) to organize events. It acts as the central hub for planning, rating, and sharing photos.
+</p>
+
+<img src="../assets/img/architecture/system-context.png" alt="System Context" />
+
+<h2>2. Container Architecture</h2>
+
+<p>
+  The system consists of a modern Single Page Application (SPA) frontend and a high-performance C++
+  backend.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Technology</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Frontend</td>
+      <td>Angular 21+</td>
+      <td>Material Design, Signals, Transloco (i18n). Responsive UI for Desktop & Mobile.</td>
+    </tr>
+    <tr>
+      <td>Backend</td>
+      <td>C++23 (Crow)</td>
+      <td>REST API, Business Logic, Image Processing.</td>
+    </tr>
+    <tr>
+      <td>Database</td>
+      <td>SQLite3</td>
+      <td>Zero-configuration SQL engine. Stores users, events, and ratings.</td>
+    </tr>
+    <tr>
+      <td>Media Engine</td>
+      <td>Qt6</td>
+      <td>Server-side image processing (scaling & WebP conversion).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. Domain Design (Bounded Contexts)</h2>
+
+<p>
+  To keep the logic organized, the application is conceptually divided into distinct Bounded
+  Contexts. Each context handles a specific part of the business domain.
+</p>
+
+<img src="../assets/img/architecture/bounded-context.png" alt="Bounded Contexts" />
+
+<h3>🔎 Context Descriptions</h3>
+
+<ol>
+  <li>
+    <p>
+      <strong>Identity & Access</strong>: Handles user registration, login, and group assignments.
+      Ensures that only group members can see their events.
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>Planning</strong>: The core calendar logic. Manages dates, baker assignments, and
+      prevents scheduling conflicts.
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>Engagement</strong>: Contains the logic for the "Hall of Fame". It calculates average
+      ratings and sorts events by popularity.
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>Media</strong>: A specialized technical context responsible for handling file uploads,
+      generating thumbnails, and optimizing images for the web (WebP).
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>Administration</strong>: Provides tools for system maintainers to manage users, reset
+      passwords, configure global settings, and view system logs.
+    </p>
+  </li>
+</ol>
+
+<h2>4. Key Workflows</h2>
+
+<p><strong>📸 Image Upload & Optimization Pipeline</strong></p>
+<p>
+  One of the key technical features is the automatic optimization of user uploads to ensure fast
+  loading times in the "Hall of Fame".
+</p>
+
+<img src="../assets/img/architecture/workflow.png" alt="Workflow" />
+
+<h2>5. Database Schema (Simplified)</h2>
+
+<p>The database is normalized to ensure data integrity.</p>
+
+<ul>
+  <li><strong>users</strong>: Stores credentials and profile data.</li>
+  <li><strong>groups</strong>: Manages baking circles.</li>
+  <li><strong>group_members</strong>: Links users to groups (n:m).</li>
+  <li><strong>events</strong>: The core entity (Date, Baker, Description).</li>
+  <li><strong>ratings</strong>: Links users to events with a score (1-5).</li>
+  <li><strong>event_photos</strong>: Stores paths to community uploads linked to events.</li>
+</ul>
