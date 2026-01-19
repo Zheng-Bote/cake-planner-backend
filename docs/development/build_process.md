@@ -8,14 +8,18 @@ This guide explains how to build the Cake Planner Backend from source and how to
 The project requires a modern Linux environment with C++23 support.
 
 ### System Requirements
--   **Compiler**: GCC 13+ or Clang 16+ (Must support **C++23**).
--   **Build System**: CMake 3.24 or newer.
--   **Dependencies**:
-    -   **Qt6**: Modules `Core`, `Sql`, `Gui`.
-    -   **OpenSSL**: `libssl-dev`.
-    -   **Git**, **Make**, **wget** (for fetching resources).
+
+- **Linux**: (Ubuntu 24.04 recommended)
+- **CMake**: 3.23+
+- **Compiler**: GCC 13+ or Clang 16+ (Must support **C++23**).
+- **Build System**: CMake 3.24 or newer.
+- **Dependencies**:
+    - **Qt6**: Modules `Core`, `Sql`, `Gui`.
+    - **OpenSSL**: `libssl-dev`.
+    - **Git**, **Make**, **wget** (for fetching resources).
 
 ### Installing Dependencies (Ubuntu/Debian)
+
 ```bash
 sudo apt update
 sudo apt install build-essential cmake git

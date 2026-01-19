@@ -35,22 +35,8 @@ The application is designed to be lightweight yet robust, leveraging C++23 for p
 
 ## 📦 Getting Started
 
-### Prerequisites
--   Linux (Ubuntu 24.04 recommended)
--   CMake 3.24+
--   Qt6 & OpenSSL
-
-### Quick Build
-```bash
-git clone https://github.com/Zheng-Bote/cake-planner-backend
-cd cake-planner-backend
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
-./CakePlanner
-```
-
-For full build instructions, including AppImage creation, see the [Build Guide](docs/development/build_process.md).
+- For Setup, see the [Deployment](deployment/setup.html).
+- For full build instructions, including AppImage creation, see the [Development](development/build_process.html).
 
 ## 📄 License
 This project is licensed under the **MIT License**.
