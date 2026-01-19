@@ -1,0 +1,42 @@
+name: Manual deploy Documentation
+
+# Author: Robert Zheng
+# created: 2026-01-12
+# updated: 2026-01-12
+# version: 1.0.0
+# description: build and generate static website from markdown files to branch gh-pages
+
+run-name: Manual deploy Documentation by ${{ github.actor }}
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: 'main'
+      - name: Build and Generate Site
+        uses: Zheng-Bote/gha_ghpages@v1.8.0
+        with:
+          template: 'theme/desktop/template.html'
+          assets: 'theme/blue/assets'
+          output: 'public'
+          docs: 'docs'
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: public/
+
+      - name: Deploy to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: public
