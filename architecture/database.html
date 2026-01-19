@@ -17,7 +17,7 @@
   <body>
     <header>
       <div class="header_left">
-        <img src="../assets/img/favicon.svg" alt="Logo" loading="eager" />
+        <img src="../assets/img/favicon.svg" alt="Logo" title="Home" loading="eager" />
         <h1>CakePlanner</h1>
       </div>
       <div class="header_middle">
@@ -41,6 +41,7 @@
   <li><a href="../architecture/class_diagrams.html">class_diagrams</a></li>
   <li><a href="../architecture/crow_server.html">crow_server</a></li>
   <li><a href="../architecture/database.html" class="active">database</a></li>
+  <li><a href="../architecture/overview.html">overview</a></li>
 </ul>
   </li>
   <li><strong>deployment</strong>
@@ -70,28 +71,38 @@
     <main class="main"><!-- DOCTOC SKIP -->
 <h1>Database Schema</h1>
 <p>The Cake Planner Backend uses <strong>SQLite</strong> as its relational database. The database file is typically located at <code>data/cakeplanner.sqlite</code>.</p>
+<h2>Database Schema (overview)</h2>
+<p>The database is normalized to ensure data integrity.</p>
+<ul>
+<li>users: Stores credentials and profile data.</li>
+<li>groups: Manages baking circles.</li>
+<li>group_members: Links users to groups (n:m).</li>
+<li>events: The core entity (Date, Baker, Description).</li>
+<li>ratings: Links users to events with a score (1-5).</li>
+<li>event_photos: Stores paths to community uploads linked to events.</li>
+</ul>
 <h2>Entity-Relationship Diagram (ERD)</h2>
 <p>The following diagram shows the database tables and their relationships.</p>
 <p><img src="../assets/img/architecture/backend/db_erp.png" alt="ERD"></p>
 <h2>Table Definitions</h2>
-<h3><code>users</code></h3>
+<h3>users</h3>
 <p>Stores user account information.</p>
 <ul>
 <li><strong>Primary Key</strong>: <code>id</code> (UUID as Text)</li>
 <li><strong>Unique</strong>: <code>email</code></li>
 </ul>
-<h3><code>groups</code></h3>
+<h3>groups</h3>
 <p>Represents groups (e.g., departments, teams) that organize cake events.</p>
 <ul>
 <li><strong>Primary Key</strong>: <code>id</code></li>
 </ul>
-<h3><code>group_members</code></h3>
+<h3>group_members</h3>
 <p>Many-to-Many link between <code>users</code> and <code>groups</code>.</p>
 <ul>
 <li><strong>Composite Primary Key</strong>: (<code>user_id</code>, <code>group_id</code>)</li>
 <li><strong>Foreign Keys</strong>: Cascade delete on both user and group.</li>
 </ul>
-<h3><code>events</code></h3>
+<h3>events</h3>
 <p>Represents a cake bringing event on a specific date.</p>
 <ul>
 <li><strong>Primary Key</strong>: <code>id</code></li>
@@ -101,13 +112,13 @@
 </ul>
 </li>
 </ul>
-<h3><code>ratings</code></h3>
+<h3>ratings</h3>
 <p>Allows users to rate and comment on events.</p>
 <ul>
 <li><strong>Unique Constraint</strong>: A user can only rate an event once (<code>event_id</code>, <code>rater_id</code>).</li>
 <li><strong>Check Constraint</strong>: <code>rating_value</code> must be between 1 and 5.</li>
 </ul>
-<h3><code>event_photos</code></h3>
+<h3>event_photos</h3>
 <p>Additional photos uploaded to an event gallery.</p>
 <ul>
 <li><strong>Composite Primary Key</strong>: (<code>event_id</code>, <code>user_id</code>) - <em>Note: Schema implies one photo per user per event based on PK, or just efficient linking.</em></li>
@@ -124,7 +135,7 @@
     <footer class="footer">
       <div class="footer-section_left">v0.12.0</div>
       <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
-      <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend">&lt;/&gt;</a></div>
+      <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
     </footer>
 
     <script src="../assets/js/main.js" defer></script>
