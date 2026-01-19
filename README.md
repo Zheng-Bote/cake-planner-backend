@@ -8,15 +8,14 @@ A high-performance C++ REST API backend for the Cake Planner application, built 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-  - [🌟 What is CakePlanner?](#-what-is-cakeplanner)
-    - [✨ Key Features](#-key-features)
-  - [🚀 How it works](#-how-it-works)
-  - [🖼️ Screenshots](#-screenshots)
-  - [🛠️ For Administrators (The Technical Stuff)](#-for-administrators-the-technical-stuff)
-    - [Admin-Panel](#admin-panel)
-      - [Screenshots](#screenshots)
-    - [Quick Start](#quick-start)
-- [See more](#see-more)
+- [🍰 Overview](#-overview)
+- [🚀 Key Features](#-key-features)
+- [🛠️ Technology Stack](#-technology-stack)
+- [📚 Documentation](#-documentation)
+- [📦 Getting Started](#-getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Quick Build](#quick-build)
+- [📄 License](#-license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
