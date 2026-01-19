@@ -6,6 +6,7 @@ function start() {
     window.location.href = "https://zheng-bote.github.io/cake-planner-backend/";
   });
 
+  toggleTheme();
 }
 
 function toggleTheme() {
