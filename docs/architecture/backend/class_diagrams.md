@@ -12,4 +12,4 @@ The application follows a defined **Model-View-Controller (MVC)** pattern (where
 
 ## Class Diagram
 
-![Class Diagram](../assets/img/architecture/backend/crow_class-diagrams.png)
+![Class Diagram](../../assets/img/architecture/backend/crow_class-diagrams.png)
