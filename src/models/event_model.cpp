@@ -2,8 +2,8 @@
  * @file event_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Model Implementation
- * @version 0.3.11
- * @date 2026-01-04
+ * @version 0.4.0
+ * @date 2026-01-20
  *
  * @copyright Copyright (c) 2025 ZHENG Robert
  *
@@ -354,16 +354,20 @@ std::vector<Event> Event::getRanked(const QString& userId, int limit) {
             e.photoPath = query.value("photo_path").toString();
             e.rating.average = query.value("avg_rating").toDouble(); // Das sortierte Rating
 
-            // WICHTIG: Jetzt die Gallery Photos für dieses Event laden
-            // (Hier machen wir es simpel per Loop, für High-Performance wäre ein JOIN besser, aber komplexer zu mappen)
             QSqlQuery galQuery(db);
-            galQuery.prepare("SELECT photo_path, user_id FROM event_photos WHERE event_id = :eid");
+            galQuery.prepare(R"(
+                SELECT ep.photo_path, ep.user_id, u.full_name
+                FROM event_photos ep
+                LEFT JOIN users u ON ep.user_id = u.id
+                WHERE ep.event_id = :eid
+            )");
             galQuery.bindValue(":eid", e.id);
             if(galQuery.exec()) {
                 while(galQuery.next()){
                     GalleryItem item;
                     item.photoUrl = "/api/uploads/" + galQuery.value("photo_path").toString();
                     item.userId = galQuery.value("user_id").toString();
+                    item.userName = galQuery.value("full_name").toString();
                     // isMine checken wir hier simpel
                     item.isMine = (item.userId == userId);
                     e.gallery.push_back(item);

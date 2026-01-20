@@ -22,12 +22,12 @@ constexpr std::string_view PROG_LICENSE = "MIT";
 
 constexpr std::string_view EXECUTABLE_NAME = "CakePlanner";
 
-constexpr std::string_view VERSION = "0.11.1";
+constexpr std::string_view VERSION = "0.13.0";
 constexpr std::int32_t PROJECT_VERSION_MAJOR { 0 };
-constexpr std::int32_t PROJECT_VERSION_MINOR { 11 };
-constexpr std::int32_t PROJECT_VERSION_PATCH { 1 };
+constexpr std::int32_t PROJECT_VERSION_MINOR { 13 };
+constexpr std::int32_t PROJECT_VERSION_PATCH { 0 };
 
-constexpr std::string_view PROJECT_HOMEPAGE_URL = "https://github.com/Zheng-Bote/cake-planner-backend";
+constexpr std::string_view PROJECT_HOMEPAGE_URL = "https://zheng-bote.github.io/cake-planner-backend";
 constexpr std::string_view AUTHOR = "ZHENG Bote";
 constexpr std::string_view CREATED_YEAR = "2026";
 constexpr std::string_view ORGANIZATION = "ZHENG Robert";
@@ -35,7 +35,7 @@ constexpr std::string_view DOMAIN = "net.hase-zheng";
 
 constexpr std::string_view CMAKE_CXX_STANDARD = "c++23";
 constexpr std::string_view CMAKE_CXX_COMPILER =
-    "Clang 20.1.8";
+    "GNU 15.2.0";
 constexpr std::string_view QT_VERSION_BUILD = "6.9.2";
 } // namespace config
 } // namespace rz
