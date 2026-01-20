@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
           ref: 'main'
       - name: Build and Generate Site
-        uses: Zheng-Bote/gha_ghpages@v1.8.0
+        uses: Zheng-Bote/gha_ghpages@main
         with:
           template: 'theme/desktop/template.html'
           assets: 'theme/blue/assets'
