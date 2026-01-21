@@ -1,8 +1,13 @@
-<!-- DOCTOC SKIP -->
-
 # Crow Server Architecture
 
 This document describes the architecture of the Cake Planner Backend, which is built using the **Crow** C++ microframework.
+
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
 
 ## Overview
 

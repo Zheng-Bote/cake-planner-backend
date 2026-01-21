@@ -1,7 +1,13 @@
-<!-- DOCTOC SKIP -->
 # Deployment Guide
 
 This guide describes how to deploy the Cake Planner Backend using **Docker Compose**, **Nginx**, and the **AppImage**.
+
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
 
 ## Architecture
 

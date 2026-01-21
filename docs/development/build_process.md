@@ -1,7 +1,13 @@
-<!-- DOCTOC SKIP -->
 # Build Process & Development Guide
 
 This guide explains how to build the Cake Planner Backend from source and how to package it as an AppImage.
+
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
 
 ## Prerequisites
 

@@ -1,4 +1,3 @@
-<!-- DOCTOC SKIP -->
 # Example of an .env file for the CakePlanner Backend
 
 ```toml

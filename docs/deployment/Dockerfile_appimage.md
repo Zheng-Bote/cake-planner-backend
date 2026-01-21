@@ -1,6 +1,4 @@
-<!-- DOCTOC SKIP -->
 # Dockerfile.appimage Example
-
 
 ```dockerfile
 # Base Image: Ubuntu 24.04 (Matches Build System)

@@ -1,8 +1,13 @@
-<!-- DOCTOC SKIP -->
-
 # Database Schema
 
 The Cake Planner Backend uses **SQLite** as its relational database. The database file is typically located at `data/cakeplanner.sqlite`.
+
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
 
 ## Database Schema (overview)
 

@@ -1,7 +1,13 @@
-<!-- DOCTOC SKIP -->
 # Backend Security
 
 This document outlines the security measures implemented in the Cake Planner Backend to protect user data, ensure integrity, and prevent common vulnerabilities.
+
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
 
 ## 1. Authentication & Authorization
 

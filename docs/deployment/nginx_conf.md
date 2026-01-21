@@ -1,4 +1,3 @@
-<!-- DOCTOC SKIP -->
 # nginx.conf Example
 
 ```nginx

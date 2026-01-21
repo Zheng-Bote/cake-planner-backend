@@ -1,4 +1,3 @@
-<!-- DOCTOC SKIP -->
 # docker-compose.yml example
 
 ```yaml

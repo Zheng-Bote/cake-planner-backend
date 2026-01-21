@@ -29,6 +29,7 @@ jobs:
           assets: 'theme/blue/assets'
           output: 'public'
           docs: 'docs'
+          toc: true
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:

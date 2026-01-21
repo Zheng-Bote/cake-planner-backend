@@ -1,4 +1,3 @@
-<!-- DOCTOC SKIP -->
 # Dockerfile.nginx Example
 
 ```dockerfile

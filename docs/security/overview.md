@@ -1,8 +1,13 @@
-<!-- DOCTOC SKIP -->
-
 # Security Overview
 
 This document outlines the security measures implemented in the application to ensure data protection and secure communication.
+
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
 
 ## Network Security
 

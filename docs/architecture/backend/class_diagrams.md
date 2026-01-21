@@ -1,4 +1,3 @@
-<!-- DOCTOC SKIP -->
 # Class Diagrams
 
 This document visualizes the class structure and relationships of the Cake Planner Backend.
