@@ -127,7 +127,7 @@ footer {
   cursor: pointer;
 }
 .header_left img {
-  width: 30px;
+  width: 45px;
   height: auto;
   vertical-align: middle;
 }
@@ -160,6 +160,7 @@ header h1 {
   font-weight: 700;
   color: var(--primary-color);
   margin-left: 12px;
+  text-wrap: pretty;
 }
 
 /* --- BUTTONS --- */
@@ -180,6 +181,28 @@ header h1 {
   border-color: var(--primary-color);
   color: var(--primary-color);
   background-color: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05));
+}
+
+.tron-btn.icon-only {
+  padding: 0;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+/* Anpassung für SVG im Button */
+.tron-btn.icon-only svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--font-color); /* Nutzt deine CSS Variable */
+  transition: stroke 0.2s ease;
+}
+
+.tron-btn.icon-only:hover svg {
+  stroke: var(--primary-color);
 }
 
 /* --- SIDEBAR NAV --- */
@@ -287,6 +310,20 @@ main p {
   line-height: 1.6;
   color: var(--font-color);
   margin-bottom: 1rem;
+  font-weight: normal;
+}
+
+main a::before {
+  content: '» ';
+}
+
+main .ul-sub > li {
+  margin-left: 12px;
+}
+
+main strong {
+  /* font-weight: 700; */
+  color: var(--primary-color);
 }
 
 /* --- CODE BLOCKS --- */
@@ -451,32 +488,6 @@ td a:hover {
   text-decoration-color: var(--primary-color);
 }
 
-/* --- RESPONSIVE / DESKTOP --- */
-@media screen and (min-width: 1024px) {
-  body {
-    grid-template-columns: 260px 1fr;
-    grid-template-rows: 70px 1fr auto;
-    grid-template-areas:
-      'header header'
-      'aside main'
-      'footer footer';
-    max-width: 1600px;
-    margin: auto;
-  }
-
-  aside {
-    border-bottom: none;
-    background-color: var(--bg-panel);
-  }
-
-  main {
-    border: none;
-    box-shadow: none;
-    background-color: transparent;
-    padding: 0 40px;
-  }
-}
-
 /* --- dark mode toggle --- */
 /* --- THEME TOGGLE SWITCH --- */
 .theme-switch {
@@ -499,7 +510,7 @@ td a:hover {
   position: absolute;
   right: 0;
   top: 0;
-  transition: .4s;
+  transition: 0.4s;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -515,15 +526,15 @@ td a:hover {
 .slider:before {
   background-color: #fff;
   bottom: 3px; /* Etwas Abstand zum Rand */
-  content: "";
+  content: '';
   height: 20px;
   left: 4px;
   position: absolute;
-  transition: .4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   width: 20px;
   border-radius: 50%;
   z-index: 2;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Wenn Checkbox aktiv (Dark Mode) */
@@ -549,9 +560,101 @@ input:checked + .slider:before {
 /* Icons Farbe anpassen, wenn aktiv */
 input:checked + .slider .icon-sun {
   opacity: 0.5;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 input:checked + .slider .icon-moon {
   opacity: 1;
   color: white;
+}
+
+/* --- TABLE OF CONTENTS (TOC) --- */
+/* Wird automatisch vom SSG generiert */
+
+/* 1. Container-Look für die Hauptliste */
+ul.toc-level-2 {
+  background-color: light-dark(rgba(0, 0, 0, 0.02), rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-color); /* Akzent-Linie links */
+  border-radius: var(--border-radius);
+  padding: 1rem 1.5rem 1rem 1rem;
+  margin: 0.5rem 0 2rem 0;
+  display: inline-block; /* Nimmt nur so viel Platz wie nötig (optional 'block' für volle Breite) */
+  min-width: 300px;
+  max-width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+
+/* 2. Reset für alle Listen-Ebenen */
+ul[class^='toc-level-'] {
+  list-style: none; /* Keine Standard-Bullets */
+}
+
+/* 3. Abstände der Listeneinträge */
+ul[class^='toc-level-'] li {
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+/* 4. Einrückung und Guides für Unterebenen (h3, h4) */
+.toc-level-3,
+.toc-level-4 {
+  margin-top: 0.4rem;
+  margin-left: 1.2rem;
+  padding-left: 0.8rem;
+  border-left: 1px solid var(--border-color); /* Feine vertikale Linie zur Orientierung */
+}
+
+.toc-level-4 {
+  font-size: 0.9em; /* Level 4 etwas kleiner */
+}
+
+/* 5. Link-Styling */
+ul[class^='toc-level-'] a {
+  color: var(--font-color);
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s ease;
+  opacity: 0.9;
+}
+
+ul[class^='toc-level-'] a:hover {
+  color: var(--primary-color);
+  opacity: 1;
+  transform: translateX(4px); /* Kleiner Slide-Effekt nach rechts */
+  text-decoration: none;
+}
+
+/* 6. Anpassung des globalen '» ' Präfixes */
+/* Da main a::before global definiert ist, passen wir es hier farblich an */
+ul[class^='toc-level-'] a::before {
+  color: var(--secondary-color); /* Sekundärfarbe für den Pfeil */
+  opacity: 0.7;
+  font-weight: normal;
+}
+
+/* --- RESPONSIVE / DESKTOP --- */
+@media screen and (min-width: 1024px) {
+  body {
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 70px 1fr auto;
+    grid-template-areas:
+      'header header'
+      'aside main'
+      'footer footer';
+    max-width: 1600px;
+    margin: auto;
+  }
+
+  aside {
+    border-bottom: none;
+    background-color: var(--bg-panel);
+  }
+
+  main {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    padding: 0 40px;
+  }
 }

@@ -5,14 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CakePlanner | backend_security</title>
 
+    <meta name="description" content="Cake Planner - The sweetest way to organize your cake events within your team."/>
+    <meta name="keywords" content="Cake Planner, sweet team events, cake events, team events, cake planning, team planning, cake management, ZHENG Robert, Robert Zheng, ZHENG Bote, 郑 伯特"/>
+    <meta name="author" content="Zheng Robert" />
+
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+
+
+
     <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon" />
     <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
 
+     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500&display=swap"
       rel="stylesheet"
     />
+        <link rel="preload" href="../assets/css/main.css" as="style" />
     <link rel="stylesheet" href="../assets/css/main.css" />
+
+     <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Cake Planner - The sweetest way to organize your cake events."
+    />
+    <meta
+      property="og:description"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta property="og:site_name" content="Cake Planner" />
+    <meta property="og:url" content="../" />
+    <meta property="og:image" content="../assets/img/logo_256x256.png" />
+    <meta
+      property="og:image:alt"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta property="og:locale" content="en_EN" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta
+      name="twitter:description"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
   </head>
   <body>
     <header>
@@ -24,6 +65,16 @@
         <span>Backend</span>
       </div>
       <div class="header_right">
+      <button id="share-btn" class="tron-btn icon-only" title="Share" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"></circle>
+      <circle cx="6" cy="12" r="3"></circle>
+      <circle cx="18" cy="19" r="3"></circle>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+    </svg>
+  </button>
+
         <label class="theme-switch" for="checkbox" title="Switch Light/Dark Mode">
           <input type="checkbox" id="checkbox" />
           <div class="slider round">
@@ -51,12 +102,12 @@
   </li>
   <li><strong>deployment</strong>
 <ul class="nav-list">
-  <li><a href="../deployment/CakePlanner.env.html">CakePlanner.env</a></li>
-  <li><a href="../deployment/Dockerfile.appimage.html">Dockerfile.appimage</a></li>
-  <li><a href="../deployment/Dockerfile.nginx.html">Dockerfile.nginx</a></li>
+  <li><a href="../deployment/CakePlanner_env.html">CakePlanner env</a></li>
+  <li><a href="../deployment/Dockerfile_appimage.html">Dockerfile appimage</a></li>
+  <li><a href="../deployment/Dockerfile_nginx.html">Dockerfile nginx</a></li>
   <li><a href="../deployment/deployment_guide.html">deployment guide</a></li>
   <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
-  <li><a href="../deployment/nginx.conf.html">nginx.conf</a></li>
+  <li><a href="../deployment/nginx_conf.html">nginx conf</a></li>
   <li><a href="../deployment/overview.html">overview</a></li>
 </ul>
   </li>
@@ -75,11 +126,38 @@
 </nav>
     </aside>
 
-    <main class="main"><!-- DOCTOC SKIP -->
-<h1>Backend Security</h1>
+    <main class="main"><h1>Backend Security</h1>
 <p>This document outlines the security measures implemented in the Cake Planner Backend to protect user data, ensure integrity, and prevent common vulnerabilities.</p>
-<h2>1. Authentication &amp; Authorization</h2>
-<h3>JSON Web Tokens (JWT)</h3>
+<hr>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<h2>Table of Contents</h2>
+<ul class="toc-level-2">
+<li><a href="#1-authentication-amp-authorization">1. Authentication &amp; Authorization</a></li>
+<ul class="toc-level-3">
+<li><a href="#json-web-tokens-jwt">JSON Web Tokens (JWT)</a></li>
+<li><a href="#role-based-access-control-rbac">Role-Based Access Control (RBAC)</a></li>
+</ul>
+<li><a href="#2-password-security">2. Password Security</a></li>
+<ul class="toc-level-3">
+<li><a href="#hashing-algorithm-argon2id">Hashing Algorithm: Argon2id</a></li>
+</ul>
+<li><a href="#3-data-protection">3. Data Protection</a></li>
+<ul class="toc-level-3">
+<li><a href="#sql-injection-prevention">SQL Injection Prevention</a></li>
+<li><a href="#input-validation">Input Validation</a></li>
+</ul>
+<li><a href="#4-transport-security">4. Transport Security</a></li>
+<ul class="toc-level-3">
+<li><a href="#https-tls">HTTPS / TLS</a></li>
+<li><a href="#cors-cross-origin-resource-sharing">CORS (Cross-Origin Resource Sharing)</a></li>
+</ul>
+<li><a href="#5-security-best-practices">5. Security Best Practices</a></li>
+</ul>
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<hr>
+<h2 id="1-authentication-amp-authorization">1. Authentication &amp; Authorization</h2>
+<h3 id="json-web-tokens-jwt">JSON Web Tokens (JWT)</h3>
 <p>The application uses <strong>JWT (JSON Web Tokens)</strong> for stateless authentication.</p>
 <ul>
 <li><strong>Library</strong>: <code>token_utils.hpp</code> handles token generation and verification.</li>
@@ -91,14 +169,14 @@
 </ul>
 </li>
 </ul>
-<h3>Role-Based Access Control (RBAC)</h3>
+<h3 id="role-based-access-control-rbac">Role-Based Access Control (RBAC)</h3>
 <ul>
 <li><strong>Middleware</strong>: <code>AuthMiddleware</code> injects the current user context into the request.</li>
 <li><strong>Controllers</strong>: Individual controllers (e.g., <code>AdminController</code>) check <code>user.is_admin</code> to restrict access to sensitive endpoints.</li>
 </ul>
-<h2>2. Password Security</h2>
+<h2 id="2-password-security">2. Password Security</h2>
 <p>User passwords are <strong>never</strong> stored in plain text.</p>
-<h3>Hashing Algorithm: Argon2id</h3>
+<h3 id="hashing-algorithm-argon2id">Hashing Algorithm: Argon2id</h3>
 <p>The application uses <strong>Argon2id</strong>, the winner of the Password Hashing Competition (PHC) and currently recommended by OWASP.</p>
 <ul>
 <li><strong>Implementation</strong>: <code>src/utils/password_utils.cpp</code></li>
@@ -111,31 +189,31 @@
 </ul>
 </li>
 </ul>
-<h2>3. Data Protection</h2>
-<h3>SQL Injection Prevention</h3>
+<h2 id="3-data-protection">3. Data Protection</h2>
+<h3 id="sql-injection-prevention">SQL Injection Prevention</h3>
 <p>All database interactions via <code>DatabaseManager</code> and Models use <strong>Prepared Statements</strong> (via <code>QSqlQuery</code>).</p>
 <ul>
 <li><strong>Mechanism</strong>: Inputs are bound using <code>bindValue()</code> (e.g., <code>:email</code>, <code>:id</code>) instead of string concatenation.</li>
 <li><strong>Benefit</strong>: This effectively neutralizes SQL injection attacks.</li>
 </ul>
-<h3>Input Validation</h3>
+<h3 id="input-validation">Input Validation</h3>
 <ul>
 <li><strong>Strong Typing</strong>: The use of C++ struct models (<code>User</code>, <code>Event</code>) ensures data types are respected.</li>
 <li><strong>Crow Routing</strong>: Route parameters are typed (e.g., <code>&lt;string&gt;</code>, <code>&lt;int&gt;</code>), preventing basic malformed URL attacks.</li>
 </ul>
-<h2>4. Transport Security</h2>
-<h3>HTTPS / TLS</h3>
+<h2 id="4-transport-security">4. Transport Security</h2>
+<h3 id="https-tls">HTTPS / TLS</h3>
 <p>The Crow server runs on <strong>HTTP</strong> internally (default port 8080).</p>
 <ul>
 <li><strong>Recommendation</strong>: For production, <strong>ALWAYS</strong> sit the application behind a Reverse Proxy (Nginx, Apache, Traefik).</li>
 <li><strong>SSL Termination</strong>: The reverse proxy should handle SSL/TLS encryption (HTTPS) and forward requests to the backend via localhost.</li>
 </ul>
-<h3>CORS (Cross-Origin Resource Sharing)</h3>
+<h3 id="cors-cross-origin-resource-sharing">CORS (Cross-Origin Resource Sharing)</h3>
 <ul>
 <li>The application implements CORS handling in middleware to allow requests from the frontend application.</li>
 <li><strong>Preflight Checks</strong>: <code>OPTIONS</code> requests are handled globally to support browser preflight checks.</li>
 </ul>
-<h2>5. Security Best Practices</h2>
+<h2 id="5-security-best-practices">5. Security Best Practices</h2>
 <ul>
 <li><strong>2FA (Two-Factor Authentication)</strong>: The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security (<code>totp_utils.hpp</code>).</li>
 <li><strong>Rate Limiting</strong>: Currently not implemented in the application layer. It is recommended to configure Rate Limiting on the <strong>Reverse Proxy</strong> level (e.g., <code>limit_req</code> in Nginx) to prevent Brute Force or DDoS attacks.</li>
@@ -144,7 +222,7 @@
 </main>
 
     <footer class="footer">
-      <div class="footer-section_left">v0.12.0</div>
+      <div class="footer-section_left">v0.13.0</div>
       <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
       <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
     </footer>

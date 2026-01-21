@@ -5,14 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CakePlanner | build_process</title>
 
+    <meta name="description" content="Cake Planner - The sweetest way to organize your cake events within your team."/>
+    <meta name="keywords" content="Cake Planner, sweet team events, cake events, team events, cake planning, team planning, cake management, ZHENG Robert, Robert Zheng, ZHENG Bote, 郑 伯特"/>
+    <meta name="author" content="Zheng Robert" />
+
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+
+
+
     <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon" />
     <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
 
+     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500&display=swap"
       rel="stylesheet"
     />
+        <link rel="preload" href="../assets/css/main.css" as="style" />
     <link rel="stylesheet" href="../assets/css/main.css" />
+
+     <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Cake Planner - The sweetest way to organize your cake events."
+    />
+    <meta
+      property="og:description"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta property="og:site_name" content="Cake Planner" />
+    <meta property="og:url" content="../" />
+    <meta property="og:image" content="../assets/img/logo_256x256.png" />
+    <meta
+      property="og:image:alt"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta property="og:locale" content="en_EN" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta
+      name="twitter:description"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
   </head>
   <body>
     <header>
@@ -24,6 +65,16 @@
         <span>Backend</span>
       </div>
       <div class="header_right">
+      <button id="share-btn" class="tron-btn icon-only" title="Share" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"></circle>
+      <circle cx="6" cy="12" r="3"></circle>
+      <circle cx="18" cy="19" r="3"></circle>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+    </svg>
+  </button>
+
         <label class="theme-switch" for="checkbox" title="Switch Light/Dark Mode">
           <input type="checkbox" id="checkbox" />
           <div class="slider round">
@@ -51,12 +102,12 @@
   </li>
   <li><strong>deployment</strong>
 <ul class="nav-list">
-  <li><a href="../deployment/CakePlanner.env.html">CakePlanner.env</a></li>
-  <li><a href="../deployment/Dockerfile.appimage.html">Dockerfile.appimage</a></li>
-  <li><a href="../deployment/Dockerfile.nginx.html">Dockerfile.nginx</a></li>
+  <li><a href="../deployment/CakePlanner_env.html">CakePlanner env</a></li>
+  <li><a href="../deployment/Dockerfile_appimage.html">Dockerfile appimage</a></li>
+  <li><a href="../deployment/Dockerfile_nginx.html">Dockerfile nginx</a></li>
   <li><a href="../deployment/deployment_guide.html">deployment guide</a></li>
   <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
-  <li><a href="../deployment/nginx.conf.html">nginx.conf</a></li>
+  <li><a href="../deployment/nginx_conf.html">nginx conf</a></li>
   <li><a href="../deployment/overview.html">overview</a></li>
 </ul>
   </li>
@@ -75,12 +126,31 @@
 </nav>
     </aside>
 
-    <main class="main"><!-- DOCTOC SKIP -->
-<h1>Build Process &amp; Development Guide</h1>
+    <main class="main"><h1>Build Process &amp; Development Guide</h1>
 <p>This guide explains how to build the Cake Planner Backend from source and how to package it as an AppImage.</p>
-<h2>Prerequisites</h2>
+<hr>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<h2>Table of Contents</h2>
+<ul class="toc-level-2">
+<li><a href="#prerequisites">Prerequisites</a></li>
+<ul class="toc-level-3">
+<li><a href="#system-requirements">System Requirements</a></li>
+<li><a href="#installing-dependencies-ubuntudebian">Installing Dependencies (Ubuntu/Debian)</a></li>
+</ul>
+<li><a href="#building-from-source">Building from Source</a></li>
+<li><a href="#creating-an-appimage">creating an AppImage</a></li>
+<ul class="toc-level-3">
+<li><a href="#script-codecreateappimageshcode">Script: <code>create_appimage.sh</code></a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#result">Result</a></li>
+</ul>
+</ul>
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<hr>
+<h2 id="prerequisites">Prerequisites</h2>
 <p>The project requires a modern Linux environment with C++23 support.</p>
-<h3>System Requirements</h3>
+<h3 id="system-requirements">System Requirements</h3>
 <ul>
 <li><strong>Linux</strong>: (Ubuntu 24.04 recommended)</li>
 <li><strong>CMake</strong>: 3.23+</li>
@@ -93,12 +163,12 @@
 </ul>
 </li>
 </ul>
-<h3>Installing Dependencies (Ubuntu/Debian)</h3>
+<h3 id="installing-dependencies-ubuntudebian">Installing Dependencies (Ubuntu/Debian)</h3>
 <pre><code class="language-bash">sudo apt update
 sudo apt install build-essential cmake git
 sudo apt install qt6-base-dev libqt6sql6-sqlite libssl-dev
 </code></pre>
-<h2>Building from Source</h2>
+<h2 id="building-from-source">Building from Source</h2>
 <p>The project uses CMake as its build system.</p>
 <ol>
 <li><p><strong>Clone the Repository</strong>:</p>
@@ -125,9 +195,9 @@ cd build
 </code></pre>
 </li>
 </ol>
-<h2>creating an AppImage</h2>
+<h2 id="creating-an-appimage">creating an AppImage</h2>
 <p>The project includes a script to package the application as a standalone <strong>AppImage</strong>.</p>
-<h3>Script: <code>create_appimage.sh</code></h3>
+<h3 id="script-codecreateappimageshcode">Script: <code>create_appimage.sh</code></h3>
 <p>This script automates the following steps:</p>
 <ol>
 <li>Rebuilds the project in <code>Release</code> mode.</li>
@@ -136,12 +206,12 @@ cd build
 <li>Downloads <code>linuxdeploy</code> and the <code>qt-plugin</code>.</li>
 <li>Generates the final <code>.AppImage</code> file.</li>
 </ol>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 <p>Run the script from the project root:</p>
 <pre><code class="language-bash">chmod +x create_appimage.sh
 ./create_appimage.sh
 </code></pre>
-<h3>Result</h3>
+<h3 id="result">Result</h3>
 <p>After successful execution, you will find <code>CakePlanner-x86_64.AppImage</code> in the root directory. You can run it directly:</p>
 <pre><code class="language-bash">./CakePlanner-x86_64.AppImage
 </code></pre>
@@ -152,7 +222,7 @@ cd build
 </main>
 
     <footer class="footer">
-      <div class="footer-section_left">v0.12.0</div>
+      <div class="footer-section_left">v0.13.0</div>
       <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
       <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
     </footer>

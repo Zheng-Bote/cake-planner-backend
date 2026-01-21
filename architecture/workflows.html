@@ -5,14 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CakePlanner | workflows</title>
 
+    <meta name="description" content="Cake Planner - The sweetest way to organize your cake events within your team."/>
+    <meta name="keywords" content="Cake Planner, sweet team events, cake events, team events, cake planning, team planning, cake management, ZHENG Robert, Robert Zheng, ZHENG Bote, 郑 伯特"/>
+    <meta name="author" content="Zheng Robert" />
+
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+
+
+
     <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon" />
     <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
 
+     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500&display=swap"
       rel="stylesheet"
     />
+        <link rel="preload" href="../assets/css/main.css" as="style" />
     <link rel="stylesheet" href="../assets/css/main.css" />
+
+     <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Cake Planner - The sweetest way to organize your cake events."
+    />
+    <meta
+      property="og:description"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta property="og:site_name" content="Cake Planner" />
+    <meta property="og:url" content="../" />
+    <meta property="og:image" content="../assets/img/logo_256x256.png" />
+    <meta
+      property="og:image:alt"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta property="og:locale" content="en_EN" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
+    <meta
+      name="twitter:description"
+      content="Cake Planner - The sweetest way to organize your cake events within your team."
+    />
   </head>
   <body>
     <header>
@@ -24,6 +65,16 @@
         <span>Backend</span>
       </div>
       <div class="header_right">
+      <button id="share-btn" class="tron-btn icon-only" title="Share" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"></circle>
+      <circle cx="6" cy="12" r="3"></circle>
+      <circle cx="18" cy="19" r="3"></circle>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+    </svg>
+  </button>
+
         <label class="theme-switch" for="checkbox" title="Switch Light/Dark Mode">
           <input type="checkbox" id="checkbox" />
           <div class="slider round">
@@ -51,12 +102,12 @@
   </li>
   <li><strong>deployment</strong>
 <ul class="nav-list">
-  <li><a href="../deployment/CakePlanner.env.html">CakePlanner.env</a></li>
-  <li><a href="../deployment/Dockerfile.appimage.html">Dockerfile.appimage</a></li>
-  <li><a href="../deployment/Dockerfile.nginx.html">Dockerfile.nginx</a></li>
+  <li><a href="../deployment/CakePlanner_env.html">CakePlanner env</a></li>
+  <li><a href="../deployment/Dockerfile_appimage.html">Dockerfile appimage</a></li>
+  <li><a href="../deployment/Dockerfile_nginx.html">Dockerfile nginx</a></li>
   <li><a href="../deployment/deployment_guide.html">deployment guide</a></li>
   <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
-  <li><a href="../deployment/nginx.conf.html">nginx.conf</a></li>
+  <li><a href="../deployment/nginx_conf.html">nginx conf</a></li>
   <li><a href="../deployment/overview.html">overview</a></li>
 </ul>
   </li>
@@ -77,7 +128,18 @@
 
     <main class="main"><h1>Backend Workflows</h1>
 
-<h2>Image Workflow</h2>
+<hr>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<h2>Table of Contents</h2>
+<ul class="toc-level-2">
+<li><a href="#image-workflow">Image Workflow</a></li>
+<li><a href="#request-workflow">Request Workflow</a></li>
+</ul>
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<hr>
+
+<h2 id="image-workflow">Image Workflow</h2>
 
 <p><strong>📸 Image Upload & Optimization Pipeline</strong></p>
 <p>
@@ -88,14 +150,14 @@
 <img src="../assets/img/architecture/image_flow.png" alt="Workflow" />
 
 
-<h2>Request Workflow</h2>
+<h2 id="request-workflow">Request Workflow</h2>
 <p><strong>HTTP Request Workflow</strong></p>
 <img src="../assets/img/architecture/request_flow.png" alt="Request Workflow" />
 
 </main>
 
     <footer class="footer">
-      <div class="footer-section_left">v0.12.0</div>
+      <div class="footer-section_left">v0.13.0</div>
       <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
       <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
     </footer>
