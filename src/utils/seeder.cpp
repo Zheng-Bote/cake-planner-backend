@@ -2,10 +2,10 @@
  * @file seeder.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Seeder Utilities
- * @version 0.1.1
- * @date 2026-01-03
+ * @version 0.1.2
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -20,31 +20,37 @@
 namespace rz {
 namespace utils {
 
+/**
+ * @brief Ensures that at least one admin account exists in the system.
+ *
+ * Checks if any admin user exists. If not, it creates a default admin account
+ * with credentials from the environment variables (or defaults).
+ */
 void Seeder::ensureAdminExists() {
   if (User::existsAnyAdmin()) {
-    qInfo() << "System-Check: Admin-Account existiert bereits.";
+    qInfo() << "System Check: Admin account already exists.";
     return;
   }
 
   qWarning()
-      << "System-Check: Kein Admin gefunden. Erstelle initialen Admin...";
+      << "System Check: No admin found. Creating initial admin...";
 
-  // Zugriff auf EnvLoader im gleichen Namespace
+  // Access EnvLoader in the same namespace
   QString adminPw = EnvLoader::get("CAKE_ADMIN_PASSWORD", "admin123");
 
   User admin;
   admin.full_name = "System Administrator";
   admin.email = "admin@cakeplanner.local";
-  // Zugriff auf PasswordUtils im gleichen Namespace
+  // Access PasswordUtils in the same namespace
   admin.password_hash = PasswordUtils::hashPassword(adminPw);
   admin.is_active = true;
   admin.is_admin = true;
 
   if (admin.create()) {
-    qInfo() << "ERFOLG: Initialer Admin erstellt.";
+    qInfo() << "SUCCESS: Initial admin created.";
     qInfo() << "Login Email: admin@cakeplanner.local";
   } else {
-    qCritical() << "FEHLER: Konnte initialen Admin nicht erstellen!";
+    qCritical() << "ERROR: Could not create initial admin!";
   }
 }
 

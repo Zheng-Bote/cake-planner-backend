@@ -2,10 +2,10 @@
  * @file notification_service.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Notification Service Implementation
- * @version 0.2.1
- * @date 2026-01-04
+ * @version 0.2.2
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -19,14 +19,24 @@
 namespace rz {
 namespace service {
 
+/**
+ * @brief Constructs the NotificationService.
+ *
+ * @param smtp Pointer to the SMTP service used for sending emails.
+ */
 NotificationService::NotificationService(SmtpService* smtp)
     : m_smtp(smtp) {}
 
+/**
+ * @brief Retrieves the email addresses of all global administrators.
+ *
+ * @return A vector of admin email addresses.
+ */
 std::vector<QString> NotificationService::getGlobalAdminEmails() {
     std::vector<QString> emails;
     auto db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
-    // Hole alle User mit is_admin = 1
+    // Get all users with is_admin = 1
     query.prepare("SELECT email FROM users WHERE is_admin = 1 AND is_active = 1");
     if (query.exec()) {
         while (query.next()) {
@@ -36,6 +46,12 @@ std::vector<QString> NotificationService::getGlobalAdminEmails() {
     return emails;
 }
 
+/**
+ * @brief Notifies admins about a new user registration.
+ *
+ * @param newUserName The name of the new user.
+ * @param newUserEmail The email of the new user.
+ */
 void NotificationService::notifyAdminsNewUser(const QString& newUserName, const QString& newUserEmail) {
     auto admins = getGlobalAdminEmails();
     if (admins.empty()) {
@@ -52,15 +68,26 @@ void NotificationService::notifyAdminsNewUser(const QString& newUserName, const 
     }
 }
 
+/**
+ * @brief Notifies group members about a new event (e.g., someone bringing cake).
+ *
+ * Sends emails in German or English based on the recipients' preferences.
+ *
+ * @param groupName The name of the group.
+ * @param bakerName The name of the user bringing the cake.
+ * @param date The date of the event.
+ * @param recipientsDe List of email addresses for German notifications.
+ * @param recipientsEn List of email addresses for English notifications.
+ */
 void NotificationService::notifyGroupNewEvent(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn) {
-    // Deutsch
+    // German
     if (!recipientsDe.empty()) {
         QString subject = QString("Neuer Kuchen in %1!").arg(groupName);
         QString body = QString("Hallo,\n\n%1 bringt am %2 einen Kuchen mit!\n\nYummy!").arg(bakerName, date);
         for (const auto& mail : recipientsDe) m_smtp->sendEmailAsync(mail, subject, body);
     }
 
-    // Englisch
+    // English
     if (!recipientsEn.empty()) {
         QString subject = QString("New Cake in %1!").arg(groupName);
         QString body = QString("Hello,\n\n%1 is bringing a cake on %2!\n\nYummy!").arg(bakerName, date);
@@ -68,6 +95,13 @@ void NotificationService::notifyGroupNewEvent(const QString& groupName, const QS
     }
 }
 
+/**
+ * @brief Notifies a user that their account has been activated.
+ *
+ * @param email The user's email address.
+ * @param name The user's name.
+ * @param lang The user's preferred language ("de" or "en").
+ */
 void NotificationService::notifyAccountActivated(const QString& email, const QString& name, const QString& lang) {
     QString subject;
     QString body;
@@ -89,6 +123,13 @@ void NotificationService::notifyAccountActivated(const QString& email, const QSt
     m_smtp->sendEmailAsync(email, subject, body);
 }
 
+/**
+ * @brief Notifies a user that their account has been deactivated.
+ *
+ * @param email The user's email address.
+ * @param name The user's name.
+ * @param lang The user's preferred language ("de" or "en").
+ */
 void NotificationService::notifyAccountDeactivated(const QString& email, const QString& name, const QString& lang) {
     QString subject;
     QString body;
@@ -110,6 +151,13 @@ void NotificationService::notifyAccountDeactivated(const QString& email, const Q
     m_smtp->sendEmailAsync(email, subject, body);
 }
 
+/**
+ * @brief Notifies a user that their account has been deleted.
+ *
+ * @param email The user's email address.
+ * @param name The user's name.
+ * @param lang The user's preferred language ("de" or "en").
+ */
 void NotificationService::notifyAccountDeleted(const QString& email, const QString& name, const QString& lang) {
     QString subject;
     QString body;
@@ -131,6 +179,15 @@ void NotificationService::notifyAccountDeleted(const QString& email, const QStri
     m_smtp->sendEmailAsync(email, subject, body);
 }
 
+/**
+ * @brief Notifies a user that their password has been changed.
+ *
+ * Serves as a security alert.
+ *
+ * @param email The user's email address.
+ * @param name The user's name.
+ * @param lang The user's preferred language ("de" or "en").
+ */
 void NotificationService::notifyPasswordChanged(const QString& email, const QString& name, const QString& lang) {
     QString subject;
     QString body;

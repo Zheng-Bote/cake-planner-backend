@@ -2,10 +2,10 @@
  * @file main.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Entry Point
- * @version 0.8.3
- * @date 2026-01-07
+ * @version 0.8.4
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -24,7 +24,7 @@
 #include <thread>
 #include <iostream>
 #include <string>
-#include <csignal> // <--- WICHTIG für Signal Handler
+#include <csignal> // <--- IMPORTANT for Signal Handler
 
 // Logging (SPDLOG)
 #include "spdlog/spdlog.h"
@@ -46,20 +46,37 @@
 
 namespace fs = std::filesystem;
 
-// Globale Funktion zum sicheren Beenden (für Signal Handler notwendig)
+// Global function for safe shutdown (necessary for Signal Handler)
 std::function<void()> shutdownHandler;
 
+/**
+ * @brief Signal handler callback.
+ *
+ * Invokes the shutdown handler lambda to safely stop the application.
+ *
+ * @param signum The signal number (e.g., SIGINT, SIGTERM).
+ */
 void signalHandler(int signum) {
-    // Ruft die Lambda-Funktion in main() auf
+    // Calls the lambda function in main()
     if(shutdownHandler) {
         shutdownHandler();
     }
 }
 
+/**
+ * @brief Main entry point of the application.
+ *
+ * Initializes the environment, logging, database, and services.
+ * Configures the Crow web server and starts the Qt event loop.
+ *
+ * @param argc Argument count.
+ * @param argv Argument vector.
+ * @return Exit code.
+ */
 int main(int argc, char *argv[]) {
     QCoreApplication qtApp(argc, argv);
 
-    // 1. Environment laden
+    // 1. Load environment
     QString envFilePath = (argc > 1) ? QString::fromUtf8(argv[1]) : QDir::homePath() + "/CakePlanner.env";
     if (!QFile::exists(envFilePath)) {
         std::cerr << "WARNING: .env file not found at: " << envFilePath.toStdString() << std::endl;
@@ -168,14 +185,14 @@ int main(int argc, char *argv[]) {
     int serverPort = rz::utils::EnvLoader::getInt("CAKE_SERVER_PORT", 8080);
     spdlog::info("Server listening on port: {}", serverPort);
 
-    // Shutdown Handler Logik definieren
+    // Define Shutdown Handler Logic
     shutdownHandler = [&]() {
         spdlog::info("Shutdown Signal received. Stopping Crow...");
-        app.stop();     // Stoppt Crow
-        qtApp.quit();   // Stoppt Qt Event Loop
+        app.stop();     // Stops Crow
+        qtApp.quit();   // Stops Qt Event Loop
     };
 
-    // Signale registrieren (Ctrl+C und SIGTERM)
+    // Register signals (Ctrl+C and SIGTERM)
     std::signal(SIGINT, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
@@ -189,7 +206,7 @@ int main(int argc, char *argv[]) {
             spdlog::info("Using {} threads for server", processor_count);
             app.port(serverPort).multithreaded().run();
         }
-        // Fallback, falls Crow von selbst stoppt (ohne Signal)
+        // Fallback in case Crow stops by itself (without signal)
         qtApp.quit();
     });
 
@@ -197,7 +214,7 @@ int main(int argc, char *argv[]) {
     int exitCode = qtApp.exec();
 
     // --- CLEANUP ---
-    app.stop(); // Sicherstellen, dass Crow stoppt
+    app.stop(); // Ensure Crow stops
     if (serverThread.joinable()) {
         serverThread.join();
     }
@@ -205,7 +222,7 @@ int main(int argc, char *argv[]) {
     spdlog::info("Server End Time: {}", QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString());
     spdlog::info("Server shutting down with code: {}", exitCode);
 
-    // WICHTIG: Logs jetzt sofort rausschreiben
+    // IMPORTANT: Flush logs immediately now
     spdlog::shutdown();
 
     return exitCode;

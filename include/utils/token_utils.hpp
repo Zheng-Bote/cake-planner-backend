@@ -2,10 +2,10 @@
  * @file token_utils.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.2.0
- * @date 2026-01-03
+ * @version 0.2.1
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -26,11 +26,11 @@ struct TokenPayload {
 
 class TokenUtils {
 public:
-  // Generiert ein Token, gültig für 24h
+  // Generates a token, valid for 24h
   static QString generateToken(const QString &userId, const QString &email,
                                bool isAdmin);
 
-  // Verifiziert das Token und gibt Payload zurück (oder nullopt bei Fehler)
+  // Verifies the token and returns payload (or nullopt on error)
   static std::optional<TokenPayload> verifyToken(const std::string &rawToken);
 };
 

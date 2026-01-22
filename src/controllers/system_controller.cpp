@@ -2,10 +2,10 @@
  * @file system_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Implementation of system routes
- * @version 0.1.0
- * @date 2026-01-07
+ * @version 0.1.1
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -17,6 +17,13 @@
 
 namespace rz::controller {
 
+/**
+ * @brief Registers system-related routes with the Crow application.
+ *
+ * This method sets up endpoints for system information and health checks.
+ *
+ * @param app The Crow application instance to register routes with.
+ */
 void SystemController::registerRoutes(crow::App<rz::middleware::AuthMiddleware>& app) {
 
     // 1. SysInfo - Returns complete Build/Config Info from rz_config.hpp
@@ -24,7 +31,7 @@ void SystemController::registerRoutes(crow::App<rz::middleware::AuthMiddleware>&
     ([]() {
         crow::json::wvalue info;
 
-        // Strings (Expliziter Cast von std::string_view zu std::string notwendig)
+        // Strings (Explicit cast from std::string_view to std::string necessary)
         info["project_name"] = std::string(rz::config::PROJECT_NAME);
         info["prog_longname"] = std::string(rz::config::PROG_LONGNAME);
         info["description"] = std::string(rz::config::PROJECT_DESCRIPTION);

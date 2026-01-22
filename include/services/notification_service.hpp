@@ -2,10 +2,10 @@
  * @file notification_service.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Notification Service
- * @version 0.2.1
- * @date 2026-01-04
+ * @version 0.2.2
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -23,13 +23,13 @@ class NotificationService {
 public:
     explicit NotificationService(SmtpService* smtp);
 
-    // Info an Admins bei neuer Registrierung
+    // Notify admins about new registration
     void notifyAdminsNewUser(const QString& newUserName, const QString& newUserEmail);
 
-    // Info an Gruppe bei neuem Kuchen
+    // Notify group about new cake
     void notifyGroupNewEvent(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn);
 
-    // Account Status Mails
+    // Account Status Emails
     void notifyAccountActivated(const QString& email, const QString& name, const QString& lang);
     void notifyAccountDeactivated(const QString& email, const QString& name, const QString& lang);
     void notifyAccountDeleted(const QString& email, const QString& name, const QString& lang);
@@ -38,7 +38,7 @@ public:
 private:
     SmtpService* m_smtp;
 
-    // Hilfsmethode um alle globalen Admins aus der DB zu holen
+    // Helper method to fetch all global admins from DB
     std::vector<QString> getGlobalAdminEmails();
 };
 

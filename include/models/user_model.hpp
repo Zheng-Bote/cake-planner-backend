@@ -2,10 +2,10 @@
  * @file user_model.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Model with Group Management Extensions
- * @version 0.2.2
- * @date 2026-01-14
+ * @version 0.2.3
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -31,6 +31,7 @@ struct User {
   bool is_active;
   bool is_admin;
   bool must_change_password = false;
+  QString last_login_at;
 
   static bool setMustChangePassword(const QString &userId, bool mustChange);
   bool enable2FA(const QString &secret);
@@ -43,6 +44,7 @@ struct User {
   static std::optional<User> getByEmail(const QString &email);
   static std::vector<User> getAll(const QString &filterGroupId = "");
   static std::pair<QString, QString> getGroupAndRole(const QString &userId);
+  static bool touchLastLogin(const QString &userId);
 
   static bool updateStatus(const QString &userId, bool isActive);
   static bool updatePassword(const QString &userId, const QString &newHash);
@@ -55,7 +57,7 @@ struct User {
   static bool setGroupRole(const QString &userId, const QString &groupId, const QString &role);
   static QString getGroupRole(const QString &userId, const QString &groupId);
 
-  // NEU: Admin-Aktionen für Gruppen
+  // NEW: Admin actions for groups
   static QString createGroup(const QString &name);
   static bool deleteGroup(const QString &groupId);
 

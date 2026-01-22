@@ -2,10 +2,10 @@
  * @file database.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.1.0
- * @date 2026-01-01
+ * @version 0.1.1
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -21,23 +21,23 @@
 
 class DatabaseManager {
 public:
-  // Singleton Zugriff
+  // Singleton access
   static DatabaseManager &instance();
 
-  // Initialisierung (wird einmalig in main.cpp aufgerufen)
+  // Initialization (called once in main.cpp)
   void initialize(const QString &path);
 
-  // Gibt die DB-Verbindung für den AKTUELLEN Thread zurück
+  // Returns the DB connection for the CURRENT thread
   QSqlDatabase getDatabase();
 
-  // Führt das Schema-Setup durch (Tabellen erstellen)
+  // Executes schema setup (create tables)
   bool migrate();
 
 private:
   DatabaseManager() = default;
   ~DatabaseManager();
 
-  // Verhindern von Kopien
+  // Prevent copying
   DatabaseManager(const DatabaseManager &) = delete;
   DatabaseManager &operator=(const DatabaseManager &) = delete;
 

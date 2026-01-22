@@ -2,10 +2,10 @@
  * @file event_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Model Implementation
- * @version 0.4.0
- * @date 2026-01-20
+ * @version 0.4.1
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -24,6 +24,11 @@
 
 // --- Methods ---
 
+/**
+ * @brief Converts the Event object to a JSON value.
+ *
+ * @return A crow::json::wvalue containing the event data.
+ */
 crow::json::wvalue Event::toJson() const {
     crow::json::wvalue json;
     json["id"] = id.toStdString();
@@ -33,10 +38,10 @@ crow::json::wvalue Event::toJson() const {
     json["date"] = date.toStdString();
     json["description"] = description.toStdString();
 
-    // Cover Bild (Falls leer -> Frontend nimmt Logo)
+    // Cover Image (If empty -> Frontend takes logo)
     json["photoUrl"] = photoPath.isEmpty() ? "" : "/api/uploads/" + photoPath.toStdString();
 
-    // Galerie Array
+    // Gallery Array
     crow::json::wvalue galleryJson = crow::json::wvalue::list();
     for (size_t i = 0; i < gallery.size(); ++i) {
         crow::json::wvalue item;
@@ -47,7 +52,7 @@ crow::json::wvalue Event::toJson() const {
     }
     json["gallery"] = std::move(galleryJson);
 
-    // Berechtigungen & Status
+    // Permissions & Status
     json["isOwner"] = isOwner;
     json["canDelete"] = isOwner && isFuture;
 
@@ -59,6 +64,14 @@ crow::json::wvalue Event::toJson() const {
     return json;
 }
 
+/**
+ * @brief Retrieves a list of events within a specific date range for a user.
+ *
+ * @param start The start date (inclusive, format yyyy-MM-dd).
+ * @param end The end date (inclusive, format yyyy-MM-dd).
+ * @param userId The ID of the user requesting the events.
+ * @return A vector of Event objects.
+ */
 std::vector<Event> Event::getRange(const QString &start,
                                    const QString &end,
                                    const QString &userId) {
@@ -66,7 +79,7 @@ std::vector<Event> Event::getRange(const QString &start,
   QSqlQuery query(db);
   std::vector<Event> events;
 
-  // Wir holen das 'photo_path' aus der 'events' Tabelle (das Cover-Bild)
+  // We fetch 'photo_path' from 'events' table (the cover image)
   QString sql = R"(
         SELECT e.id, e.event_date, e.description, e.photo_path, e.group_id,
                u.full_name, u.id as baker_id, g.name as group_name
@@ -106,6 +119,12 @@ std::vector<Event> Event::getRange(const QString &start,
   return events;
 }
 
+/**
+ * @brief Creates a new event in the database.
+ *
+ * @param userId The ID of the user creating the event (the baker).
+ * @return True if successful, false otherwise.
+ */
 bool Event::create(const QString &userId) {
   auto db = DatabaseManager::instance().getDatabase();
 
@@ -133,7 +152,7 @@ bool Event::create(const QString &userId) {
   }
 
   QSqlQuery query(db);
-  // Speichert das Cover-Bild direkt in events
+  // Saves cover image directly in events
   query.prepare("INSERT INTO events (id, group_id, baker_id, event_date, "
                 "description, photo_path) "
                 "VALUES (:id, :gid, :bid, :date, :desc, :photo)");
@@ -148,11 +167,18 @@ bool Event::create(const QString &userId) {
   return query.exec();
 }
 
+/**
+ * @brief Retrieves a specific event by its ID.
+ *
+ * @param eventId The ID of the event to retrieve.
+ * @param currentUserId The ID of the currently logged-in user.
+ * @return An optional Event object if found, std::nullopt otherwise.
+ */
 std::optional<Event> Event::getById(const QString& eventId, const QString& currentUserId) {
     auto db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
 
-    // Lädt das Event inkl. dem Cover-Bild (photo_path)
+    // Loads event incl. cover image (photo_path)
     query.prepare(R"(
         SELECT e.*, u.full_name, g.name as group_name
         FROM events e
@@ -177,7 +203,7 @@ std::optional<Event> Event::getById(const QString& eventId, const QString& curre
     e.isOwner = (e.bakerId == currentUserId);
     e.isFuture = (QDate::fromString(e.date, "yyyy-MM-dd") >= QDate::currentDate());
 
-    // Ratings laden
+    // Load Ratings
     QSqlQuery rateQuery(db);
     rateQuery.prepare("SELECT AVG(rating_value), COUNT(*) FROM ratings WHERE event_id = :eid");
     rateQuery.bindValue(":eid", eventId);
@@ -186,7 +212,7 @@ std::optional<Event> Event::getById(const QString& eventId, const QString& curre
         e.rating.count = rateQuery.value(1).toInt();
     }
 
-    // Mein Rating laden
+    // Load my rating
     QSqlQuery myRateQuery(db);
     myRateQuery.prepare("SELECT rating_value FROM ratings WHERE event_id = :eid AND rater_id = :uid");
     myRateQuery.bindValue(":eid", eventId);
@@ -195,7 +221,7 @@ std::optional<Event> Event::getById(const QString& eventId, const QString& curre
         e.rating.myRating = myRateQuery.value(0).toInt();
     }
 
-    // NEU: Query 3 (Galerie)
+    // NEW: Query 3 (Gallery)
     QSqlQuery galleryQuery(db);
     galleryQuery.prepare(R"(
         SELECT ep.photo_path, u.full_name, ep.user_id
@@ -221,6 +247,15 @@ std::optional<Event> Event::getById(const QString& eventId, const QString& curre
     return e;
 }
 
+/**
+ * @brief Deletes an event.
+ *
+ * Only the owner can delete their own future events.
+ *
+ * @param eventId The ID of the event to delete.
+ * @param currentUserId The ID of the user attempting to delete the event.
+ * @return True if successful and authorized, false otherwise.
+ */
 bool Event::deleteEvent(const QString& eventId, const QString& currentUserId) {
     auto evt = getById(eventId, currentUserId);
     if (!evt) return false;
@@ -234,6 +269,15 @@ bool Event::deleteEvent(const QString& eventId, const QString& currentUserId) {
     return query.exec();
 }
 
+/**
+ * @brief Rates an event.
+ *
+ * @param eventId The ID of the event to rate.
+ * @param userId The ID of the user submitting the rating.
+ * @param stars The number of stars (rating value).
+ * @param comment An optional comment.
+ * @return True if successful, false otherwise.
+ */
 bool Event::rateEvent(const QString& eventId, const QString& userId, int stars, const QString& comment) {
     auto db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
@@ -254,13 +298,22 @@ bool Event::rateEvent(const QString& eventId, const QString& userId, int stars, 
     return query.exec();
 }
 
-// NEUE METHODE: Speichert Eintrag in event_photos und updatet optional events.photo_path
+/**
+ * @brief Uploads a photo to an event's gallery.
+ *
+ * If the uploader is the baker (owner), the event's cover photo is also updated.
+ *
+ * @param eventId The ID of the event.
+ * @param userId The ID of the user uploading the photo.
+ * @param filename The relative path/filename of the uploaded photo.
+ * @return True if successful, false otherwise.
+ */
 bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QString& filename) {
     auto db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
 
-    // 1. In event_photos Tabelle eintragen (1 Foto pro User per Event)
-    // Wir nutzen ON CONFLICT DO UPDATE (Upsert)
+    // 1. Insert into event_photos table (1 photo per user per event)
+    // We use ON CONFLICT DO UPDATE (Upsert)
     query.prepare(R"(
         INSERT INTO event_photos (event_id, user_id, photo_path, uploaded_at)
         VALUES (:eid, :uid, :path, CURRENT_TIMESTAMP)
@@ -277,7 +330,7 @@ bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QSt
         return false;
     }
 
-    // 2. Prüfen, ob der User der Bäcker (Owner) ist
+    // 2. Check if user is the baker (owner)
     QSqlQuery ownerQuery(db);
     ownerQuery.prepare("SELECT baker_id FROM events WHERE id = :id");
     ownerQuery.bindValue(":id", eventId);
@@ -285,7 +338,7 @@ bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QSt
     if (ownerQuery.exec() && ownerQuery.next()) {
         QString bakerId = ownerQuery.value("baker_id").toString();
 
-        // 3. Wenn ja, aktualisieren wir das Cover-Bild in der events-Tabelle
+        // 3. If yes, we update the cover image in the events table
         if (bakerId == userId) {
             QSqlQuery updateCover(db);
             updateCover.prepare("UPDATE events SET photo_path = :path WHERE id = :id");
@@ -300,6 +353,11 @@ bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QSt
     return true;
 }
 
+/**
+ * @brief Generates an ICS (iCalendar) string for the event.
+ *
+ * @return The ICS string.
+ */
 std::string Event::toIcsString() const {
     std::stringstream ss;
     ss << "BEGIN:VCALENDAR\r\n"
@@ -316,12 +374,19 @@ std::string Event::toIcsString() const {
     return ss.str();
 }
 
+/**
+ * @brief Retrieves a list of events ranked by their average rating.
+ *
+ * @param userId The ID of the requesting user (used for group filtering).
+ * @param limit The maximum number of events to return.
+ * @return A vector of ranked Event objects.
+ */
 std::vector<Event> Event::getRanked(const QString& userId, int limit) {
     auto db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
 
-    // Wir joinen ratings, berechnen den Durchschnitt und sortieren danach
-    // COALESCE(AVG(...), 0) sorgt dafür, dass Events ohne Rating als 0 gewertet werden
+    // We join ratings, calculate average, and sort by it
+    // COALESCE(AVG(...), 0) ensures events without rating are valued as 0
     QString sql = R"(
         SELECT e.id, e.event_date, e.description, e.photo_path, e.group_id,
                u.full_name, u.id as baker_id, g.name as group_name,
@@ -346,13 +411,13 @@ std::vector<Event> Event::getRanked(const QString& userId, int limit) {
     if (query.exec()) {
         while (query.next()) {
             Event e;
-            // ... Mappen der Basisdaten (id, date, bakerName etc.) wie in getRange ...
+            // ... map base data (id, date, bakerName etc.) as in getRange ...
             e.id = query.value("id").toString();
             e.bakerName = query.value("full_name").toString();
             e.date = query.value("event_date").toString();
             e.description = query.value("description").toString();
             e.photoPath = query.value("photo_path").toString();
-            e.rating.average = query.value("avg_rating").toDouble(); // Das sortierte Rating
+            e.rating.average = query.value("avg_rating").toDouble(); // The sorted rating
 
             QSqlQuery galQuery(db);
             galQuery.prepare(R"(
@@ -368,14 +433,14 @@ std::vector<Event> Event::getRanked(const QString& userId, int limit) {
                     item.photoUrl = "/api/uploads/" + galQuery.value("photo_path").toString();
                     item.userId = galQuery.value("user_id").toString();
                     item.userName = galQuery.value("full_name").toString();
-                    // isMine checken wir hier simpel
+                    // Check isMine simply here
                     item.isMine = (item.userId == userId);
                     e.gallery.push_back(item);
                 }
             }
 
-            // Auch das Cover-Bild in die Gallery Logik integrieren, falls gewünscht?
-            // Aktuell ist e.gallery nur die Community-Fotos.
+            // Integrate cover image into gallery logic too, if desired?
+            // Currently e.gallery is only community photos.
 
             events.push_back(e);
         }

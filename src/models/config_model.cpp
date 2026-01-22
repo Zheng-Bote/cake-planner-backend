@@ -2,15 +2,15 @@
  * @file config_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Configuration Model implementation
- * @version 0.2.0
- * @date 2026-01-03
+ * @version 0.2.1
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
 
-// WICHTIG: Include auf den neuen Dateinamen (snake_case) angepasst
+// IMPORTANT: Include adapted to new filename (snake_case)
 #include "models/config_model.hpp"
 #include <dotenv.h>
 #include <QDebug>
@@ -19,6 +19,9 @@
 namespace rz {
 namespace model {
 
+/**
+ * @brief Constructs the ConfigModel.
+ */
 ConfigModel::ConfigModel() = default;
 
 /**
@@ -35,10 +38,10 @@ void ConfigModel::loadEnv(const std::string& path) {
     } catch (const std::exception& e) {
         qWarning() << "Could not load .env file from" << QString::fromStdString(path)
                    << ":" << e.what();
-        // Warnung reicht, wir versuchen Fallback auf System-Env
+        // Warning is sufficient, we try fallback to system env
     }
 
-    // Helper Lambda für sauberen Env-Zugriff mit Default-Werten
+    // Helper lambda for clean env access with default values
     auto getEnv = [](const char* key, const char* defaultVal = "") -> QString {
         const char* val = std::getenv(key);
         return val ? QString::fromUtf8(val) : QString::fromUtf8(defaultVal);
@@ -58,12 +61,46 @@ void ConfigModel::loadEnv(const std::string& path) {
     qInfo() << "Loaded Configuration for SMTP Server:" << m_smtpServer;
 }
 
+/**
+ * @brief Gets the SMTP server address.
+ * @return The SMTP server.
+ */
 QString ConfigModel::getSmtpServer() const { return m_smtpServer; }
+
+/**
+ * @brief Gets the SMTP username.
+ * @return The SMTP username.
+ */
 QString ConfigModel::getSmtpUsername() const { return m_smtpUsername; }
+
+/**
+ * @brief Gets the SMTP password.
+ * @return The SMTP password.
+ */
 QString ConfigModel::getSmtpPassword() const { return m_smtpPassword; }
+
+/**
+ * @brief Gets the SMTP Sender email address.
+ * @return The SMTP from address.
+ */
 QString ConfigModel::getSmtpFrom() const { return m_smtpFrom; }
+
+/**
+ * @brief Gets the SMTP port.
+ * @return The SMTP port.
+ */
 int ConfigModel::getSmtpPort() const { return m_smtpPort; }
+
+/**
+ * @brief Checks if STARTTLS is enabled for SMTP.
+ * @return True if STARTTLS is enabled, false otherwise.
+ */
 bool ConfigModel::getSmtpStartTls() const { return m_smtpStartTls; }
+
+/**
+ * @brief Gets the directory being watched for changes.
+ * @return The watch directory.
+ */
 QString ConfigModel::getWatchDir() const { return m_watchDir; }
 
 } // namespace model

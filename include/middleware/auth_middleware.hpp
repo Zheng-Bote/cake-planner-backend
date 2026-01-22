@@ -2,10 +2,10 @@
  * @file auth_middleware.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Auth Middleware
- * @version 0.3.0
- * @date 2026-01-17
+ * @version 0.3.1
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -19,7 +19,7 @@ namespace rz {
 namespace middleware {
 
 struct AuthMiddleware {
-  // Kontext speichert Daten für den Controller
+  // Context stores data for the controller
   struct context {
     rz::utils::TokenPayload currentUser;
   };
@@ -33,12 +33,12 @@ struct AuthMiddleware {
       return;
     }
 
-    // CORS Preflight immer erlauben
+    // Always allow CORS Preflight
     if (req.method == crow::HTTPMethod::OPTIONS) {
         return;
     }
 
-    // 2. Header prüfen
+    // 2. Check Header
     std::string authHeader = req.get_header_value("Authorization");
     if (authHeader.empty() || !authHeader.starts_with("Bearer ")) {
       res.code = 401;
@@ -47,11 +47,11 @@ struct AuthMiddleware {
       return;
     }
 
-    // 3. Token extrahieren
+    // 3. Extract Token
     std::string token = authHeader.substr(7);
 
-    // 4. Verifizieren
-    // KORREKTUR: 'token' ist bereits std::string, keine Konvertierung nötig!
+    // 4. Verify
+    // CORRECTION: 'token' is already std::string, no conversion needed!
     auto payload = rz::utils::TokenUtils::verifyToken(token);
 
     if (!payload) {
@@ -61,7 +61,7 @@ struct AuthMiddleware {
       return;
     }
 
-    // 5. User-Daten im Kontext speichern
+    // 5. Store user data in context
     ctx.currentUser = *payload;
   }
 

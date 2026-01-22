@@ -2,10 +2,10 @@
  * @file event_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Controller Implementation (Safe Blocking Long Polling)
- * @version 0.3.17
- * @date 2026-01-07
+ * @version 0.3.19
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -36,6 +36,11 @@ struct LatestEventData {
     crow::json::wvalue payload;
 } latestEvent;
 
+/**
+ * @brief Thread-safe helper to broadcast a new event to all waiting SSE clients.
+ *
+ * @param evt The event to broadcast.
+ */
 void broadcastNewEvent(const Event& evt) {
     {
         std::lock_guard<std::mutex> lock(event_mutex);
@@ -53,6 +58,15 @@ void broadcastNewEvent(const Event& evt) {
 namespace rz {
 namespace controller {
 
+/**
+ * @brief Registers event-related routes with the Crow application.
+ *
+ * This method sets up the endpoints for managing events, including creating, listing, deleting, rating,
+ * and serving static files (uploads). It also handles the Server-Sent Events (SSE) stream for real-time updates.
+ *
+ * @param app The Crow application instance to register routes with.
+ * @param notifyService Pointer to the notification service for email notifications.
+ */
 void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app, service::NotificationService* notifyService) {
 
     // -------------------------------------------------------------------------
@@ -165,7 +179,19 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
                         }
                     }
                     else if (name == "image" && part.body.size() > 0) {
-                        QString ext = ".jpg";
+                        // --- FIX START: Determine dynamic file extension ---
+                        QString ext = ".jpg"; // Fallback standard
+
+                        // Check if an original filename was sent
+                        if (params.count("filename")) {
+                            std::string originalName = params["filename"];
+                            size_t lastDot = originalName.find_last_of('.');
+                            if (lastDot != std::string::npos) {
+                                // Extract extension and convert to lowercase (e.g. ".PNG" -> ".png")
+                                ext = QString::fromStdString(originalName.substr(lastDot)).toLower();
+                            }
+                        }
+                        // --- FIX END ---
                         QString fileName = QUuid::createUuid().toString(QUuid::WithoutBraces) + ext;
 
                         QString eventDir = baseUploadDir + "/" + newEventId;

@@ -2,10 +2,10 @@
  * @file env_loader.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Environment Loader Implementation
- * @version 0.1.3
- * @date 2026-01-07
+ * @version 0.1.4
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -20,6 +20,14 @@
 namespace rz {
 namespace utils {
 
+/**
+ * @brief Loads environment variables from a file.
+ *
+ * Searches for the .env file in the application directory and the current working directory.
+ * If found, it loads the variables into the process environment.
+ *
+ * @param filenameStd The name of the file to load (default: .env).
+ */
 void EnvLoader::load(const std::string &filenameStd) {
   QString filename = QString::fromStdString(filenameStd);
 
@@ -64,6 +72,13 @@ void EnvLoader::load(const std::string &filenameStd) {
   }
 }
 
+/**
+ * @brief Retrieves an environment variable as a QString.
+ *
+ * @param keyStd The key of the environment variable.
+ * @param defaultValueStd The default value if the key is not found.
+ * @return The value of the environment variable or the default value.
+ */
 QString EnvLoader::get(const std::string &keyStd, const std::string &defaultValueStd) {
   QString key = QString::fromStdString(keyStd);
   QString val = qEnvironmentVariable(key.toUtf8());
@@ -71,7 +86,13 @@ QString EnvLoader::get(const std::string &keyStd, const std::string &defaultValu
   return val.isEmpty() ? QString::fromStdString(defaultValueStd) : val;
 }
 
-// IMPLEMENTIERUNG getString
+/**
+ * @brief Retrieves an environment variable as a std::string.
+ *
+ * @param keyStd The key of the environment variable.
+ * @param defaultValueStd The default value if the key is not found.
+ * @return The value of the environment variable or the default value.
+ */
 std::string EnvLoader::getString(const std::string &keyStd, const std::string &defaultValueStd) {
   QString key = QString::fromStdString(keyStd);
   QString val = qEnvironmentVariable(key.toUtf8());
@@ -79,6 +100,13 @@ std::string EnvLoader::getString(const std::string &keyStd, const std::string &d
   return val.isEmpty() ? defaultValueStd : val.toStdString();
 }
 
+/**
+ * @brief Retrieves an environment variable as an integer.
+ *
+ * @param keyStd The key of the environment variable.
+ * @param defaultValue The default value if the key is not found or not a valid number.
+ * @return The integer value of the environment variable or the default value.
+ */
 int EnvLoader::getInt(const std::string &keyStd, int defaultValue) {
   QString key = QString::fromStdString(keyStd);
   QString val = qEnvironmentVariable(key.toUtf8());

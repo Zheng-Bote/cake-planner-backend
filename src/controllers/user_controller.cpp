@@ -2,10 +2,10 @@
  * @file user_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Controller with Email Notifications
- * @version 0.4.5
- * @date 2026-01-14
+ * @version 0.4.6
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -14,12 +14,21 @@
 #include "models/user_model.hpp"
 #include "utils/password_utils.hpp"
 #include "utils/token_utils.hpp"
-#include "services/notification_service.hpp" // NEU: Include
+#include "services/notification_service.hpp" // NEW: Include
 
 namespace rz {
 namespace controller {
 
-// Signatur Update: notifyService
+// Signature Update: notifyService
+/**
+ * @brief Registers user-related routes with the Crow application.
+ *
+ * This method sets up endpoints for user profile management, such as registration, password change,
+ * updating settings (language), and account deletion. It also handles listing users for non-admin users.
+ *
+ * @param app The Crow application instance to register routes with.
+ * @param notifyService Pointer to the notification service for email notifications.
+ */
 void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app, service::NotificationService* notifyService) {
 
   // --- GET /api/users ---
@@ -98,7 +107,7 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         if (newUser.create()) {
           resJson["message"] = "Registration successful.";
           resJson["userId"] = newUser.id.toStdString();
-            // Notification auslösen
+            // Trigger notification
             if (notifyService) {
                 notifyService->notifyAdminsNewUser(newUser.full_name, newUser.email);
             } else {
@@ -114,14 +123,14 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
 
   // --- POST /api/user/change-password ---
   CROW_ROUTE(app, "/api/user/change-password")
-      .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) { // notifyService capturen
+      .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) { // capture notifyService
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         if (ctx.currentUser.userId.isEmpty()) return crow::response(401);
 
         auto json = crow::json::load(req.body);
         if (!json || !json.has("newPassword")) return crow::response(400);
 
-        // 1. User für E-Mail laden
+        // 1. Load user for email
         auto user = User::getById(ctx.currentUser.userId);
         if (!user) return crow::response(404, "User not found");
 
@@ -133,7 +142,7 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
 
         if (User::updatePassword(ctx.currentUser.userId, newHash)) {
 
-            // 2. E-Mail senden
+            // 2. Send email
             if (notifyService) {
                 notifyService->notifyPasswordChanged(user->email, user->full_name, user->emailLanguage);
             }
@@ -145,7 +154,7 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         return crow::response(500, "DB Error");
       });
 
-    // Profil-Update (Sprache)
+    // Profile Update (Language)
     CROW_ROUTE(app, "/api/user/settings")
     .methods(crow::HTTPMethod::POST)
     ([&](const crow::request& req){
@@ -175,17 +184,17 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         return crow::response(500, res);
     });
 
-    // Account Löschen (Self-Delete)
+    // Account Deletion (Self-Delete)
     CROW_ROUTE(app, "/api/user")
     .methods(crow::HTTPMethod::DELETE)
-    ([&, notifyService](const crow::request& req){ // notifyService capturen
+    ([&, notifyService](const crow::request& req){ // capture notifyService
         const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
 
-        // Daten für E-Mail sichern
+        // Save data for email
         auto user = User::getById(ctx.currentUser.userId);
 
         if (User::softDelete(ctx.currentUser.userId)) {
-            // E-Mail senden (Account Deleted)
+            // Send email (Account Deleted)
             if (notifyService && user) {
                 notifyService->notifyAccountDeleted(user->email, user->full_name, user->emailLanguage);
             }

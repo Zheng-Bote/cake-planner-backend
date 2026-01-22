@@ -2,10 +2,10 @@
  * @file auth_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Auth Controller Implementation
- * @version 0.4.5
- * @date 2026-01-14
+ * @version 0.4.7
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -18,16 +18,29 @@
 #include "utils/totp_utils.hpp"
 #include <QDebug>
 
+#include "spdlog/spdlog.h"
+
 namespace rz {
 namespace controller {
 
+/**
+ * @brief Constructs the AuthController.
+ *
+ * @param notifyService Pointer to the notification service (can be nullptr).
+ */
 AuthController::AuthController(service::NotificationService* notifyService)
     : m_notifyService(notifyService) {}
 
-// KORRIGIERT: Namespace rz::middleware::AuthMiddleware
+/**
+ * @brief Registers authentication-related routes with the Crow application.
+ *
+ * This method sets up the endpoints for user registration, login, and Two-Factor Authentication (2FA) setup/activation.
+ *
+ * @param app The Crow application instance to register routes with.
+ */
 void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app) {
 
-  // 1. REGISTRIERUNG
+  // 1. REGISTRATION
   CROW_ROUTE(app, "/api/auth/register")
       .methods(crow::HTTPMethod::POST)([this](const crow::request &req) {
         auto json = crow::json::load(req.body);
@@ -38,7 +51,7 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
 
         User user;
         user.email = QString::fromStdString(json["email"].s());
-        // Voll qualifizierter Aufruf für utils
+        // Fully qualified call for utils
         user.password_hash = rz::utils::PasswordUtils::hashPassword(
             QString::fromStdString(json["password"].s()));
         user.full_name = QString::fromStdString(json["name"].s());
@@ -56,7 +69,7 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         }
 
         if (user.create()) {
-            // Notification auslösen
+            // Trigger notification
             if (m_notifyService) {
                 m_notifyService->notifyAdminsNewUser(user.full_name, user.email);
             } else {
@@ -107,6 +120,12 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         if (!user.is_active)
           return crow::response(403, "Account inactive");
 
+        // Update last login timestamp
+        if (!User::touchLastLogin(user.id)) {
+            spdlog::error("Failed to update last login timestamp for user {}", user.id.toStdString());
+        }
+
+        spdlog::info("[AUTH] Login successful for {}", user.email.toStdString());
         auto token =
             rz::utils::TokenUtils::generateToken(user.id, user.email, user.is_admin);
         crow::json::wvalue res;
@@ -131,7 +150,7 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         return crow::response(res);
       });
 
-  // 4. 2FA AKTIVIEREN
+  // 4. ACTIVATE 2FA
   CROW_ROUTE(app, "/api/auth/2fa/activate")
       .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);

@@ -2,10 +2,10 @@
  * @file rz_config.hpp.in
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief configuration
- * @version 2.1.0
- * @date 2026-01-01
+ * @version 2.1.1
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -35,7 +35,7 @@ constexpr std::string_view DOMAIN = "net.hase-zheng";
 
 constexpr std::string_view CMAKE_CXX_STANDARD = "c++23";
 constexpr std::string_view CMAKE_CXX_COMPILER =
-    "Clang 20.1.8";
+    "GNU 15.2.0";
 constexpr std::string_view QT_VERSION_BUILD = "6.9.2";
 } // namespace config
 } // namespace rz

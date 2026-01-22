@@ -2,10 +2,10 @@
  * @file token_utils.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief JWT Token Utilities Implementation
- * @version 0.1.1
- * @date 2026-01-03
+ * @version 0.1.2
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -15,25 +15,36 @@
 #include <chrono>
 #include <iostream>
 
-// Zugriff auf JSON Traits für Bool-Konvertierung
+// Access JSON Traits for Bool conversion
 using json_value = jwt::traits::kazuho_picojson::value_type;
 
-// KORREKTUR: Alles in den Namespace rz::utils packen
+// CORRECTION: Put everything in the namespace rz::utils
 namespace rz {
 namespace utils {
 
-// Helper im Namespace (findet jetzt EnvLoader)
+// Helper in namespace (now finds EnvLoader)
 static std::string getSecret() {
   QString secret = EnvLoader::get("CAKE_JWT_SECRET", "");
   if (secret.isEmpty()) {
     std::cerr
-        << "WARNUNG: CAKE_JWT_SECRET nicht gesetzt! Nutze unsicheren Default."
+        << "WARNING: CAKE_JWT_SECRET not set! Using unsafe default."
         << std::endl;
     return "CHANGE_ME_IN_PRODUCTION_THIS_IS_UNSAFE";
   }
   return secret.toStdString();
 }
 
+/**
+ * @brief Generates a JWT (JSON Web Token) for a user.
+ *
+ * The token contains the user ID, email, and admin status as claims.
+ * It is signed with the secret key and expires after 24 hours.
+ *
+ * @param userId The ID of the user.
+ * @param email The email address of the user.
+ * @param isAdmin True if the user is an administrator.
+ * @return The generated JWT as a string.
+ */
 QString TokenUtils::generateToken(const QString &userId, const QString &email,
                                   bool isAdmin) {
   auto now = std::chrono::system_clock::now();
@@ -51,6 +62,14 @@ QString TokenUtils::generateToken(const QString &userId, const QString &email,
   return QString::fromStdString(token);
 }
 
+/**
+ * @brief Verifies and decodes a JWT.
+ *
+ * Checks the signature and expiration time.
+ *
+ * @param rawToken The raw JWT string.
+ * @return An optional TokenPayload containing the user info if verification succeeds, std::nullopt otherwise.
+ */
 std::optional<TokenPayload>
 TokenUtils::verifyToken(const std::string &rawToken) {
   try {

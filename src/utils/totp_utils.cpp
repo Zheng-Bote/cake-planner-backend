@@ -2,10 +2,10 @@
  * @file totp_utils.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Time-based One-Time Password (TOTP) Utilities
- * @version 0.1.1
- * @date 2026-01-03
+ * @version 0.1.2
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -28,6 +28,13 @@ static const char *B32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 namespace rz {
 namespace utils {
 
+/**
+ * @brief Generates a random Base32 secret for TOTP.
+ *
+ * The secret is 32 characters long, consisting of upper-case letters A-Z and digits 2-7.
+ *
+ * @return The generated secret string.
+ */
 QString TotpUtils::generateSecret() {
   std::random_device rd;
   std::uniform_int_distribution<int> dist(0, 31);
@@ -39,6 +46,16 @@ QString TotpUtils::generateSecret() {
   return secret;
 }
 
+/**
+ * @brief Generates the provisioning URI for the QR code.
+ *
+ * The URI follows the otpauth scheme (RFC 6238).
+ *
+ * @param userEmail The email address of the user.
+ * @param secret The Base32 secret.
+ * @param issuer The name of the issuer (e.g., "Cake Planner").
+ * @return The provisioning URI string.
+ */
 QString TotpUtils::getProvisioningUri(const QString &userEmail,
                                       const QString &secret,
                                       const QString &issuer) {
@@ -47,10 +64,24 @@ QString TotpUtils::getProvisioningUri(const QString &userEmail,
       .arg(issuer, userEmail, secret);
 }
 
+/**
+ * @brief Gets the current time step for TOTP calculation.
+ *
+ * TOTP uses 30-second intervals. This function returns the number of 30-second
+ * intervals that have elapsed since the Unix epoch.
+ *
+ * @return The current time step.
+ */
 int64_t TotpUtils::getCurrentTimeStep() {
   return QDateTime::currentSecsSinceEpoch() / 30;
 }
 
+/**
+ * @brief Decodes a Base32 string into bytes.
+ *
+ * @param secret The Base32 encoded secret.
+ * @return A vector of bytes representing the decoded secret.
+ */
 std::vector<uint8_t> TotpUtils::base32Decode(const QString &secret) {
   std::vector<uint8_t> result;
   unsigned int buffer = 0;
@@ -72,6 +103,16 @@ std::vector<uint8_t> TotpUtils::base32Decode(const QString &secret) {
   return result;
 }
 
+/**
+ * @brief Generates a TOTP code for a specific time step.
+ *
+ * Calculates the HMAC-SHA1 hash of the time step using the secret key,
+ * and extracts a 6-digit code.
+ *
+ * @param keyBytes The decoded secret key in bytes.
+ * @param timeStep The time step to generate the code for.
+ * @return The 6-digit TOTP code as a string.
+ */
 QString TotpUtils::generateCodeForStep(const std::vector<uint8_t> &keyBytes,
                                        int64_t timeStep) {
   uint8_t timeData[8];
@@ -98,6 +139,16 @@ QString TotpUtils::generateCodeForStep(const std::vector<uint8_t> &keyBytes,
   return QString::fromStdString(ss.str());
 }
 
+/**
+ * @brief Validates a TOTP code against a secret.
+ *
+ * Checks the code for the current time step and the immediately preceding and
+ * succeeding time steps (to account for clock drift).
+ *
+ * @param secret The Base32 secret.
+ * @param code The TOTP code to validate.
+ * @return True if the code is valid, false otherwise.
+ */
 bool TotpUtils::validateCode(const QString &secret, const QString &code) {
   if (secret.isEmpty() || code.length() != 6) return false;
 

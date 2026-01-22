@@ -2,8 +2,8 @@
  * @file database.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
- * @version 0.3.1
- * @date 2026-01-14
+ * @version 0.3.3
+ * @date 2026-01-22
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -24,31 +24,51 @@
 
 #include "spdlog/spdlog.h"
 
+/**
+ * @brief Gets the singleton instance of the DatabaseManager.
+ *
+ * @return Reference to the singleton instance.
+ */
 DatabaseManager &DatabaseManager::instance() {
   static DatabaseManager instance;
   return instance;
 }
 
+/**
+ * @brief Initializes the database manager.
+ *
+ * Sets the database path and ensures the directory exists.
+ *
+ * @param path The file path to the SQLite database.
+ */
 void DatabaseManager::initialize(const QString &path) {
   m_dbPath = path;
 
-  // Ordner-Check
+  // Directory check
   QFileInfo fileInfo(m_dbPath);
   QDir dir = fileInfo.absoluteDir();
 
   if (!dir.exists()) {
-    qDebug() << "Datenbank-Ordner existiert nicht. Erstelle:"
+    qDebug() << "Database directory does not exist. Creating:"
             << dir.absolutePath();
     if (!dir.mkpath(".")) {
       qCritical()
-          << "Kritischer Fehler: Konnte Datenbank-Ordner nicht erstellen:"
+          << "Critical Error: Could not create database directory:"
           << dir.absolutePath();
     }
   }
 
-  qDebug() << "Datenbank-Pfad gesetzt auf:" << m_dbPath;
+  qDebug() << "Database path set to:" << m_dbPath;
 }
 
+/**
+ * @brief Gets a thread-safe database connection.
+ *
+ * Creates a unique connection name for the current thread to ensure
+ * thread safety when accessing the SQLite database.
+ *
+ * @return A QSqlDatabase connection object.
+ */
 QSqlDatabase DatabaseManager::getDatabase() {
   QString connectionName =
       QString("db_conn_%1")
@@ -58,7 +78,7 @@ QSqlDatabase DatabaseManager::getDatabase() {
     auto db = QSqlDatabase::database(connectionName);
     if (db.isOpen()) return db;
     if (!db.open()) {
-      qCritical() << "Kritischer Fehler: Konnte existierende Verbindung nicht öffnen:" << connectionName;
+      qCritical() << "Critical Error: Could not open existing connection:" << connectionName;
     }
     return db;
   }
@@ -67,7 +87,7 @@ QSqlDatabase DatabaseManager::getDatabase() {
   db.setDatabaseName(m_dbPath);
 
   if (!db.open()) {
-    qCritical() << "Fehler beim Öffnen der DB in Thread" << connectionName
+    qCritical() << "Error opening DB in thread" << connectionName
                 << ":" << db.lastError().text();
   } else {
     QSqlQuery query(db);
@@ -79,8 +99,19 @@ QSqlDatabase DatabaseManager::getDatabase() {
   return db;
 }
 
+/**
+ * @brief Destructor.
+ */
 DatabaseManager::~DatabaseManager() {}
 
+/**
+ * @brief Migrates the database schema.
+ *
+ * Creates necessary tables (users, groups, events, etc.) if they do not exist.
+ * Executes the schema SQL in a transaction.
+ *
+ * @return True if migration succeeded, false otherwise.
+ */
 bool DatabaseManager::migrate() {
   auto db = getDatabase();
 
@@ -96,6 +127,7 @@ bool DatabaseManager::migrate() {
             is_active INTEGER DEFAULT 0,
             is_admin INTEGER DEFAULT 0,
             must_change_password INTEGER DEFAULT 0,
+            last_login_at TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
@@ -151,7 +183,7 @@ bool DatabaseManager::migrate() {
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
 
-        -- INDIZES für Performance
+        -- INDICES for Performance
         CREATE INDEX IF NOT EXISTS idx_ratings_event_id ON ratings(event_id);
         CREATE INDEX IF NOT EXISTS idx_event_photos_event_id ON event_photos(event_id);
         CREATE INDEX IF NOT EXISTS idx_events_group_date ON events(group_id, event_date);
@@ -167,8 +199,8 @@ bool DatabaseManager::migrate() {
     if (trimmedStmt.isEmpty() || trimmedStmt.startsWith("--")) continue;
 
     if (!query.exec(trimmedStmt)) {
-      qCritical() << "Migration Fehler bei Statement:" << trimmedStmt
-                  << "\nGrund:" << query.lastError().text();
+      qCritical() << "Migration error at statement:" << trimmedStmt
+                  << "\nReason:" << query.lastError().text();
     spdlog::error("Failed to create groups table: {}", query.lastError().text().toStdString());
       success = false;
       break;
@@ -177,7 +209,7 @@ bool DatabaseManager::migrate() {
 
   if (success) {
     db.commit();
-    qDebug() << "Datenbank-Migration erfolgreich abgeschlossen.";
+    qDebug() << "Database migration successfully completed.";
   } else {
     db.rollback();
   }

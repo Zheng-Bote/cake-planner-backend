@@ -2,10 +2,10 @@
  * @file image_processor.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Image Processor Implementation
- * @version 0.1.2
- * @date 2026-01-04
+ * @version 0.1.3
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -17,14 +17,22 @@
 #include <QFileInfo>
 #include <QDebug>
 
-// Zielgrößen
+// Target sizes
 const std::vector<int> ImageProcessor::TARGET_WIDTHS = {480, 800, 1280};
 
+/**
+ * @brief Generates WebP versions of an image in multiple resolutions.
+ *
+ * Creates images with widths defined in TARGET_WIDTHS (480, 800, 1280).
+ * If the source image is smaller than a target width, it is just converted to WebP without upscaling.
+ *
+ * @param sourcePath The file path of the source image.
+ */
 void ImageProcessor::generateWebPVersions(const QString& sourcePath) {
     QImage img(sourcePath);
     if (img.isNull()) {
         qCritical() << "ImageProcessor: Failed to load image. Check path and Qt Plugins (JPEG support)!" << sourcePath;
-        // Tipp: Auf Linux muss oft 'libqt6-imageformats' installiert sein
+        // Tip: On Linux 'libqt6-imageformats' often needs to be installed
         return;
     }
 
@@ -40,12 +48,12 @@ void ImageProcessor::generateWebPVersions(const QString& sourcePath) {
 
         bool success = false;
 
-        // Fall 1: Original ist kleiner als Ziel -> Nur Konvertieren, nicht hochskalieren
+        // Case 1: Original is smaller than target -> Convert only, do not upscale
         if (img.width() <= width) {
-            // Wir speichern das Original als WebP (Qualität 90)
+            // Save original as WebP (Quality 90)
             success = img.save(targetPath, "WEBP", 90);
         }
-        // Fall 2: Skalieren
+        // Case 2: Scale
         else {
             QImage scaled = img.scaledToWidth(width, Qt::SmoothTransformation);
             success = scaled.save(targetPath, "WEBP", 85);
@@ -60,15 +68,20 @@ void ImageProcessor::generateWebPVersions(const QString& sourcePath) {
     }
 }
 
+/**
+ * @brief Deletes the original image and all generated WebP versions.
+ *
+ * @param sourcePath The file path of the original image (used to derive version filenames).
+ */
 void ImageProcessor::deleteAllVersions(const QString& sourcePath) {
     QFileInfo fileInfo(sourcePath);
     QDir dir = fileInfo.dir();
     QString baseName = fileInfo.completeBaseName();
 
-    // Löscht Original
+    // Deletes original
     QFile::remove(sourcePath);
 
-    // Löscht WebP Versionen
+    // Deletes WebP versions
     for (int width : TARGET_WIDTHS) {
         QString webpName = QString("%1__%2.webp").arg(baseName).arg(width);
         if (dir.exists(webpName)) {

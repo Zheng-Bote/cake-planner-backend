@@ -1,3 +1,14 @@
+/**
+ * @file smtp_service.hpp
+ * @author ZHENG Robert (robert@hase-zheng.net)
+ * @brief SMTP Service Header
+ * @version 0.3.1
+ * @date 2026-01-22
+ *
+ * @copyright Copyright (c) 2026 ZHENG Robert
+ *
+ * SPDX-License-Identifier: MIT
+ */
 #pragma once
 
 #include "models/config_model.hpp"
@@ -17,11 +28,11 @@ public:
     explicit SmtpService(const model::ConfigModel& config, QObject* parent = nullptr);
     ~SmtpService();
 
-    // Diese Methode ist THREAD-SAFE und kann aus Crow-Controllern aufgerufen werden
+    // This method is THREAD-SAFE and can be called from Crow controllers
     void sendEmailAsync(const QString& to, const QString& subject, const QString& body);
 
 private slots:
-    // Dieser Slot läuft im Main-Thread
+    // This slot runs in the main thread
     void doSendEmail(const QString& to, const QString& subject, const QString& body);
 
 private:

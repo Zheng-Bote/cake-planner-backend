@@ -2,10 +2,10 @@
  * @file admin_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Admin Controller Implementation with Group Management
- * @version 0.4.1
- * @date 2026-01-07
+ * @version 0.4.2
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -18,6 +18,15 @@
 
 namespace rz::controller {
 
+/**
+ * @brief Registers all admin-related routes with the Crow application.
+ *
+ * This method sets up the endpoints for user management, group management, and other administrative tasks.
+ * It enforces authentication and authorization checks (admin privileges) for sensitive operations.
+ *
+ * @param app The Crow application instance to register routes with.
+ * @param notifyService Pointer to the notification service for sending emails (can be nullptr).
+ */
 void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app, service::NotificationService* notifyService) {
 
   // --- GET /api/admin/users ---

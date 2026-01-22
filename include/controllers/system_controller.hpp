@@ -2,10 +2,10 @@
  * @file system_controller.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Controller for system related routes (Healthcheck, Sysinfo)
- * @version 0.1.0
- * @date 2026-01-07
+ * @version 0.1.1
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */

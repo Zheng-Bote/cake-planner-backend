@@ -2,16 +2,16 @@
  * @file password_utils.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Password Hashing Utilities
- * @version 0.1.1
- * @date 2026-01-03
+ * @version 0.1.2
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
 
-// (OWASP Empfehlungen).
-// Time Cost(t) : 3 Iterationen
+// (OWASP Recommendations).
+// Time Cost(t) : 3 Iterations
 // Memory Cost(m) : 64 MB(65536 KB)
 // Parallelism(p) : 4 Threads
 
@@ -23,9 +23,9 @@
 #include <random>
 #include <vector>
 
-// Interne Konstanten für Argon2id Sicherheit
-const uint32_t T_COST = 3;      // 3 Iterationen
-const uint32_t M_COST = 65536;  // 64 MiB RAM Nutzung
+// Internal constants for Argon2id security
+const uint32_t T_COST = 3;      // 3 iterations
+const uint32_t M_COST = 65536;  // 64 MiB RAM usage
 const uint32_t PARALLELISM = 4; // 4 Lanes
 const uint32_t SALT_LEN = 16;   // 16 Bytes Salt
 const uint32_t HASH_LEN = 32;   // 32 Bytes Output Hash
@@ -34,6 +34,17 @@ const uint32_t HASH_LEN = 32;   // 32 Bytes Output Hash
 namespace rz {
 namespace utils {
 
+/**
+ * @brief Hashes a plain text password using Argon2id.
+ *
+ * Uses settings recommended by OWASP:
+ * - Time Cost: 3 iterations
+ * - Memory Cost: 64 MiB
+ * - Parallelism: 4 threads
+ *
+ * @param plainText The password to hash.
+ * @return The encoded hash string (including salt and parameters) or empty string on failure.
+ */
 QString PasswordUtils::hashPassword(const QString &plainText) {
   uint8_t salt[SALT_LEN];
   std::random_device rd;
@@ -53,13 +64,20 @@ QString PasswordUtils::hashPassword(const QString &plainText) {
       SALT_LEN, HASH_LEN, encoded.data(), encodedLen);
 
   if (result != ARGON2_OK) {
-    qCritical() << "Argon2 Hashing fehlgeschlagen, Error Code:" << result;
+    qCritical() << "Argon2 use failed, Error Code:" << result;
     return QString();
   }
 
   return QString::fromLatin1(encoded.data());
 }
 
+/**
+ * @brief Verifies a password against an encoded hash.
+ *
+ * @param plainText The plain text password to verify.
+ * @param encodedHash The Argon2id encoded hash to verify against.
+ * @return True if the password matches, false otherwise.
+ */
 bool PasswordUtils::verifyPassword(const QString &plainText,
                                    const QString &encodedHash) {
   if (encodedHash.isEmpty())

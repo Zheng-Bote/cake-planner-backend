@@ -2,10 +2,10 @@
  * @file event_model.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Unified Event Model
- * @version 0.3.11
- * @date 2026-01-04
+ * @version 0.3.12
+ * @date 2026-01-22
  *
- * @copyright Copyright (c) 2025 ZHENG Robert
+ * @copyright Copyright (c) 2026 ZHENG Robert
  *
  * SPDX-License-Identifier: MIT
  */
@@ -23,7 +23,7 @@ struct EventRating {
     int myRating = 0;
 };
 
-// Struktur für Galerie-Einträge
+// Structure for gallery items
 struct GalleryItem {
     QString userId;
     QString userName;
@@ -39,15 +39,15 @@ struct Event {
     QString bakerName;
     QString date;      // YYYY-MM-DD
     QString description;
-    QString photoPath; // Haupt-Foto (Cover)
+    QString photoPath; // Main photo (Cover)
 
-    // Dynamische Felder
+    // Dynamic fields
     bool isOwner = false;
     bool isFuture = false;
     EventRating rating;
     std::vector<GalleryItem> gallery;
 
-    // --- Methoden ---
+    // --- Methods ---
     crow::json::wvalue toJson() const;
 
     bool create(const QString& userId);
@@ -58,8 +58,8 @@ struct Event {
     static bool deleteEvent(const QString& eventId, const QString& currentUserId);
     static bool rateEvent(const QString& eventId, const QString& userId, int stars, const QString& comment);
 
-    // Methode für Gallery Upload (DB Update)
-    // Controller hat das File schon gespeichert, wir brauchen nur den Dateinamen.
+    // Method for gallery upload (DB Update)
+    // Controller has already saved the file, we only need the filename.
     static bool uploadPhoto(const QString& eventId, const QString& userId, const QString& filename);
 
     static std::vector<Event> getRanked(const QString& userId, int limit = 50);
