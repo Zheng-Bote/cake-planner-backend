@@ -8,14 +8,15 @@ A high-performance C++ REST API backend for the Cake Planner application, built 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [🍰 Overview](#-overview)
-- [🚀 Key Features](#-key-features)
-- [🛠️ Technology Stack](#-technology-stack)
-- [📚 Documentation](#-documentation)
-- [📦 Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Quick Build](#quick-build)
-- [📄 License](#-license)
+- [Cake Planner Backend](#cake-planner-backend)
+  - [🍰 Overview](#-overview)
+  - [🚀 Key Features](#-key-features)
+  - [🛠️ Technology Stack](#️-technology-stack)
+  - [📚 Documentation](#-documentation)
+  - [📦 Getting Started](#-getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Quick Build](#quick-build)
+  - [📄 License](#-license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -53,14 +54,7 @@ The application is designed to be lightweight yet robust, leveraging C++23 for p
 
 ## 📚 Documentation
 
-Detailed documentation is available in the `docs/` directory:
-
--   **[Architecture](docs/architecture/crow_server.md)**: Overview of the server components, controllers, and request flow.
--   **[Class Diagrams](docs/architecture/class_diagrams.md)**: Visual representation of classes and relationships.
--   **[Database](docs/architecture/database.md)**: Entity-Relationship Diagram (ERD) and Schema definitions.
--   **[Security](docs/security/backend_security.md)**: In-depth look at authentication, encryption, and data protection measures.
--   **[Development](docs/development/build_process.md)**: Guide on how to build the project from source and create AppImages..
--   **[Deployment](docs/deployment/deployment_guide.md)**: Instructions for deploying using Docker Compose and Nginx.
+Detailed documentation is available on the [Github Pages](https://zheng-bote.github.io/cake-planner-backend/)
 
 ## 📦 Getting Started
 

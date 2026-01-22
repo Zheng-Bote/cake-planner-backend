@@ -17,7 +17,7 @@ on:
     paths:
       - "README.md"
       #    - "dist/**"
-      # - "docs/**"
+      #    - "docs/**"
       #    - ".github/actions/**"
       #    - ".github/workflows/**"
 

@@ -1,0 +1,184 @@
+<h1>API Documentation</h1>
+
+<p>API Documentation for the Cake Planner Backend, separated into Admin API and User API.</p>
+
+<hr>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<hr>
+
+<article>
+    <section>
+        <h2>Admin API</h2>
+        <p>These endpoints require administrator privileges (<code>is_admin</code> flag) or specific group administration rights.</p>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>GET</td>
+                    <td>/api/admin/users</td>
+                    <td>List all users (Admin) or group members (Group Admin).</td>
+                </tr>
+                <tr>
+                    <td>PUT</td>
+                    <td>/api/admin/users/&lt;id&gt;/status</td>
+                    <td>Activate or deactivate a user account (Admin only).</td>
+                </tr>
+                <tr>
+                    <td>DELETE</td>
+                    <td>/api/admin/users/&lt;id&gt;</td>
+                    <td>Delete a user account (Admin only).</td>
+                </tr>
+                <tr>
+                    <td>GET</td>
+                    <td>/api/admin/groups</td>
+                    <td>List all groups (Admin) or owned group (Group Admin).</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/admin/groups</td>
+                    <td>Create a new group (Admin only).</td>
+                </tr>
+                <tr>
+                    <td>DELETE</td>
+                    <td>/api/admin/groups/&lt;id&gt;</td>
+                    <td>Delete a group (Admin only).</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/admin/users/assign-group</td>
+                    <td>Assign a user to a group (Admin only).</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/admin/groups/set-role</td>
+                    <td>Set a user's role within a group (Admin only).</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>User API</h2>
+        <p>Endpoints available to standard users. Some endpoints (login, register) are public.</p>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Authentication -->
+                <tr>
+                    <td>POST</td>
+                    <td>/api/auth/register</td>
+                    <td>Register a new user account.</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/login</td>
+                    <td>Authenticate and receive a JWT token.</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/auth/2fa/setup</td>
+                    <td>Initiate 2FA setup (returns secret and QR code URL).</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/auth/2fa/activate</td>
+                    <td>Activate 2FA by verifying the code.</td>
+                </tr>
+
+                <!-- User Profile -->
+                <tr>
+                    <td>GET</td>
+                    <td>/api/users</td>
+                    <td>List accessible users (e.g., group members).</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/user/change-password</td>
+                    <td>Change the current user's password.</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/user/settings</td>
+                    <td>Update user settings (e.g., language).</td>
+                </tr>
+                <tr>
+                    <td>DELETE</td>
+                    <td>/api/user</td>
+                    <td>Delete own user account.</td>
+                </tr>
+
+                <!-- Events -->
+                <tr>
+                    <td>GET</td>
+                    <td>/api/events</td>
+                    <td>List events within a date range (params: start, end).</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/events</td>
+                    <td>Create a new event.</td>
+                </tr>
+                <tr>
+                    <td>GET</td>
+                    <td>/api/events/&lt;id&gt;</td>
+                    <td>Get details of a specific event.</td>
+                </tr>
+                <tr>
+                    <td>DELETE</td>
+                    <td>/api/events/&lt;id&gt;</td>
+                    <td>Delete an event (creator or admin).</td>
+                </tr>
+                <tr>
+                    <td>GET</td>
+                    <td>/api/events/stream</td>
+                    <td>Server-Sent Events (SSE) stream for real-time updates.</td>
+                </tr>
+                <tr>
+                    <td>GET</td>
+                    <td>/api/events/ranked</td>
+                    <td>Get "Hall of Fame" (ranked events).</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/events/&lt;id&gt;/rate</td>
+                    <td>Rate an event.</td>
+                </tr>
+                <tr>
+                    <td>GET</td>
+                    <td>/api/events/&lt;id&gt;/ics</td>
+                    <td>Download event as ICS calendar file.</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/events/&lt;id&gt;/photo</td>
+                    <td>Upload a photo to an existing event.</td>
+                </tr>
+
+                <!-- System -->
+                <tr>
+                    <td>GET</td>
+                    <td>/api/system/sysinfo</td>
+                    <td>Retrieve system and build information.</td>
+                </tr>
+                <tr>
+                    <td>GET</td>
+                    <td>/api/system/healthcheck</td>
+                    <td>Check system health status.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</article>
