@@ -95,6 +95,26 @@ void NotificationService::notifyGroupNewEvent(const QString& groupName, const QS
     }
 }
 
+void NotificationService::notifyGroupEventDeleted(const QString& groupName, const QString& bakerName, const QString& date,
+                                                  const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn) {
+
+    // German
+    if (!recipientsDe.empty()) {
+        QString subjectDe = QString("Kuchen-Absage: %1").arg(date);
+        QString bodyDe = QString("Hallo,\n\nleider wurde der Kuchen-Termin am %1 von %2 in der Gruppe '%3' abgesagt.\n\nViele Grüße,\nDein CakePlanner")
+                         .arg(date, bakerName, groupName);
+        for (const auto& mail : recipientsDe) m_smtp->sendEmailAsync(mail, subjectDe, bodyDe);
+    }
+    // English
+    if (!recipientsEn.empty()) {
+        QString subjectEn = QString("Cake Cancellation: %1").arg(date);
+        QString bodyEn = QString("Hello,\n\nunfortunately, the cake event on %1 by %2 in group '%3' has been cancelled.\n\nBest regards,\nYour CakePlanner")
+                         .arg(date, bakerName, groupName);
+        for (const auto& mail : recipientsEn) m_smtp->sendEmailAsync(mail, subjectEn, bodyEn);
+    }
+
+}
+
 /**
  * @brief Notifies a user that their account has been activated.
  *
@@ -206,6 +226,41 @@ void NotificationService::notifyPasswordChanged(const QString& email, const QStr
                        "If this was you, you can ignore this email.\n\n"
                        "IF NOT: Please contact the administrator immediately!\n\n"
                        "Best regards,\nYour Cake Planner Bot").arg(name);
+    }
+
+    m_smtp->sendEmailAsync(email, subject, body);
+}
+
+/**
+ * @brief Sends a temporary password to the user.
+ *
+ * @param email The user's email address.
+ * @param name The user's name.
+ * @param tempPassword The temporary password.
+ * @param lang The user's preferred language.
+ */
+void NotificationService::notifyForgotPassword(const QString& email, const QString& name, const QString& tempPassword, const QString& lang) {
+    QString subject;
+    QString body;
+
+    if (lang == "de") {
+        subject = "Dein temporäres Passwort - Cake Planner";
+        body = QString("Hallo %1,\n\n"
+                       "Du hast ein neues Passwort angefordert.\n"
+                       "Dein temporäres Passwort lautet:\n\n"
+                       "%2\n\n"
+                       "Dieses Passwort ist 24 Stunden gültig.\n"
+                       "Bitte ändere dein Passwort sofort nach der Anmeldung.\n\n"
+                       "Viele Grüße,\nDein Cake Planner Bot").arg(name, tempPassword);
+    } else {
+        subject = "Your temporary password - Cake Planner";
+        body = QString("Hello %1,\n\n"
+                       "You requested a new password.\n"
+                       "Your temporary password is:\n\n"
+                       "%2\n\n"
+                       "This password is valid for 24 hours.\n"
+                       "Please change your password immediately after logging in.\n\n"
+                       "Best regards,\nYour Cake Planner Bot").arg(name, tempPassword);
     }
 
     m_smtp->sendEmailAsync(email, subject, body);

@@ -28,12 +28,15 @@ public:
 
     // Notify group about new cake
     void notifyGroupNewEvent(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn);
+    // Notify group about deleted cake
+    void notifyGroupEventDeleted(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn);
 
     // Account Status Emails
     void notifyAccountActivated(const QString& email, const QString& name, const QString& lang);
     void notifyAccountDeactivated(const QString& email, const QString& name, const QString& lang);
     void notifyAccountDeleted(const QString& email, const QString& name, const QString& lang);
     void notifyPasswordChanged(const QString& email, const QString& name, const QString& lang);
+    void notifyForgotPassword(const QString& email, const QString& name, const QString& tempPassword, const QString& lang);
 
 private:
     SmtpService* m_smtp;

@@ -24,7 +24,7 @@
 #include <thread>
 #include <iostream>
 #include <string>
-#include <csignal> // <--- IMPORTANT for Signal Handler
+#include <csignal>
 
 // Logging (SPDLOG)
 #include "spdlog/spdlog.h"

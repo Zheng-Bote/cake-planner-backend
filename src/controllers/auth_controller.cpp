@@ -101,8 +101,23 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
           return crow::response(401, "Invalid credentials");
         User user = *userOpt;
 
+        bool isTempPassword = false;
         if (!rz::utils::PasswordUtils::verifyPassword(password, user.password_hash)) {
-          return crow::response(401, "Invalid credentials");
+            // Check temp password
+            bool tempValid = false;
+            if (!user.temp_password_hash.isEmpty() && !user.temp_password_expiry.isEmpty()) {
+                QDateTime expiry = QDateTime::fromString(user.temp_password_expiry, Qt::ISODate);
+                if (expiry > QDateTime::currentDateTime()) {
+                     if (rz::utils::PasswordUtils::verifyPassword(password, user.temp_password_hash)) {
+                         tempValid = true;
+                         isTempPassword = true;
+                     }
+                }
+            }
+
+            if (!tempValid) {
+                return crow::response(401, "Invalid credentials");
+            }
         }
 
         // 2FA Check
@@ -181,6 +196,38 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
             res["error"] = "Invalid code";
           return crow::response(400, res);
         }
+      });
+
+  // 5. FORGOT PASSWORD
+  CROW_ROUTE(app, "/api/auth/forgot-password")
+      .methods(crow::HTTPMethod::POST)([this](const crow::request& req) {
+          auto json = crow::json::load(req.body);
+            crow::json::wvalue res;
+          if (!json || !json.has("email")) {
+            res["message"] = "Missing eMail";
+              return crow::response(400, res);
+          }
+          QString email = QString::fromStdString(json["email"].s()).trimmed();
+          auto userOpt = User::getByEmail(email);
+
+          if (userOpt) {
+              User u = *userOpt;
+              QString tempPass = rz::utils::PasswordUtils::generateRandomPassword(10);
+              QString hash = rz::utils::PasswordUtils::hashPassword(tempPass);
+
+              if (u.setTempPassword(hash, 24)) {
+                if (User::setMustChangePassword(u.id, true)) {
+                    spdlog::info("[AUTH] Forgot password set must change password flag for {}", u.email.toStdString());
+                }
+                   if (m_notifyService) {
+                       m_notifyService->notifyForgotPassword(u.email, u.full_name, tempPass, u.emailLanguage);
+                   }
+              }
+          }
+
+          // Always return 200 to prevent user enumeration
+          res["message"] = "If the email exists, a reset link has been sent.";
+          return crow::response(200, res);
       });
 }
 

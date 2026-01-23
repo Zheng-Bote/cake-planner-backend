@@ -2,8 +2,8 @@
  * @file event_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Controller Implementation (Safe Blocking Long Polling)
- * @version 0.3.19
- * @date 2026-01-22
+ * @version 0.4.4
+ * @date 2026-01-23
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -257,9 +257,35 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
     // 4. DELETE
     CROW_ROUTE(app, "/api/events/<string>")
     .methods(crow::HTTPMethod::DELETE)
-    ([&](const crow::request& req, std::string eventId){
+    ([&, notifyService](const crow::request& req, std::string eventId){ // WICHTIG: notifyService in Capture aufnehmen
         const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
-        if(Event::deleteEvent(QString::fromStdString(eventId), ctx.currentUser.userId)) {
+        QString qEventId = QString::fromStdString(eventId);
+
+        // 1. Daten holen, BEVOR wir löschen (für die Benachrichtigung)
+        auto evt = Event::getById(qEventId, ctx.currentUser.userId);
+
+        // 2. Löschen versuchen
+        if(Event::deleteEvent(qEventId, ctx.currentUser.userId)) {
+
+            // 3. Wenn erfolgreich und Event-Daten vorhanden -> Benachrichtigen
+            if (notifyService && evt && !evt->groupId.isEmpty()) {
+                // Alle Mitglieder der Gruppe laden
+                auto members = User::getAll(evt->groupId);
+                std::vector<QString> de, en;
+
+                for (const auto& u : members) {
+                    // Den User, der löscht, nicht benachrichtigen (optional)
+                    if (u.id == ctx.currentUser.userId) continue;
+                    if (!u.is_active) continue;
+
+                    if (u.emailLanguage == "de") de.push_back(u.email);
+                    else en.push_back(u.email);
+                }
+
+                // Benachrichtigung senden (Methode muss im NotificationService existieren!)
+                notifyService->notifyGroupEventDeleted(evt->groupName, evt->bakerName, evt->date, de, en);
+            }
+
             return crow::response(200);
         }
         return crow::response(403);

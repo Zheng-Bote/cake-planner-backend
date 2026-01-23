@@ -208,6 +208,33 @@ bool DatabaseManager::migrate() {
   }
 
   if (success) {
+    // --- MIGRATION FOR v0.5.0 (Temp Passwords) ---
+    // Check if columns exist, if not add them.
+    // SQLite does not support IF NOT EXISTS in ALTER TABLE ADD COLUMN directly in all versions,
+    // but we can just try to add them and ignore the specific "duplicate column" error,
+    // OR inspect the table info. For simplicity/robustness here, we'll try to add and catch error.
+
+    auto checkAndAddColumn = [&](const QString& table, const QString& column, const QString& type) {
+        QSqlQuery checkQ(db);
+        // Simple check: try to select the column. If it fails, it likely doesn't exist.
+        // A cleaner way is PRAGMA table_info, but this is quick.
+        checkQ.prepare(QString("SELECT %1 FROM %2 LIMIT 1").arg(column, table));
+        if (!checkQ.exec()) {
+            // Likely doesn't exist, try to add
+             QSqlQuery alterQ(db);
+             QString sql = QString("ALTER TABLE %1 ADD COLUMN %2 %3").arg(table, column, type);
+             if (!alterQ.exec(sql)) {
+                 spdlog::warn("Migration: Failed to add column {}.{} (might already exist or other error): {}",
+                    table.toStdString(), column.toStdString(), alterQ.lastError().text().toStdString());
+             } else {
+                 spdlog::info("Migration: Added column {}.{}", table.toStdString(), column.toStdString());
+             }
+        }
+    };
+
+    checkAndAddColumn("users", "temp_password_hash", "TEXT");
+    checkAndAddColumn("users", "temp_password_expiry", "TEXT");
+
     db.commit();
     qDebug() << "Database migration successfully completed.";
   } else {

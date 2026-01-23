@@ -192,6 +192,36 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         }
         return crow::response(500);
       });
+
+      // --- POST /api/admin/users/force-password-change ---
+  // Matches Frontend Payload: { "userId": "...", "mustChange": true }
+  CROW_ROUTE(app, "/api/admin/users/force-password-change")
+      .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+
+        // 1. Sicherheitscheck: Nur Admins
+        if (!ctx.currentUser.isAdmin) return crow::response(403);
+
+        // 2. JSON parsen
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("userId") || !json.has("mustChange")) {
+            return crow::response(400, "Missing userId or mustChange in payload");
+        }
+
+        // 3. Werte extrahieren
+        QString targetUserId = QString::fromStdString(json["userId"].s());
+        bool mustChange = json["mustChange"].b();
+
+        // 4. Update durchführen
+        if (User::setMustChangePassword(targetUserId, mustChange)) {
+            crow::json::wvalue res;
+            res["message"] = "Force password change flag updated";
+            res["mustChange"] = mustChange;
+            return crow::response(200, res);
+        }
+
+        return crow::response(500, "Database error");
+      });
 }
 
 } // namespace rz::controller

@@ -33,7 +33,20 @@ struct User {
   bool must_change_password = false;
   QString last_login_at;
 
+  // Temp Password
+  QString temp_password_hash;
+  QString temp_password_expiry; // ISO Date string
+
+  struct GroupMembership {
+      QString groupId;
+      QString groupName;
+      QString role;
+  };
+
   static bool setMustChangePassword(const QString &userId, bool mustChange);
+  bool setTempPassword(const QString &hash, int durationInHours = 24);
+  bool clearTempPassword();
+
   bool enable2FA(const QString &secret);
 
   // --- View Logic (Serialization) ---
@@ -56,6 +69,7 @@ struct User {
   static bool assignToGroup(const QString &userId, const QString &groupId);
   static bool setGroupRole(const QString &userId, const QString &groupId, const QString &role);
   static QString getGroupRole(const QString &userId, const QString &groupId);
+static std::vector<GroupMembership> getGroupsForUser(const QString &userId);
 
   // NEW: Admin actions for groups
   static QString createGroup(const QString &name);

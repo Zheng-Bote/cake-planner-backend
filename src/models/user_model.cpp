@@ -2,8 +2,8 @@
  * @file user_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Model Implementation
- * @version 0.4.3
- * @date 2026-01-22
+ * @version 0.4.4
+ * @date 2026-01-23
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -64,6 +64,7 @@ crow::json::wvalue User::toJson() const {
   json["has2FA"] = !totp_secret.isEmpty();
   json["groupId"] = groupId.toStdString();
   json["groupRole"] = groupRole.toStdString();
+  json["lastLoginAt"] = last_login_at.toStdString();
   return json;
 }
 
@@ -78,7 +79,7 @@ std::optional<User> User::getByEmail(const QString &email) {
   QSqlQuery query(db);
   // FIX 2: Add email_language in SELECT
   query.prepare("SELECT id, full_name, email, language, email_language, password_hash, is_active, "
-                "is_admin, totp_secret, must_change_password FROM users WHERE "
+                "is_admin, totp_secret, must_change_password, temp_password_hash, temp_password_expiry, last_login_at FROM users WHERE "
                 "email = :email");
   query.bindValue(":email", email);
 
@@ -99,7 +100,9 @@ std::optional<User> User::getByEmail(const QString &email) {
     u.is_admin = query.value("is_admin").toBool();
     u.must_change_password = query.value("must_change_password").toBool();
     u.totp_secret = query.value("totp_secret").toString();
-
+    u.temp_password_hash = query.value("temp_password_hash").toString();
+    u.temp_password_expiry = query.value("temp_password_expiry").toString();
+    u.last_login_at = query.value("last_login_at").toString();
     // Reload group info
     auto groupInfo = getGroupAndRole(u.id);
     u.groupId = groupInfo.first;
@@ -126,7 +129,7 @@ std::optional<User> User::getById(const QString &id) {
   // FIX 3: Add email_language in SELECT
   query.prepare(
       "SELECT id, full_name, email, language, email_language, password_hash, is_active, "
-      "is_admin, totp_secret, must_change_password FROM users WHERE id = :id");
+      "is_admin, totp_secret, must_change_password, temp_password_hash, temp_password_expiry, last_login_at FROM users WHERE id = :id");
   query.bindValue(":id", id);
 
   if (query.exec() && query.next()) {
@@ -146,6 +149,9 @@ std::optional<User> User::getById(const QString &id) {
     u.is_admin = query.value("is_admin").toBool();
     u.must_change_password = query.value("must_change_password").toBool();
     u.totp_secret = query.value("totp_secret").toString();
+    u.temp_password_hash = query.value("temp_password_hash").toString();
+    u.temp_password_expiry = query.value("temp_password_expiry").toString();
+    u.last_login_at = query.value("last_login_at").toString();
 
     // Reload group info
     auto groupInfo = getGroupAndRole(u.id);
@@ -339,11 +345,46 @@ bool User::updatePassword(const QString &userId, const QString &newHash) {
 }
 
 /**
+ * @brief Sets a temporary password for the user.
+ *
+ * @param hash The hash of the temporary password.
+ * @param durationInHours How long the password is valid.
+ * @return True if successful.
+ */
+bool User::setTempPassword(const QString &hash, int durationInHours) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+
+    QDateTime expiry = QDateTime::currentDateTime().addSecs(durationInHours * 3600);
+
+    query.prepare("UPDATE users SET temp_password_hash = :hash, temp_password_expiry = :expiry WHERE id = :id");
+    query.bindValue(":hash", hash);
+    query.bindValue(":expiry", expiry.toString(Qt::ISODate));
+    query.bindValue(":id", this->id);
+
+    return query.exec();
+}
+
+/**
+ * @brief Clears the temporary password for the user.
+ *
+ * @return True if successful.
+ */
+bool User::clearTempPassword() {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+    query.prepare("UPDATE users SET temp_password_hash = NULL, temp_password_expiry = NULL WHERE id = :id");
+    query.bindValue(":id", this->id);
+    return query.exec();
+}
+
+/**
  * @brief Updates the last login timestamp for a user.
  *
  * @param userId The ID of the user.
  * @return True if successful, false otherwise.
  */
+
 bool User::touchLastLogin(const QString &userId) {
     auto db = DatabaseManager::instance().getDatabase();
     QSqlQuery query(db);
@@ -589,4 +630,37 @@ bool User::deleteGroup(const QString &groupId) {
 
     spdlog::info("Gruppe {} erfolgreich gelöscht.", groupId.toStdString());
     return true;
+}
+
+
+std::vector<User::GroupMembership> User::getGroupsForUser(const QString &userId) {
+    auto db = DatabaseManager::instance().getDatabase();
+    QSqlQuery query(db);
+    std::vector<GroupMembership> result;
+
+    // Wir holen ID und Name aus der Gruppen-Tabelle und die Rolle aus der Verknüpfungstabelle
+    QString sql = R"(
+        SELECT g.id, g.name, gm.role
+        FROM groups g
+        INNER JOIN group_members gm ON g.id = gm.group_id
+        WHERE gm.user_id = :uid
+        ORDER BY g.name ASC
+    )";
+
+    query.prepare(sql);
+    query.bindValue(":uid", userId);
+
+    if (query.exec()) {
+        while (query.next()) {
+            GroupMembership gm;
+            gm.groupId = query.value("id").toString();
+            gm.groupName = query.value("name").toString();
+            gm.role = query.value("role").toString();
+            result.push_back(gm);
+        }
+    } else {
+        qWarning() << "User::getGroupsForUser error:" << query.lastError().text();
+    }
+
+    return result;
 }

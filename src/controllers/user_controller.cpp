@@ -16,6 +16,8 @@
 #include "utils/token_utils.hpp"
 #include "services/notification_service.hpp" // NEW: Include
 
+#include "spdlog/spdlog.h"
+
 namespace rz {
 namespace controller {
 
@@ -61,6 +63,32 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
       result[i++] = user.toJson();
     }
     return crow::response(result);
+  });
+
+  // --- GET /api/user/groups ---
+  // Liefert alle Gruppen zurück, in denen der aktuelle User Mitglied ist
+  CROW_ROUTE(app, "/api/user/groups")
+  .methods(crow::HTTPMethod::GET)
+  ([&](const crow::request &req) {
+    const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+
+    // 1. Prüfen, ob User eingeloggt ist
+    if (ctx.currentUser.userId.isEmpty()) {
+        return crow::response(401);
+    }
+
+    // 2. Daten aus dem Model holen
+    auto memberships = User::getGroupsForUser(ctx.currentUser.userId);
+
+    // 3. JSON bauen
+    crow::json::wvalue json = crow::json::wvalue::list();
+    for (size_t i = 0; i < memberships.size(); ++i) {
+        json[i]["id"] = memberships[i].groupId.toStdString();
+        json[i]["name"] = memberships[i].groupName.toStdString();
+        json[i]["role"] = memberships[i].role.toStdString();
+    }
+
+    return crow::response(200, json);
   });
 
   // --- POST /api/register ---
@@ -142,6 +170,7 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
 
         if (User::updatePassword(ctx.currentUser.userId, newHash)) {
 
+            spdlog::info("[USER] Password changed for {}", user->email.toStdString());
             // 2. Send email
             if (notifyService) {
                 notifyService->notifyPasswordChanged(user->email, user->full_name, user->emailLanguage);

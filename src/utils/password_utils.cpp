@@ -92,5 +92,27 @@ bool PasswordUtils::verifyPassword(const QString &plainText,
   return (result == ARGON2_OK);
 }
 
+/**
+ * @brief Generates a random password.
+ *
+ * @param length Length of the password.
+ * @return Random string.
+ */
+QString PasswordUtils::generateRandomPassword(int length) {
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const size_t max_index = (sizeof(charset) - 1);
+
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<size_t> distribution(0, max_index - 1); // fix range
+
+    QString password;
+    password.reserve(length);
+    for (int i = 0; i < length; ++i) {
+        password.append(QChar::fromLatin1(charset[distribution(generator)]));
+    }
+    return password;
+}
+
 } // namespace utils
 } // namespace rz

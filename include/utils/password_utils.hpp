@@ -30,6 +30,11 @@ public:
    */
   static bool verifyPassword(const QString &plainText,
                              const QString &encodedHash);
+
+  /**
+   * Generates a random variable-length safe string.
+   */
+  static QString generateRandomPassword(int length = 12);
 };
 
 } // namespace utils
