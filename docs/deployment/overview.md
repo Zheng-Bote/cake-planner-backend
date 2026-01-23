@@ -3,6 +3,17 @@
 ---
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Components](#components)
+  - [Webserver](#webserver)
+  - [Web-Applicationserver](#web-applicationserver)
+  - [Database](#database)
+  - [Frontends](#frontends)
+    - [Admin Panel](#admin-panel)
+    - [User Frontend](#user-frontend)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ---

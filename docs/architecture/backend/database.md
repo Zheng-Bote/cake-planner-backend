@@ -5,6 +5,20 @@ The Cake Planner Backend uses **SQLite** as its relational database. The databas
 ---
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Database Schema (overview)](#database-schema-overview)
+- [Entity-Relationship Diagram (ERD)](#entity-relationship-diagram-erd)
+- [Table Definitions](#table-definitions)
+  - [users](#users)
+  - [groups](#groups)
+  - [group_members](#group_members)
+  - [events](#events)
+  - [ratings](#ratings)
+  - [event_photos](#event_photos)
+- [Migration System](#migration-system)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ---

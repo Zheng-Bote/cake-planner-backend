@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Class Diagrams](#class-diagrams)
+  - [Overview](#overview)
+  - [Class Diagram](#class-diagram)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Class Diagrams
 
 This document visualizes the class structure and relationships of the Cake Planner Backend.

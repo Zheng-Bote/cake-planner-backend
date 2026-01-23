@@ -5,6 +5,14 @@ This document outlines the security measures implemented in the application to e
 ---
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Network Security](#network-security)
+- [Web Server Security](#web-server-security)
+- [Authentication & Data Protection](#authentication--data-protection)
+- [Email Security](#email-security)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ---
