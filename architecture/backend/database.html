@@ -133,9 +133,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <h2>Table of Contents</h2>
 <ul class="toc-level-2">
+<li><a href="#description">Description</a></li>
 <li><a href="#database-schema-overview">Database Schema (overview)</a></li>
-<li><a href="#entity-relationship-diagram-erd">Entity-Relationship Diagram (ERD)</a></li>
-<li><a href="#table-definitions">Table Definitions</a></li>
+<li><a href="#entity-relationship-diagram-erd">Entity Relationship Diagram (ERD)</a></li>
+<li><a href="#tables">Tables</a></li>
 <ul class="toc-level-3">
 <li><a href="#users">users</a></li>
 <li><a href="#groups">groups</a></li>
@@ -149,6 +150,8 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <hr>
+<h2 id="description">Description</h2>
+<p>This document describes the database schema for the <strong>Cake Planner Backend</strong>. The application uses an <strong>SQLite</strong> database.</p>
 <h2 id="database-schema-overview">Database Schema (overview)</h2>
 <p>The database is normalized to ensure data integrity.</p>
 <ul>
@@ -159,48 +162,290 @@
 <li>ratings: Links users to events with a score (1-5).</li>
 <li>event_photos: Stores paths to community uploads linked to events.</li>
 </ul>
-<h2 id="entity-relationship-diagram-erd">Entity-Relationship Diagram (ERD)</h2>
-<p>The following diagram shows the database tables and their relationships.</p>
+<h2 id="entity-relationship-diagram-erd">Entity Relationship Diagram (ERD)</h2>
 <p><img src="../../assets/img/architecture/backend/db_erp.png" alt="ERD"></p>
-<h2 id="table-definitions">Table Definitions</h2>
+<h2 id="tables">Tables</h2>
 <h3 id="users">users</h3>
-<p>Stores user account information.</p>
-<ul>
-<li><strong>Primary Key</strong>: <code>id</code> (UUID as Text)</li>
-<li><strong>Unique</strong>: <code>email</code></li>
-</ul>
+<p>Stores user account information, including authentication details and preferences.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Primary Key (UUID).</td>
+</tr>
+<tr>
+<td align="left"><code>full_name</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Full name of the user.</td>
+</tr>
+<tr>
+<td align="left"><code>email</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Unique email address.</td>
+</tr>
+<tr>
+<td align="left"><code>password_hash</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Argon2id password hash.</td>
+</tr>
+<tr>
+<td align="left"><code>language</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Preferred UI language (e.g., 'en', 'de').</td>
+</tr>
+<tr>
+<td align="left"><code>email_language</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Preferred language for emails.</td>
+</tr>
+<tr>
+<td align="left"><code>totp_secret</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Secret for 2FA (if enabled).</td>
+</tr>
+<tr>
+<td align="left"><code>is_active</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left">1 if active, 0 if inactive.</td>
+</tr>
+<tr>
+<td align="left"><code>is_admin</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left">1 if global admin, 0 otherwise.</td>
+</tr>
+<tr>
+<td align="left"><code>must_change_password</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left">1 if user must change password next login.</td>
+</tr>
+<tr>
+<td align="left"><code>temp_password_hash</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Hash of a temporary password (forgot password flow).</td>
+</tr>
+<tr>
+<td align="left"><code>temp_password_expiry</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Expiration timestamp of the temp password.</td>
+</tr>
+<tr>
+<td align="left"><code>last_login_at</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Timestamp of last login.</td>
+</tr>
+<tr>
+<td align="left"><code>created_at</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Creation timestamp.</td>
+</tr>
+<tr>
+<td align="left"><code>updated_at</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Update timestamp.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="groups">groups</h3>
-<p>Represents groups (e.g., departments, teams) that organize cake events.</p>
-<ul>
-<li><strong>Primary Key</strong>: <code>id</code></li>
-</ul>
+<p>Represents groups (departments, teams) that can organize cake events.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Primary Key (UUID).</td>
+</tr>
+<tr>
+<td align="left"><code>name</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Name of the group.</td>
+</tr>
+<tr>
+<td align="left"><code>description</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Optional description.</td>
+</tr>
+<tr>
+<td align="left"><code>created_at</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Creation timestamp.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="groupmembers">group_members</h3>
-<p>Many-to-Many link between <code>users</code> and <code>groups</code>.</p>
-<ul>
-<li><strong>Composite Primary Key</strong>: (<code>user_id</code>, <code>group_id</code>)</li>
-<li><strong>Foreign Keys</strong>: Cascade delete on both user and group.</li>
-</ul>
+<p>Link table defining the many-to-many relationship between users and groups.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>user_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Foreign Key to <code>users.id</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>group_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Foreign Key to <code>groups.id</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>role</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Role in group (e.g., 'member', 'admin').</td>
+</tr>
+<tr>
+<td align="left"><code>joined_at</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Timestamp when user joined.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Primary Key:</strong> Composite (<code>user_id</code>, <code>group_id</code>)</p>
 <h3 id="events">events</h3>
-<p>Represents a cake bringing event on a specific date.</p>
-<ul>
-<li><strong>Primary Key</strong>: <code>id</code></li>
-<li><strong>Foreign Keys</strong>:<ul>
-<li><code>group_id</code>: The group this event belongs to.</li>
-<li><code>baker_id</code>: The user responsible for baking.</li>
-</ul>
-</li>
-</ul>
+<p>Represents a &quot;Cake Event&quot; where a user brings a cake on a specific date.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Primary Key (UUID).</td>
+</tr>
+<tr>
+<td align="left"><code>group_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The group this event belongs to.</td>
+</tr>
+<tr>
+<td align="left"><code>baker_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">The user bringing the cake.</td>
+</tr>
+<tr>
+<td align="left"><code>event_date</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Date of the event (<code>YYYY-MM-DD</code>).</td>
+</tr>
+<tr>
+<td align="left"><code>description</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Description of the cake/event.</td>
+</tr>
+<tr>
+<td align="left"><code>photo_path</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Path to the cover image.</td>
+</tr>
+<tr>
+<td align="left"><code>created_at</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Creation timestamp.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="ratings">ratings</h3>
 <p>Allows users to rate and comment on events.</p>
-<ul>
-<li><strong>Unique Constraint</strong>: A user can only rate an event once (<code>event_id</code>, <code>rater_id</code>).</li>
-<li><strong>Check Constraint</strong>: <code>rating_value</code> must be between 1 and 5.</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Primary Key (UUID).</td>
+</tr>
+<tr>
+<td align="left"><code>event_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Foreign Key to <code>events.id</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>rater_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Foreign Key to <code>users.id</code> (the rater).</td>
+</tr>
+<tr>
+<td align="left"><code>rating_value</code></td>
+<td align="left"><code>INTEGER</code></td>
+<td align="left">1 to 5 stars.</td>
+</tr>
+<tr>
+<td align="left"><code>comment</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Optional text comment.</td>
+</tr>
+<tr>
+<td align="left"><code>created_at</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Creation timestamp.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Constraints:</strong> A user can rate each event only once (UNIQUE <code>event_id</code>, <code>rater_id</code>).</p>
 <h3 id="eventphotos">event_photos</h3>
-<p>Additional photos uploaded to an event gallery.</p>
-<ul>
-<li><strong>Composite Primary Key</strong>: (<code>event_id</code>, <code>user_id</code>) - <em>Note: Schema implies one photo per user per event based on PK, or just efficient linking.</em></li>
-</ul>
+<p>Stores additional photos uploaded to the gallery of an event.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>event_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Foreign Key to <code>events.id</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>user_id</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Foreign Key to <code>users.id</code> (uploader).</td>
+</tr>
+<tr>
+<td align="left"><code>photo_path</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Path to the uploaded photo.</td>
+</tr>
+<tr>
+<td align="left"><code>uploaded_at</code></td>
+<td align="left"><code>TEXT</code></td>
+<td align="left">Upload timestamp.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Primary Key:</strong> Composite (<code>event_id</code>, <code>user_id</code>). Currently, users can upload only one photo per event gallery (excluding the cover photo if they are the baker, which is stored in <code>events</code>).</p>
 <h2 id="migration-system">Migration System</h2>
 <p>Database migrations are handled automatically in <code>DatabaseManager::migrate()</code>.</p>
 <ul>
@@ -211,7 +456,7 @@
 </main>
 
     <footer class="footer">
-      <div class="footer-section_left">v0.13.0</div>
+      <div class="footer-section_left">v1.0.0</div>
       <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
       <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
     </footer>

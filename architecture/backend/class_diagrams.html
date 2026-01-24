@@ -127,29 +127,71 @@
 </nav>
     </aside>
 
-    <main class="main"><!-- START doctoc generated TOC please keep comment here to allow auto update -->
+    <main class="main"><h1>Backend Class Design</h1>
+<p>The Backend is built using modern C++23 and the Crow framework. It follows a layered MVC-like architecture (Controller-Model-Service).</p>
+<hr>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <h2>Table of Contents</h2>
 <ul class="toc-level-2">
-<li><a href="#overview">Overview</a></li>
-<li><a href="#class-diagram">Class Diagram</a></li>
+<li><a href="#description">Description</a></li>
+<li><a href="#class-diagrams">Class Diagrams</a></li>
+<li><a href="#component-details">Component Details</a></li>
+<ul class="toc-level-3">
+<li><a href="#controllers">Controllers</a></li>
+<li><a href="#models">Models</a></li>
+<li><a href="#services">Services</a></li>
+<li><a href="#middleware">Middleware</a></li>
+<li><a href="#utilities-amp-core">Utilities &amp; Core</a></li>
+</ul>
 </ul>
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-<h1>Class Diagrams</h1>
+<hr>
+<h2 id="description">Description</h2>
 <p>This document visualizes the class structure and relationships of the Cake Planner Backend.</p>
-<h2 id="overview">Overview</h2>
-<p>The application follows a defined <strong>Model-View-Controller (MVC)</strong> pattern (where &quot;View&quot; is JSON serialization).</p>
-<ul>
-<li><strong>Controllers</strong> handle HTTP requests.</li>
-<li><strong>Services</strong> encapsulate business logic and external communications (e.g., SMTP).</li>
-<li><strong>Models</strong> represent data structures and contain database interaction logic.</li>
-</ul>
-<h2 id="class-diagram">Class Diagram</h2>
+<h2 id="class-diagrams">Class Diagrams</h2>
+<p>The following diagram illustrates the core classes and their relationships. To ensure readability, the classes are arranged in logical tiers with a maximum of four components per row.</p>
 <p><img src="../../assets/img/architecture/backend/crow_class-diagrams.png" alt="Class Diagram"></p>
+<h2 id="component-details">Component Details</h2>
+<p>The application follows a defined <strong>Model-View-Controller (MVC)</strong> pattern (where &quot;View&quot; is JSON serialization).</p>
+<h3 id="controllers">Controllers</h3>
+<p>Controllers handle incoming HTTP requests, parse JSON bodies, and delegate logic to Models or Services. They are the entry point for the REST API.</p>
+<ul>
+<li><strong>AuthController</strong>: Handles Registration, Login, Password Reset, and 2FA setup.</li>
+<li><strong>UserController</strong>: Manages user profiles, settings (language), and self-deletion.</li>
+<li><strong>EventController</strong>: Handles event creation, listing, deletion, rating, and photo uploads.</li>
+<li><strong>AdminController</strong>: Provides endpoints for user and group management (Admin only).</li>
+<li><strong>SystemController</strong>: Exposes system health and version information.</li>
+</ul>
+<h3 id="models">Models</h3>
+<p>Models represent the data entities and encompass the business logic and database interactions.</p>
+<ul>
+<li><strong>User</strong>: Represents a registered user. Handles authentication checks, password hashing, and group membership logic.</li>
+<li><strong>Event</strong>: Represents a cake event. Handles creation rules, date filtering, and rating calculations.</li>
+<li><strong>ConfigModel</strong>: Loads and provides access to application configuration (env vars).</li>
+</ul>
+<h3 id="services">Services</h3>
+<p>Services encapsulate business logic that spans multiple models or involves external communication.</p>
+<ul>
+<li><strong>NotificationService</strong>: Abstraction layer for sending business-level emails (e.g., &quot;New Cake Alert&quot;). localized in German/English.</li>
+<li><strong>SmtpService</strong>: Low-level wrapper around the SMTP library to send raw emails asynchronously via Qt's event loop.</li>
+</ul>
+<h3 id="middleware">Middleware</h3>
+<ul>
+<li><strong>AuthMiddleware</strong>: Intercepts every request (except <code>login</code>/<code>register</code>) to validate the JWT Bearer Token. It populates the request context with the authenticated user's ID and role.</li>
+</ul>
+<h3 id="utilities-amp-core">Utilities &amp; Core</h3>
+<p>Helper classes for common tasks.</p>
+<ul>
+<li><strong>DatabaseManager</strong>: Singleton that manages the SQLite connection pool and handles schema migrations.</li>
+<li><strong>TokenUtils</strong>: Generates and verifies JWTs (JSON Web Tokens).</li>
+<li><strong>PasswordUtils</strong>: Handles secure password hashing using Argon2id.</li>
+<li><strong>ImageProcessor</strong>: Resizes uploaded images and converts them to WebP format.</li>
+</ul>
 </main>
 
     <footer class="footer">
-      <div class="footer-section_left">v0.13.0</div>
+      <div class="footer-section_left">v1.0.0</div>
       <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
       <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
     </footer>

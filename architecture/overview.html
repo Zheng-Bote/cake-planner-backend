@@ -138,23 +138,53 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <h2>Table of Contents</h2>
 <ul class="toc-level-2">
+<li><a href="#description">Description</a></li>
 <li><a href="#1-system-context-the-big-picture">1. System Context (The Big Picture)</a></li>
 <li><a href="#2-container-architecture">2. Container Architecture</a></li>
+<ul class="toc-level-3">
+<li><a href="#component-description">Component Description</a></li>
+<ul class="toc-level-4">
+<li><a href="#1-nginx-reverse-proxy-web-server">1. NGINX (Reverse Proxy & Web Server)</a></li>
+<li><a href="#2-frontends-angular-app">2. Frontends (Angular App)</a></li>
+<li><a href="#3-backend-c-crow">3. Backend (C++ Crow)</a></li>
+<li><a href="#4-database-sqlite">4. Database (SQLite)</a></li>
+<li><a href="#5-external-systems">5. External Systems</a></li>
+</ul>
+</ul>
 <li><a href="#3-domain-design-bounded-contexts">3. Domain Design (Bounded Contexts)</a></li>
 <ul class="toc-level-3">
+<li><a href="#31-bounded-contexts-description">3.1 Bounded Contexts Description</a></li>
+<ul class="toc-level-4">
+<li><a href="#1-identity-access-management-iam">1. Identity & Access Management (IAM)</a></li>
+<li><a href="#2-group-management">2. Group Management</a></li>
+<li><a href="#3-event-planning">3. Event Planning</a></li>
+<li><a href="#4-engagement-social">4. Engagement & Social</a></li>
+<li><a href="#5-notification-system">5. Notification System</a></li>
+</ul>
+<li><a href="#32-context-map-diagram">3.2 Context Map Diagram</a></li>
+<li><a href="#33-distinct-bounded-contexts">3.3 Distinct Bounded Contexts</a></li>
+<ul class="toc-level-4">
 <li><a href="#context-descriptions">🔎 Context Descriptions</a></li>
+</ul>
 </ul>
 </ul>
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <hr>
 
+<h2 id="description">Description</h2>
+
+<p>The <strong>Cake Planner</strong> is a web-based application designed to organize cake-bringing events within groups (e.g., teams, departments). It consists of a modern Single Page Application (SPA) frontend and a high-performance C++ backend.</p>
+
 <h2 id="1-system-context-the-big-picture">1. System Context (The Big Picture)</h2>
 
 <p>
-  CakePlanner is designed as a monolithic application that serves baking groups (companies, clubs,
+  The <strong>Cake Planner</strong> is designed as a monolithic application that serves baking groups (companies, clubs,
   friends) to organize events. It acts as the central hub for planning, rating, and sharing photos.
 </p>
+<p>The system follows a classic **Client-Server Architecture**, facilitated by a Reverse Proxy.</p>
+
+<p>The following C4-style System Context diagram illustrates how users interact with the system and how the internal components relate to each other.</p>
 
 <img src="../assets/img/architecture/system-context.png" alt="System Context" />
 
@@ -180,9 +210,14 @@
       <td>Material Design, Signals, Transloco (i18n). Responsive UI for Desktop & Mobile.</td>
     </tr>
     <tr>
+      <td>Middleware</td>
+      <td>NGINX</td>
+      <td>Reverse Proxy, Load Balancer, SSL Termination. HTTP Security Headers.</td>
+    </tr>
+    <tr>
       <td>Backend</td>
       <td>C++23 (Crow)</td>
-      <td>REST API, Business Logic, Security.</td>
+      <td>REST API, Business Logic, Authentication, Authorization.</td>
     </tr>
     <tr>
       <td>Database</td>
@@ -196,9 +231,102 @@
     </tr>
   </tbody>
 </table>
+<br>
+<h3 id="component-description">Component Description</h3>
+
+<h4 id="1-nginx-reverse-proxy-web-server">1. NGINX (Reverse Proxy & Web Server)</h4>
+<p>The entry point for all traffic. It handles:
+<ul>
+    <li><strong>SSL Termination</strong>: Manages HTTPS certificates and encryption.</li>
+    <li><strong>Static File Serving</strong>: Delivers the compiled Angular application (HTML, CSS, JS) directly to the browser.</li>
+    <li><strong>Reverse Proxy</strong>: Forwards all requests starting with `/api/` to the C++ Backend.</li>
+    <li><strong>Security Headers</strong>: Adds headers like CSP, HSTS, and X-Frame-Options.</li>
+</ul>
+
+<h4 id="2-frontends-angular-app">2. Frontends (Angular App)</h4>
+<p><strong>Admin-Panel</strong>: A Single Page Application (SPA) built with Angular.</p>
+<br>
+<ul>
+    <li>Runs in the user's browser.</li>
+    <li>Communicates with the Backend via REST API.</li>
+    <li>Handles Groups, Users, Assignments, and Settings.</li>
+</ul>
+<br>
+<p><strong>User-App</strong>: A Progressive Web Application (PWA) built with Angular.</p>
+<br>
+<ul>
+    <li>Runs in the user's browser.</li>
+    <li>Communicates with the Backend via REST API.</li>
+    <li>Handles logic for views, routing, and user interaction.</li>
+</ul>
+
+<h4 id="3-backend-c-crow">3. Backend (C++ Crow)</h4>
+<p>The core logic provider, written in C++23 using the Crow framework.</p>
+<br>
+<ul>
+    <li><strong>REST API</strong>: Provides endpoints for managing users, events, and ratings.</li>
+    <li><strong>Authentication</strong>: Validates JWT tokens and handles login/registration.</li>
+    <li><strong>Business Logic</strong>: Enforces rules (e.g., "only owners can delete future events").</li>
+    <li><strong>Image Processing</strong>: Uses Qt to resize and convert uploaded images to WebP.</li>
+</ul>
+
+<h4 id="4-database-sqlite">4. Database (SQLite)</h4>
+<p>A local, file-based relational database.</p>
+<br>
+<ul>
+    <li>Stores all structured data (users, events, groups, ratings).</li>
+    <li>Ensures data integrity via Foreign Keys.</li>
+    <li>Lightweight and requires no separate server process.</li>
+</ul>
+
+<h4 id="5-external-systems">5. External Systems</h4>
+<p><strong>SMTP Mail Gateway</strong>: Used by the backend to send notifications (registration, password reset, event updates).</p>
 
 <h2 id="3-domain-design-bounded-contexts">3. Domain Design (Bounded Contexts)</h2>
 
+<p>The <strong>Cake Planner</strong> system is divided into several <strong>Bounded Contexts</strong> to modularize logic and clarify responsibilities. This ensures that different parts of the system (e.g., user management vs. event planning) remain loosely coupled where possible.
+</p>
+
+<h3 id="31-bounded-contexts-description">3.1 Bounded Contexts Description</h3>
+
+<h4 id="1-identity-access-management-iam">1. Identity & Access Management (IAM)</h4>
+<p><strong>Responsibility</strong>: Handles everything related to checking "who is this user" and "what can they do".
+<ul><li><strong>Core Entities</strong>: `User`, `Credentials`, `Token`.</li>
+<li><strong>Key Processes</strong>: Registration, Login (JWT), Password Reset (Forgot Password), Two-Factor Authentication (2FA).</li>
+</ul>
+
+<h4 id="2-group-management">2. Group Management</h4>
+<ul><li><strong>Responsibility</strong>: Manages the organizational structures where events happen.</li>
+<li><strong>Core Entities</strong>: `Group`, `Membership` (Role: Admin/Member).</li>
+<li><strong>Key Processes</strong>: Creating groups, inviting members, assigning roles.</li>
+</ul>
+
+<h4 id="3-event-planning">3. Event Planning</h4>
+<ul><li><strong>Responsibility</strong>: The core domain of the application; scheduling and organizing cake events.</li>
+<li><strong>Core Entities</strong>: `Event`, `Baker` (User alias), `Schedule`.</li>
+<li><strong>Key Processes</strong>: Creating an event ("I bring cake"), deleting events, viewing the calendar.</li>
+</ul>
+
+<h4 id="4-engagement-social">4. Engagement & Social</h4>
+<ul><li><strong>Responsibility</strong>: Increases user interaction and adds fun to the platform.</li>
+<li><strong>Core Entities</strong>: `Rating`, `Comment`, `GalleryPhoto`.</li>
+<li><strong>Key Processes</strong>: Rating a cake (1-5 stars), uploading photos of the cake.</li>
+</ul>
+
+<h4 id="5-notification-system">5. Notification System</h4>
+<ul><li><strong>Responsibility</strong>: Asynchronous communication with external world.</li>
+<li><strong>Core Entities</strong>: `Notification`, `EmailTemplate`.</li>
+<li><strong>Key Processes</strong>: Sending activation emails, event reminders, and change alerts.</li>
+</ul>
+
+<h3 id="32-context-map-diagram">3.2 Context Map Diagram</h3>
+
+<p>The following diagram illustrates the relationships between these contexts. To maintain readability, the components are arranged hierarchically.
+
+<img src="../assets/img/architecture/context-map.png" alt="Context Map" />
+
+
+<h3 id="33-distinct-bounded-contexts">3.3 Distinct Bounded Contexts</h3>
 <p>
   To keep the logic organized, the application is conceptually divided into distinct Bounded
   Contexts. Each context handles a specific part of the business domain.
@@ -206,7 +334,7 @@
 
 <img src="../assets/img/architecture/bounded-context.png" alt="Bounded Contexts" />
 
-<h3 id="context-descriptions">🔎 Context Descriptions</h3>
+<h4 id="context-descriptions">🔎 Context Descriptions</h4>
 
 <ol>
   <li>
@@ -244,7 +372,7 @@
 </main>
 
     <footer class="footer">
-      <div class="footer-section_left">v0.13.0</div>
+      <div class="footer-section_left">v1.0.0</div>
       <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
       <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
     </footer>
