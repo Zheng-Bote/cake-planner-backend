@@ -177,78 +177,78 @@
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>id</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">id</td>
+<td align="left">TEXT</td>
 <td align="left">Primary Key (UUID).</td>
 </tr>
 <tr>
-<td align="left"><code>full_name</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">full_name</td>
+<td align="left">TEXT</td>
 <td align="left">Full name of the user.</td>
 </tr>
 <tr>
-<td align="left"><code>email</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">email</td>
+<td align="left">TEXT</td>
 <td align="left">Unique email address.</td>
 </tr>
 <tr>
-<td align="left"><code>password_hash</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">password_hash</td>
+<td align="left">TEXT</td>
 <td align="left">Argon2id password hash.</td>
 </tr>
 <tr>
-<td align="left"><code>language</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">language</td>
+<td align="left">TEXT</td>
 <td align="left">Preferred UI language (e.g., 'en', 'de').</td>
 </tr>
 <tr>
-<td align="left"><code>email_language</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">email_language</td>
+<td align="left">TEXT</td>
 <td align="left">Preferred language for emails.</td>
 </tr>
 <tr>
-<td align="left"><code>totp_secret</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">totp_secret</td>
+<td align="left">TEXT</td>
 <td align="left">Secret for 2FA (if enabled).</td>
 </tr>
 <tr>
-<td align="left"><code>is_active</code></td>
-<td align="left"><code>INTEGER</code></td>
+<td align="left">is_active</td>
+<td align="left">INTEGER</td>
 <td align="left">1 if active, 0 if inactive.</td>
 </tr>
 <tr>
-<td align="left"><code>is_admin</code></td>
-<td align="left"><code>INTEGER</code></td>
+<td align="left">is_admin</td>
+<td align="left">INTEGER</td>
 <td align="left">1 if global admin, 0 otherwise.</td>
 </tr>
 <tr>
-<td align="left"><code>must_change_password</code></td>
-<td align="left"><code>INTEGER</code></td>
+<td align="left">must_change_password</td>
+<td align="left">INTEGER</td>
 <td align="left">1 if user must change password next login.</td>
 </tr>
 <tr>
-<td align="left"><code>temp_password_hash</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">temp_password_hash</td>
+<td align="left">TEXT</td>
 <td align="left">Hash of a temporary password (forgot password flow).</td>
 </tr>
 <tr>
-<td align="left"><code>temp_password_expiry</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">temp_password_expiry</td>
+<td align="left">TEXT</td>
 <td align="left">Expiration timestamp of the temp password.</td>
 </tr>
 <tr>
-<td align="left"><code>last_login_at</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">last_login_at</td>
+<td align="left">TEXT</td>
 <td align="left">Timestamp of last login.</td>
 </tr>
 <tr>
-<td align="left"><code>created_at</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">created_at</td>
+<td align="left">TEXT</td>
 <td align="left">Creation timestamp.</td>
 </tr>
 <tr>
-<td align="left"><code>updated_at</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">updated_at</td>
+<td align="left">TEXT</td>
 <td align="left">Update timestamp.</td>
 </tr>
 </tbody>
@@ -265,23 +265,23 @@
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>id</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">id</td>
+<td align="left">TEXT</td>
 <td align="left">Primary Key (UUID).</td>
 </tr>
 <tr>
-<td align="left"><code>name</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">name</td>
+<td align="left">TEXT</td>
 <td align="left">Name of the group.</td>
 </tr>
 <tr>
-<td align="left"><code>description</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">description</td>
+<td align="left">TEXT</td>
 <td align="left">Optional description.</td>
 </tr>
 <tr>
-<td align="left"><code>created_at</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">created_at</td>
+<td align="left">TEXT</td>
 <td align="left">Creation timestamp.</td>
 </tr>
 </tbody>
@@ -298,28 +298,28 @@
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>user_id</code></td>
-<td align="left"><code>TEXT</code></td>
-<td align="left">Foreign Key to <code>users.id</code>.</td>
+<td align="left">user_id</td>
+<td align="left">TEXT</td>
+<td align="left">Foreign Key to users.id.</td>
 </tr>
 <tr>
-<td align="left"><code>group_id</code></td>
-<td align="left"><code>TEXT</code></td>
-<td align="left">Foreign Key to <code>groups.id</code>.</td>
+<td align="left">group_id</td>
+<td align="left">TEXT</td>
+<td align="left">Foreign Key to groups.id.</td>
 </tr>
 <tr>
-<td align="left"><code>role</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">role</td>
+<td align="left">TEXT</td>
 <td align="left">Role in group (e.g., 'member', 'admin').</td>
 </tr>
 <tr>
-<td align="left"><code>joined_at</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">joined_at</td>
+<td align="left">TEXT</td>
 <td align="left">Timestamp when user joined.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Primary Key:</strong> Composite (<code>user_id</code>, <code>group_id</code>)</p>
+<p><strong>Primary Key:</strong> Composite (user_id, group_id)</p>
 <h3 id="events">events</h3>
 <p>Represents a &quot;Cake Event&quot; where a user brings a cake on a specific date.</p>
 <table>
@@ -332,38 +332,38 @@
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>id</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">id</td>
+<td align="left">TEXT</td>
 <td align="left">Primary Key (UUID).</td>
 </tr>
 <tr>
-<td align="left"><code>group_id</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">group_id</td>
+<td align="left">TEXT</td>
 <td align="left">The group this event belongs to.</td>
 </tr>
 <tr>
-<td align="left"><code>baker_id</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">baker_id</td>
+<td align="left">TEXT</td>
 <td align="left">The user bringing the cake.</td>
 </tr>
 <tr>
-<td align="left"><code>event_date</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">event_date</td>
+<td align="left">TEXT</td>
 <td align="left">Date of the event (<code>YYYY-MM-DD</code>).</td>
 </tr>
 <tr>
-<td align="left"><code>description</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">description</td>
+<td align="left">TEXT</td>
 <td align="left">Description of the cake/event.</td>
 </tr>
 <tr>
-<td align="left"><code>photo_path</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">photo_path</td>
+<td align="left">TEXT</td>
 <td align="left">Path to the cover image.</td>
 </tr>
 <tr>
-<td align="left"><code>created_at</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">created_at</td>
+<td align="left">TEXT</td>
 <td align="left">Creation timestamp.</td>
 </tr>
 </tbody>
@@ -380,33 +380,33 @@
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>id</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">id</td>
+<td align="left">TEXT</td>
 <td align="left">Primary Key (UUID).</td>
 </tr>
 <tr>
-<td align="left"><code>event_id</code></td>
-<td align="left"><code>TEXT</code></td>
-<td align="left">Foreign Key to <code>events.id</code>.</td>
+<td align="left">event_id</td>
+<td align="left">TEXT</td>
+<td align="left">Foreign Key to events.id.</td>
 </tr>
 <tr>
-<td align="left"><code>rater_id</code></td>
-<td align="left"><code>TEXT</code></td>
-<td align="left">Foreign Key to <code>users.id</code> (the rater).</td>
+<td align="left">rater_id</td>
+<td align="left">TEXT</td>
+<td align="left">Foreign Key to users.id (the rater).</td>
 </tr>
 <tr>
-<td align="left"><code>rating_value</code></td>
-<td align="left"><code>INTEGER</code></td>
+<td align="left">rating_value</td>
+<td align="left">INTEGER</td>
 <td align="left">1 to 5 stars.</td>
 </tr>
 <tr>
-<td align="left"><code>comment</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">comment</td>
+<td align="left">TEXT</td>
 <td align="left">Optional text comment.</td>
 </tr>
 <tr>
-<td align="left"><code>created_at</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">created_at</td>
+<td align="left">TEXT</td>
 <td align="left">Creation timestamp.</td>
 </tr>
 </tbody>
@@ -424,30 +424,30 @@
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>event_id</code></td>
-<td align="left"><code>TEXT</code></td>
-<td align="left">Foreign Key to <code>events.id</code>.</td>
+<td align="left">event_id</td>
+<td align="left">TEXT</td>
+<td align="left">Foreign Key to events.id.</td>
 </tr>
 <tr>
-<td align="left"><code>user_id</code></td>
-<td align="left"><code>TEXT</code></td>
-<td align="left">Foreign Key to <code>users.id</code> (uploader).</td>
+<td align="left">user_id</td>
+<td align="left">TEXT</td>
+<td align="left">Foreign Key to users.id (uploader).</td>
 </tr>
 <tr>
-<td align="left"><code>photo_path</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">photo_path</td>
+<td align="left">TEXT</td>
 <td align="left">Path to the uploaded photo.</td>
 </tr>
 <tr>
-<td align="left"><code>uploaded_at</code></td>
-<td align="left"><code>TEXT</code></td>
+<td align="left">uploaded_at</td>
+<td align="left">TEXT</td>
 <td align="left">Upload timestamp.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Primary Key:</strong> Composite (<code>event_id</code>, <code>user_id</code>). Currently, users can upload only one photo per event gallery (excluding the cover photo if they are the baker, which is stored in <code>events</code>).</p>
+<p><strong>Primary Key:</strong> Composite (event_id, user_id). Currently, users can upload only one photo per event gallery (excluding the cover photo if they are the baker, which is stored in events).</p>
 <h2 id="migration-system">Migration System</h2>
-<p>Database migrations are handled automatically in <code>DatabaseManager::migrate()</code>.</p>
+<p>Database migrations are handled automatically in <strong>DatabaseManager::migrate()</strong>.</p>
 <ul>
 <li>On startup, the application checks if tables exist.</li>
 <li>If not, it executes <code>CREATE TABLE IF NOT EXISTS</code> statements.</li>

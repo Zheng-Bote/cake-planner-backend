@@ -137,7 +137,7 @@
 <li><a href="#high-level-architecture">High-Level Architecture</a></li>
 <li><a href="#key-components">Key Components</a></li>
 <ul class="toc-level-3">
-<li><a href="#1-entry-point-codesrcmaincppcode">1. Entry Point (<code>src/main.cpp</code>)</a></li>
+<li><a href="#1-entry-point-srcmaincpp">1. Entry Point (src/main.cpp)</a></li>
 <li><a href="#2-middleware">2. Middleware</a></li>
 <li><a href="#3-controllers">3. Controllers</a></li>
 <li><a href="#4-database-integration">4. Database Integration</a></li>
@@ -155,16 +155,16 @@
 <p>The following diagram illustrates the high-level components and their interactions:</p>
 <p><img src="../../assets/img/architecture/backend/high-level_architecture.png" alt="High Level Architecture"></p>
 <h2 id="key-components">Key Components</h2>
-<h3 id="1-entry-point-codesrcmaincppcode">1. Entry Point (<code>src/main.cpp</code>)</h3>
+<h3 id="1-entry-point-srcmaincpp">1. Entry Point (src/main.cpp)</h3>
 <p>The <code>main.cpp</code> file is the bootstrap of the application. It performs the following steps:</p>
 <ol>
 <li><strong>Environment Loading</strong>: Loads configuration from <code>.env</code> file via <code>rz::utils::EnvLoader</code>.</li>
-<li><strong>Logging</strong>: Initializes <code>spdlog</code> with console and rotating file sinks.</li>
-<li><strong>Database</strong>: Initializes <code>DatabaseManager</code> and runs migrations.</li>
-<li><strong>Services</strong>: Instantiates <code>SmtpService</code> and <code>NotificationService</code>.</li>
-<li><strong>Crow App</strong>: Configures the Crow application with <code>AuthMiddleware</code>.</li>
-<li><strong>Routing</strong>: Registers all controllers (<code>System</code>, <code>Auth</code>, <code>User</code>, <code>Event</code>, <code>Admin</code>).</li>
-<li><strong>Server Start</strong>: Starts the Crow server in a separate thread while the main thread runs the Qt Event Loop (<code>QCoreApplication</code>).</li>
+<li><strong>Logging</strong>: Initializes <strong>spdlog</strong> with console and rotating file sinks.</li>
+<li><strong>Database</strong>: Initializes <strong>DatabaseManager</strong> and runs migrations.</li>
+<li><strong>Services</strong>: Instantiates <strong>SmtpService</strong> and <strong>NotificationService</strong>.</li>
+<li><strong>Crow App</strong>: Configures the Crow application with <strong>AuthMiddleware</strong>.</li>
+<li><strong>Routing</strong>: Registers all controllers (<strong>System</strong>, <strong>Auth</strong>, <strong>User</strong>, <strong>Event</strong>, <strong>Admin</strong>).</li>
+<li><strong>Server Start</strong>: Starts the Crow server in a separate thread while the main thread runs the Qt Event Loop (<strong>QCoreApplication</strong>).</li>
 </ol>
 <h3 id="2-middleware">2. Middleware</h3>
 <p>The server uses a custom <strong>AuthMiddleware</strong> to secure API endpoints.</p>
@@ -172,10 +172,10 @@
 <li><strong>File</strong>: <code>include/middleware/auth_middleware.hpp</code></li>
 <li><strong>Functionality</strong>:<ul>
 <li>Intercepts every request.</li>
-<li>Checks for a whitelist of public URLs (e.g., <code>/api/login</code>, <code>/static/</code>).</li>
-<li>Validates the <code>Authorization: Bearer &lt;token&gt;</code> header.</li>
-<li>Verifies the JWT token using <code>rz::utils::TokenUtils</code>.</li>
-<li>Injects the current user (<code>TokenPayload</code>) into the request context.</li>
+<li>Checks for a whitelist of public URLs (e.g., <strong>/api/login</strong>, <strong>/static/</strong>).</li>
+<li>Validates the <strong>Authorization: Bearer token</strong> header.</li>
+<li>Verifies the JWT token using <strong>rz::utils::TokenUtils</strong>.</li>
+<li>Injects the current user <strong>(TokenPayload)</strong> into the request context.</li>
 </ul>
 </li>
 </ul>
@@ -191,34 +191,34 @@
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>SystemController</code></td>
+<td align="left">SystemController</td>
 <td align="left">System status, health checks, version info.</td>
 <td align="left">None</td>
 </tr>
 <tr>
-<td align="left"><code>AuthController</code></td>
+<td align="left">AuthController</td>
 <td align="left">Login, registration, password reset.</td>
-<td align="left"><code>NotificationService</code></td>
+<td align="left">NotificationService</td>
 </tr>
 <tr>
-<td align="left"><code>UserController</code></td>
+<td align="left">UserController</td>
 <td align="left">User profile management.</td>
-<td align="left"><code>NotificationService</code></td>
+<td align="left">NotificationService</td>
 </tr>
 <tr>
-<td align="left"><code>EventController</code></td>
+<td align="left">EventController</td>
 <td align="left">Event creation, listing, updates.</td>
-<td align="left"><code>NotificationService</code></td>
+<td align="left">NotificationService</td>
 </tr>
 <tr>
-<td align="left"><code>AdminController</code></td>
+<td align="left">AdminController</td>
 <td align="left">Administrative tasks (user management).</td>
-<td align="left"><code>NotificationService</code></td>
+<td align="left">NotificationService</td>
 </tr>
 </tbody>
 </table>
 <h3 id="4-database-integration">4. Database Integration</h3>
-<p>Data persistence is handled by <code>DatabaseManager</code> (Singleton).</p>
+<p>Data persistence is handled by <strong>DatabaseManager</strong> (Singleton).</p>
 <ul>
 <li><strong>Database</strong>: SQLite (<code>cakeplanner.sqlite</code>).</li>
 <li><strong>Pattern</strong>: The application likely uses DAO (Data Access Object) or direct model mapping within services/controllers to interact with the database manager.</li>
@@ -230,22 +230,22 @@
 <h2 id="configuration">Configuration</h2>
 <p>The application uses a dual configuration strategy:</p>
 <ol>
-<li><strong><code>rz_config.hpp</code></strong>: Compile-time constants (Version, Application Name).</li>
-<li><strong><code>.env</code> File</strong> (Runtime):<ul>
-<li><code>CAKE_SERVER_PORT</code>: Port to listen on (default: 8080).</li>
-<li><code>DB_DIR</code>: Path to the SQLite database.</li>
-<li><code>LOG_LEVEL</code>: Logging verbosity (<code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code>).</li>
-<li><code>UPLOAD_DIR</code>: Directory for file uploads.</li>
+<li><strong>rz_config.hpp</strong>: Compile-time constants (Version, Application Name).</li>
+<li><strong>env File</strong> (Runtime):<ul>
+<li><strong>CAKE_SERVER_PORT</strong>: Port to listen on (default: 8080).</li>
+<li><strong>DB_DIR</strong>: Path to the SQLite database.</li>
+<li><strong>LOG_LEVEL</strong>: Logging verbosity (debug, info, warn, error).</li>
+<li><strong>UPLOAD_DIR</strong>: Directory for file uploads.</li>
 </ul>
 </li>
 </ol>
 <h2 id="signal-handling-amp-shutdown">Signal Handling &amp; Shutdown</h2>
-<p>The server handles <code>SIGINT</code> (Ctrl+C) and <code>SIGTERM</code> gracefully:</p>
+<p>The server handles <strong>SIGINT</strong> (Ctrl+C) and <strong>SIGTERM</strong> gracefully:</p>
 <ol>
-<li>Signal is caught by <code>signalHandler</code>.</li>
-<li><code>shutdownHandler</code> lambda is invoked.</li>
-<li><code>app.stop()</code> stops the Crow server.</li>
-<li><code>qtApp.quit()</code> exits the Qt Event Loop.</li>
+<li><strong>Signal</strong> is caught by <strong>signalHandler</strong>.</li>
+<li><strong>shutdownHandler</strong> lambda is invoked.</li>
+<li><strong>app.stop()</strong> stops the Crow server.</li>
+<li><strong>qtApp.quit()</strong> exits the Qt Event Loop.</li>
 <li>Logs are flushed and resources cleaned up.</li>
 </ol>
 </main>
