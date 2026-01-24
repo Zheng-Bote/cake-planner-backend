@@ -2,8 +2,8 @@
  * @file user_model.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Model with Group Management Extensions
- * @version 0.2.3
- * @date 2026-01-22
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *

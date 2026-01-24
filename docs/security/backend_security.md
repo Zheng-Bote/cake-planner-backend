@@ -8,18 +8,19 @@ This document outlines the security measures implemented in the Cake Planner Bac
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [1. Authentication & Authorization](#1-authentication--authorization)
-  - [JSON Web Tokens (JWT)](#json-web-tokens-jwt)
-  - [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
-- [2. Password Security](#2-password-security)
-  - [Hashing Algorithm: Argon2id](#hashing-algorithm-argon2id)
-- [3. Data Protection](#3-data-protection)
-  - [SQL Injection Prevention](#sql-injection-prevention)
-  - [Input Validation](#input-validation)
-- [4. Transport Security](#4-transport-security)
-  - [HTTPS / TLS](#https--tls)
-  - [CORS (Cross-Origin Resource Sharing)](#cors-cross-origin-resource-sharing)
-- [5. Security Best Practices](#5-security-best-practices)
+- [Backend Security](#backend-security)
+  - [1. Authentication \& Authorization](#1-authentication--authorization)
+    - [JSON Web Tokens (JWT)](#json-web-tokens-jwt)
+    - [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
+  - [2. Password Security](#2-password-security)
+    - [Hashing Algorithm: Argon2id](#hashing-algorithm-argon2id)
+  - [3. Data Protection](#3-data-protection)
+    - [SQL Injection Prevention](#sql-injection-prevention)
+    - [Input Validation](#input-validation)
+  - [4. Transport Security](#4-transport-security)
+    - [HTTPS / TLS](#https--tls)
+    - [CORS (Cross-Origin Resource Sharing)](#cors-cross-origin-resource-sharing)
+  - [5. Security Best Practices](#5-security-best-practices)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -79,5 +80,5 @@ The Crow server runs on **HTTP** internally (default port 8080).
 
 ## 5. Security Best Practices
 - **2FA (Two-Factor Authentication)**: The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security (`totp_utils.hpp`).
-- **Rate Limiting**: Currently not implemented in the application layer. It is recommended to configure Rate Limiting on the **Reverse Proxy** level (e.g., `limit_req` in Nginx) to prevent Brute Force or DDoS attacks.
+- **Rate Limiting**: It is recommended to configure Rate Limiting on the **Reverse Proxy** level (e.g., `limit_req` in Nginx) to prevent Brute Force or DDoS attacks.
 - **Environment Variables**: Sensitive secrets (Database path, API keys, SMTP credentials) are loaded from `.env` and **not** hardcoded.

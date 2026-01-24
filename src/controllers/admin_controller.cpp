@@ -2,8 +2,8 @@
  * @file admin_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Admin Controller Implementation with Group Management
- * @version 0.4.2
- * @date 2026-01-22
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -199,20 +199,20 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
       .methods(crow::HTTPMethod::POST)([&](const crow::request &req) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
 
-        // 1. Sicherheitscheck: Nur Admins
+        // 1. Security check: Only admins
         if (!ctx.currentUser.isAdmin) return crow::response(403);
 
-        // 2. JSON parsen
+        // 2. Parse JSON
         auto json = crow::json::load(req.body);
         if (!json || !json.has("userId") || !json.has("mustChange")) {
             return crow::response(400, "Missing userId or mustChange in payload");
         }
 
-        // 3. Werte extrahieren
+        // 3. Extract values
         QString targetUserId = QString::fromStdString(json["userId"].s());
         bool mustChange = json["mustChange"].b();
 
-        // 4. Update durchführen
+        // 4. Perform update
         if (User::setMustChangePassword(targetUserId, mustChange)) {
             crow::json::wvalue res;
             res["message"] = "Force password change flag updated";

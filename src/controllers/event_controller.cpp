@@ -2,8 +2,8 @@
  * @file event_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Controller Implementation (Safe Blocking Long Polling)
- * @version 0.4.4
- * @date 2026-01-23
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -257,24 +257,24 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
     // 4. DELETE
     CROW_ROUTE(app, "/api/events/<string>")
     .methods(crow::HTTPMethod::DELETE)
-    ([&, notifyService](const crow::request& req, std::string eventId){ // WICHTIG: notifyService in Capture aufnehmen
+    ([&, notifyService](const crow::request& req, std::string eventId){ // IMPORTANT: Capture notifyService
         const auto& ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
         QString qEventId = QString::fromStdString(eventId);
 
-        // 1. Daten holen, BEVOR wir löschen (für die Benachrichtigung)
+        // 1. Get data BEFORE deleting (for notification)
         auto evt = Event::getById(qEventId, ctx.currentUser.userId);
 
-        // 2. Löschen versuchen
+        // 2. Attempt deletion
         if(Event::deleteEvent(qEventId, ctx.currentUser.userId)) {
 
-            // 3. Wenn erfolgreich und Event-Daten vorhanden -> Benachrichtigen
+            // 3. If successful and Event data exists -> Notify
             if (notifyService && evt && !evt->groupId.isEmpty()) {
-                // Alle Mitglieder der Gruppe laden
+                // Load all group members
                 auto members = User::getAll(evt->groupId);
                 std::vector<QString> de, en;
 
                 for (const auto& u : members) {
-                    // Den User, der löscht, nicht benachrichtigen (optional)
+                    // Do not notify the user who deletes (optional)
                     if (u.id == ctx.currentUser.userId) continue;
                     if (!u.is_active) continue;
 
@@ -282,7 +282,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
                     else en.push_back(u.email);
                 }
 
-                // Benachrichtigung senden (Methode muss im NotificationService existieren!)
+                // Send notification (Method must exist in NotificationService!)
                 notifyService->notifyGroupEventDeleted(evt->groupName, evt->bakerName, evt->date, de, en);
             }
 

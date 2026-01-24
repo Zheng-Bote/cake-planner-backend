@@ -2,8 +2,8 @@
  * @file ConfigModel.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Configuration Model to load env vars
- * @version 0.1.1
- * @date 2026-01-22
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *

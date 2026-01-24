@@ -60,6 +60,11 @@
                     <td>/api/admin/groups/set-role</td>
                     <td>Set a user's role within a group (Admin only).</td>
                 </tr>
+                 <tr>
+                    <td>POST</td>
+                    <td>/api/admin/users/force-password-change</td>
+                    <td>Force a user to change their password on next login.</td>
+                </tr>
             </tbody>
         </table>
     </section>
@@ -97,12 +102,22 @@
                     <td>/api/auth/2fa/activate</td>
                     <td>Activate 2FA by verifying the code.</td>
                 </tr>
+                <tr>
+                    <td>POST</td>
+                    <td>/api/auth/forgot-password</td>
+                    <td>Request a temporary password (sent via email).</td>
+                </tr>
 
                 <!-- User Profile -->
                 <tr>
                     <td>GET</td>
                     <td>/api/users</td>
                     <td>List accessible users (e.g., group members).</td>
+                </tr>
+                <tr>
+                    <td>GET</td>
+                    <td>/api/user/groups</td>
+                    <td>List groups the user is a member of.</td>
                 </tr>
                 <tr>
                     <td>POST</td>
@@ -146,7 +161,7 @@
                     <td>/api/events/stream</td>
                     <td>Server-Sent Events (SSE) stream for real-time updates.</td>
                 </tr>
-                <tr>
+                 <tr>
                     <td>GET</td>
                     <td>/api/events/ranked</td>
                     <td>Get "Hall of Fame" (ranked events).</td>

@@ -2,8 +2,8 @@
  * @file user_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Controller with Email Notifications
- * @version 0.4.6
- * @date 2026-01-22
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -66,21 +66,21 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
   });
 
   // --- GET /api/user/groups ---
-  // Liefert alle Gruppen zurück, in denen der aktuelle User Mitglied ist
+  // Returns all groups where the current user is a member
   CROW_ROUTE(app, "/api/user/groups")
   .methods(crow::HTTPMethod::GET)
   ([&](const crow::request &req) {
     const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
 
-    // 1. Prüfen, ob User eingeloggt ist
+    // 1. Check if user is logged in
     if (ctx.currentUser.userId.isEmpty()) {
         return crow::response(401);
     }
 
-    // 2. Daten aus dem Model holen
+    // 2. Get data from model
     auto memberships = User::getGroupsForUser(ctx.currentUser.userId);
 
-    // 3. JSON bauen
+    // 3. Build JSON
     crow::json::wvalue json = crow::json::wvalue::list();
     for (size_t i = 0; i < memberships.size(); ++i) {
         json[i]["id"] = memberships[i].groupId.toStdString();

@@ -2,8 +2,8 @@
  * @file auth_controller.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Auth Controller Implementation
- * @version 0.4.7
- * @date 2026-01-22
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -81,7 +81,75 @@ void AuthController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         }
       });
 
-  // 2. LOGIN
+      // 2. LOGIN
+       CROW_ROUTE(app, "/api/auth/login")
+      .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("email") || !json.has("password")) {
+          return crow::response(400, "Missing credentials");
+        }
+
+        QString email = QString::fromStdString(json["email"].s());
+        QString password = QString::fromStdString(json["password"].s());
+        QString totpCode;
+        if (json.has("code")) {
+          totpCode = QString::fromStdString(json["code"].s());
+        }
+
+        auto userOpt = User::getByEmail(email);
+        if (!userOpt)
+          return crow::response(401, "Invalid credentials");
+        User user = *userOpt;
+
+        bool isTempPassword = false;
+        if (!rz::utils::PasswordUtils::verifyPassword(password, user.password_hash)) {
+            // Check temp password
+            bool tempValid = false;
+            if (!user.temp_password_hash.isEmpty() && !user.temp_password_expiry.isEmpty()) {
+                QDateTime expiry = QDateTime::fromString(user.temp_password_expiry, Qt::ISODate);
+                if (expiry > QDateTime::currentDateTime()) {
+                     if (rz::utils::PasswordUtils::verifyPassword(password, user.temp_password_hash)) {
+                         tempValid = true;
+                         isTempPassword = true;
+                     }
+                }
+            }
+
+            if (!tempValid) {
+                return crow::response(401, "Invalid credentials");
+            }
+        }
+
+        // 2FA Check
+        if (!user.totp_secret.isEmpty()) {
+          if (totpCode.isEmpty()) {
+            crow::json::wvalue res;
+            res["require2fa"] = true;
+            return crow::response(200, res);
+          }
+          if (!rz::utils::TotpUtils::validateCode(user.totp_secret, totpCode)) {
+            return crow::response(401, "Invalid 2FA code");
+          }
+        }
+
+        if (!user.is_active)
+          return crow::response(403, "Account inactive");
+
+        // Update last login timestamp
+        if (!User::touchLastLogin(user.id)) {
+            spdlog::error("Failed to update last login timestamp for user {}", user.id.toStdString());
+        }
+
+        spdlog::info("[AUTH] Login successful for {}", user.email.toStdString());
+        auto token =
+            rz::utils::TokenUtils::generateToken(user.id, user.email, user.is_admin);
+        crow::json::wvalue res;
+        res["token"] = token.toStdString();
+        res["user"] = user.toJson();
+        return crow::response(200, res);
+      });
+
+  // 2. LOGIN => backward compatibility
   CROW_ROUTE(app, "/api/login")
       .methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         auto json = crow::json::load(req.body);

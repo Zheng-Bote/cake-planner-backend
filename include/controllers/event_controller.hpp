@@ -2,8 +2,8 @@
  * @file event_controller.hpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Controller Header
- * @version 0.3.5
- * @date 2026-01-22
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *

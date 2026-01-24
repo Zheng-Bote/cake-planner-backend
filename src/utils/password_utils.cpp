@@ -2,8 +2,8 @@
  * @file password_utils.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Password Hashing Utilities
- * @version 0.1.2
- * @date 2026-01-22
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *

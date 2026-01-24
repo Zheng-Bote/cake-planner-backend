@@ -2,8 +2,8 @@
  * @file user_model.cpp
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Model Implementation
- * @version 0.4.4
- * @date 2026-01-23
+ * @version 0.15.0
+ * @date 2026-01-24
  *
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
@@ -557,11 +557,11 @@ bool User::updateLanguage(const QString& userId, const QString& lang) {
 QString User::createGroup(const QString &name) {
     QString trimmedName = name.trimmed();
     if (trimmedName.isEmpty()) {
-        spdlog::warn("createGroup abgebrochen: Name ist leer.");
+        spdlog::warn("createGroup aborted: Name is empty.");
         return "";
     }
 
-    // Datenbankverbindung holen (Thread-Safe über DatabaseManager)
+    // Get database connection (Thread-Safe via DatabaseManager)
     QSqlDatabase db = DatabaseManager::instance().getDatabase();
     QString newGroupId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -571,13 +571,13 @@ QString User::createGroup(const QString &name) {
     query.bindValue(":name", trimmedName);
 
     if (!query.exec()) {
-        spdlog::error("Fehler beim Erstellen der Gruppe '{}': {}",
+        spdlog::error("Error creating group '{}': {}",
                       trimmedName.toStdString(),
                       query.lastError().text().toStdString());
         return "";
     }
 
-    spdlog::info("Gruppe erfolgreich erstellt: {} (ID: {})",
+    spdlog::info("Group successfully created: {} (ID: {})",
                  trimmedName.toStdString(),
                  newGroupId.toStdString());
 
@@ -597,7 +597,7 @@ bool User::deleteGroup(const QString &groupId) {
 
     QSqlDatabase db = DatabaseManager::instance().getDatabase();
 
-    // 1. Integritätsprüfung: Sind noch User in der Gruppe?
+    // 1. Integrity check: Are there still users in the group?
     QSqlQuery checkQuery(db);
     checkQuery.prepare("SELECT COUNT(*) FROM users WHERE group_id = :gid");
     checkQuery.bindValue(":gid", groupId);
@@ -605,30 +605,30 @@ bool User::deleteGroup(const QString &groupId) {
     if (checkQuery.exec() && checkQuery.next()) {
         int userCount = checkQuery.value(0).toInt();
         if (userCount > 0) {
-            spdlog::warn("Löschen der Gruppe {} verweigert: {} Benutzer sind noch zugeordnet.",
+            spdlog::warn("Deleting group {} denied: {} users are still assigned.",
                          groupId.toStdString(), userCount);
-            return false; // Verhindert verwaiste User-Einträge
+            return false; // Prevents orphaned user entries
         }
     }
 
-    // 2. Eigentliches Löschen
+    // 2. Actual Deletion
     QSqlQuery deleteQuery(db);
     deleteQuery.prepare("DELETE FROM groups WHERE id = :id");
     deleteQuery.bindValue(":id", groupId);
 
     if (!deleteQuery.exec()) {
-        spdlog::error("Fehler beim Löschen der Gruppe {}: {}",
+        spdlog::error("Error deleting group {}: {}",
                       groupId.toStdString(),
                       deleteQuery.lastError().text().toStdString());
         return false;
     }
 
     if (deleteQuery.numRowsAffected() == 0) {
-        spdlog::warn("Löschen fehlgeschlagen: Gruppe {} existiert nicht.", groupId.toStdString());
+        spdlog::warn("Deletion failed: Group {} does not exist.", groupId.toStdString());
         return false;
     }
 
-    spdlog::info("Gruppe {} erfolgreich gelöscht.", groupId.toStdString());
+    spdlog::info("Group {} successfully deleted.", groupId.toStdString());
     return true;
 }
 
@@ -638,7 +638,7 @@ std::vector<User::GroupMembership> User::getGroupsForUser(const QString &userId)
     QSqlQuery query(db);
     std::vector<GroupMembership> result;
 
-    // Wir holen ID und Name aus der Gruppen-Tabelle und die Rolle aus der Verknüpfungstabelle
+    // We get ID and Name from the groups table and the role from the join table
     QString sql = R"(
         SELECT g.id, g.name, gm.role
         FROM groups g
