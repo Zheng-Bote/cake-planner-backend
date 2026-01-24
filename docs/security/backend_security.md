@@ -8,19 +8,18 @@ This document outlines the security measures implemented in the Cake Planner Bac
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Backend Security](#backend-security)
-  - [1. Authentication \& Authorization](#1-authentication--authorization)
-    - [JSON Web Tokens (JWT)](#json-web-tokens-jwt)
-    - [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
-  - [2. Password Security](#2-password-security)
-    - [Hashing Algorithm: Argon2id](#hashing-algorithm-argon2id)
-  - [3. Data Protection](#3-data-protection)
-    - [SQL Injection Prevention](#sql-injection-prevention)
-    - [Input Validation](#input-validation)
-  - [4. Transport Security](#4-transport-security)
-    - [HTTPS / TLS](#https--tls)
-    - [CORS (Cross-Origin Resource Sharing)](#cors-cross-origin-resource-sharing)
-  - [5. Security Best Practices](#5-security-best-practices)
+- [1. Authentication & Authorization](#1-authentication--authorization)
+  - [JSON Web Tokens (JWT)](#json-web-tokens-jwt)
+  - [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
+- [2. Password Security](#2-password-security)
+  - [Hashing Algorithm: Argon2id](#hashing-algorithm-argon2id)
+- [3. Data Protection](#3-data-protection)
+  - [SQL Injection Prevention](#sql-injection-prevention)
+  - [Input Validation](#input-validation)
+- [4. Transport Security](#4-transport-security)
+  - [HTTPS / TLS](#https--tls)
+  - [CORS (Cross-Origin Resource Sharing)](#cors-cross-origin-resource-sharing)
+- [5. Security Best Practices](#5-security-best-practices)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

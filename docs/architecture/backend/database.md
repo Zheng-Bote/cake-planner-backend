@@ -8,18 +8,17 @@ The Cake Planner Backend uses **SQLite** as its relational database. The databas
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Database Schema](#database-schema)
-  - [Description](#description)
-  - [Database Schema (overview)](#database-schema-overview)
-  - [Entity Relationship Diagram (ERD)](#entity-relationship-diagram-erd)
-  - [Tables](#tables)
-    - [users](#users)
-    - [groups](#groups)
-    - [group\_members](#group_members)
-    - [events](#events)
-    - [ratings](#ratings)
-    - [event\_photos](#event_photos)
-  - [Migration System](#migration-system)
+- [Description](#description)
+- [Database Schema (overview)](#database-schema-overview)
+- [Entity Relationship Diagram (ERD)](#entity-relationship-diagram-erd)
+- [Tables](#tables)
+  - [users](#users)
+  - [groups](#groups)
+  - [group_members](#group_members)
+  - [events](#events)
+  - [ratings](#ratings)
+  - [event_photos](#event_photos)
+- [Migration System](#migration-system)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
