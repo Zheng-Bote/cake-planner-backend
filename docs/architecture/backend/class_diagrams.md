@@ -8,14 +8,15 @@ The Backend is built using modern C++23 and the Crow framework. It follows a lay
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Description](#description)
-- [Class Diagrams](#class-diagrams)
-- [Component Details](#component-details)
-  - [Controllers](#controllers)
-  - [Models](#models)
-  - [Services](#services)
-  - [Middleware](#middleware)
-  - [Utilities & Core](#utilities--core)
+- [Backend Class Design](#backend-class-design)
+  - [Description](#description)
+  - [Class Diagrams](#class-diagrams)
+  - [Component Details](#component-details)
+    - [Controllers](#controllers)
+    - [Models](#models)
+    - [Services](#services)
+    - [Middleware](#middleware)
+    - [Utilities \& Core](#utilities--core)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -27,7 +28,7 @@ This document visualizes the class structure and relationships of the Cake Plann
 
 ## Class Diagrams
 
-The following diagram illustrates the core classes and their relationships. To ensure readability, the classes are arranged in logical tiers with a maximum of four components per row.
+The following diagram illustrates the core classes and their relationships. To ensure readability, the classes are arranged in logical tiers.
 
 ![Class Diagram](../../assets/img/architecture/backend/crow_class-diagrams.png)
 
