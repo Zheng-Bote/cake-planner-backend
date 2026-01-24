@@ -8,11 +8,12 @@ This document outlines the security measures implemented in the application to e
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Network Security](#network-security)
-- [Web Server Security](#web-server-security)
-- [Authentication & Data Protection](#authentication--data-protection)
-- [Data Protection](#data-protection)
-- [Email Security](#email-security)
+- [Security Overview](#security-overview)
+  - [Network Security](#network-security)
+  - [Web Server Security](#web-server-security)
+  - [Authentication \& Data Protection](#authentication--data-protection)
+  - [Data Protection](#data-protection)
+  - [Email Security](#email-security)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -35,7 +36,9 @@ The NGINX web server is configured with **Rate Limiting** to prevent Brute Force
 
 User passwords are encrypted using **Argon2id**, a state-of-the-art password hashing algorithm resilient against GPU-based brute-force attacks.
 
-The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security with **Google Authenticator** or **Microsoft Authenticator**. Users can enable or disable **2FA (Two-Factor Auth entication)** in their profile settings.
+The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security with **Google Authenticator** or **Microsoft Authenticator**.
+\
+Users can enable or disable **2FA (Two-Factor Auth entication)** in their profile settings.
 
 ## Data Protection
 
