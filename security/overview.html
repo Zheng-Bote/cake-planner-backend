@@ -154,7 +154,9 @@ The NGINX web server is configured with <strong>Rate Limiting</strong> to preven
 </ul>
 <h2 id="authentication-amp-data-protection">Authentication &amp; Data Protection</h2>
 <p>User passwords are encrypted using <strong>Argon2id</strong>, a state-of-the-art password hashing algorithm resilient against GPU-based brute-force attacks.</p>
-<p>The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security with <strong>Google Authenticator</strong> or <strong>Microsoft Authenticator</strong>. Users can enable or disable <strong>2FA (Two-Factor Auth entication)</strong> in their profile settings.</p>
+<p>The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security with <strong>Google Authenticator</strong> or <strong>Microsoft Authenticator</strong>.
+<br>
+Users can enable or disable <strong>2FA (Two-Factor Auth entication)</strong> in their profile settings.</p>
 <h2 id="data-protection">Data Protection</h2>
 <p>Input validation and routing are using <strong>strong typing</strong> and all database interactions are using <strong>prepared statements</strong> to prevent SQL injection and other common web vulnerabilities.</p>
 <h2 id="email-security">Email Security</h2>
