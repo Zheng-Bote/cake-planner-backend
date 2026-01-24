@@ -29,14 +29,14 @@ The NGINX web server is configured with robust **Security Headers** to protect a
 
 - **Content-Security-Policy (CSP)**: To prevent Cross-Site Scripting (XSS) attacks.
 - Other standard security headers to harden the server response.
-
+\
 The NGINX web server is configured with **Rate Limiting** to prevent Brute Force or DDoS attacks.
 
 ## Authentication & Data Protection
 
 User passwords are encrypted using **Argon2id**, a state-of-the-art password hashing algorithm resilient against GPU-based brute-force attacks.
 
-The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security with **Google Authenticator** or **Microsoft Authenticator**. Users can enable or disable 2FA (Two-Factor Authentication) in their profile settings.
+The backend supports TOTP (Time-based One-Time Password) for an additional layer of login security with **Google Authenticator** or **Microsoft Authenticator**. Users can enable or disable **2FA (Two-Factor Auth entication)** in their profile settings.
 
 ## Data Protection
 
