@@ -106,8 +106,8 @@
   <li><a href="../deployment/Dockerfile_appimage.html">Dockerfile appimage</a></li>
   <li><a href="../deployment/Dockerfile_nginx.html">Dockerfile nginx</a></li>
   <li><a href="../deployment/deployment_guide.html">deployment guide</a></li>
-  <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
-  <li><a href="../deployment/nginx_conf.html">nginx conf</a></li>
+  <li><a href="../deployment/docker_compose.yml.html">docker compose.yml</a></li>
+  <li><a href="../deployment/nginx_configuration.html">nginx configuration</a></li>
   <li><a href="../deployment/overview.html">overview</a></li>
 </ul>
   </li>
@@ -172,30 +172,33 @@ sudo apt install qt6-base-dev libqt6sql6-sqlite libssl-dev
 <h2 id="building-from-source">Building from Source</h2>
 <p>The project uses CMake as its build system.</p>
 <ol>
-<li><p><strong>Clone the Repository</strong>:</p>
-<pre><code class="language-bash">git clone https://github.com/Zheng-Bote/cake-planner-backend.git
-cd cake-planner-backend
+<li><strong>Clone the Repository</strong>:</li>
+</ol>
+<pre><code class="language-bash">    git clone https://github.com/Zheng-Bote/cake-planner-backend.git
+    cd cake-planner-backend
 </code></pre>
-</li>
-<li><p><strong>Create a Build Directory</strong>:</p>
+<ol start="2">
+<li><strong>Create a Build Directory</strong>:</li>
+</ol>
 <pre><code class="language-bash">mkdir build
 cd build
 </code></pre>
-</li>
-<li><p><strong>Configure the Project</strong>:</p>
+<ol>
+<li><strong>Configure the Project</strong>:</li>
+</ol>
 <pre><code class="language-bash">cmake ..
 </code></pre>
 <p><em>Note: Dependencies like Crow, spdlog, etc., are automatically fetched via CMake <code>FetchContent</code>.</em></p>
-</li>
-<li><p><strong>Compile</strong>:</p>
+<ol start="3">
+<li><strong>Compile</strong>:</li>
+</ol>
 <pre><code class="language-bash">make -j$(nproc)
 </code></pre>
-</li>
-<li><p><strong>Run</strong>:</p>
+<ol start="4">
+<li><strong>Run</strong>:</li>
+</ol>
 <pre><code class="language-bash">./CakePlanner
 </code></pre>
-</li>
-</ol>
 <h2 id="creating-an-appimage">creating an AppImage</h2>
 <p>The project includes a script to package the application as a standalone <strong>AppImage</strong>.</p>
 <h3 id="script-codecreateappimageshcode">Script: <code>create_appimage.sh</code></h3>

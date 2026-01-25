@@ -106,8 +106,8 @@
   <li><a href="../deployment/Dockerfile_appimage.html">Dockerfile appimage</a></li>
   <li><a href="../deployment/Dockerfile_nginx.html">Dockerfile nginx</a></li>
   <li><a href="../deployment/deployment_guide.html">deployment guide</a></li>
-  <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
-  <li><a href="../deployment/nginx_conf.html">nginx conf</a></li>
+  <li><a href="../deployment/docker_compose.yml.html">docker compose.yml</a></li>
+  <li><a href="../deployment/nginx_configuration.html">nginx configuration</a></li>
   <li><a href="../deployment/overview.html">overview</a></li>
 </ul>
   </li>
@@ -145,12 +145,11 @@
 <h2 id="network-security">Network Security</h2>
 <p>The application enforces <strong>HTTPS (SSL/TLS)</strong> for all connections to the backend. This ensures that all data transmitted between the client and the server is encrypted and protected from eavesdropping.</p>
 <h2 id="web-server-security">Web Server Security</h2>
-<p>The NGINX web server is configured with robust <strong>Security Headers</strong> to protect against common web vulnerabilities. This includes:</p>
+<p>The NGINX web server is configured with <strong>Rate Limiting</strong> to prevent Brute Force or DDoS attacks.</p>
+<p>Also, the NGINX web server is configured with robust <strong>Security Headers</strong> to protect against common web vulnerabilities. This includes:</p>
 <ul>
 <li><strong>Content-Security-Policy (CSP)</strong>: To prevent Cross-Site Scripting (XSS) attacks.</li>
-<li>Other standard security headers to harden the server response.
-<br>
-The NGINX web server is configured with <strong>Rate Limiting</strong> to prevent Brute Force or DDoS attacks.</li>
+<li>Other standard security headers to harden the server response.</li>
 </ul>
 <h2 id="authentication-amp-data-protection">Authentication &amp; Data Protection</h2>
 <p>User passwords are encrypted using <strong>Argon2id</strong>, a state-of-the-art password hashing algorithm resilient against GPU-based brute-force attacks.</p>

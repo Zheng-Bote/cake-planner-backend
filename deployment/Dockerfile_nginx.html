@@ -106,8 +106,8 @@
   <li><a href="../deployment/Dockerfile_appimage.html">Dockerfile appimage</a></li>
   <li><a href="../deployment/Dockerfile_nginx.html" class="active">Dockerfile nginx</a></li>
   <li><a href="../deployment/deployment_guide.html">deployment guide</a></li>
-  <li><a href="../deployment/docker-compose.yml.html">docker-compose.yml</a></li>
-  <li><a href="../deployment/nginx_conf.html">nginx conf</a></li>
+  <li><a href="../deployment/docker_compose.yml.html">docker compose.yml</a></li>
+  <li><a href="../deployment/nginx_configuration.html">nginx configuration</a></li>
   <li><a href="../deployment/overview.html">overview</a></li>
 </ul>
   </li>
@@ -127,14 +127,15 @@
 </nav>
     </aside>
 
-    <main class="main"><!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-<p><strong>Table of Contents</strong></p>
-<ul>
+    <main class="main"><h1>Dockerfile.nginx</h1>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<h2>Table of Contents</h2>
+<ul class="toc-level-2">
 <li><a href="#dockerfilenginx-example">Dockerfile.nginx Example</a></li>
 </ul>
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-<h1>Dockerfile.nginx Example</h1>
+<h2 id="dockerfilenginx-example">Dockerfile.nginx Example</h2>
 <pre><code class="language-dockerfile">FROM nginx:alpine
 
 COPY nginx.conf /etc/nginx/nginx.conf
