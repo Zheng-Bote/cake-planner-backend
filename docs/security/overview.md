@@ -25,12 +25,12 @@ The application enforces **HTTPS (SSL/TLS)** for all connections to the backend.
 
 ## Web Server Security
 
-The NGINX web server is configured with robust **Security Headers** to protect against common web vulnerabilities. This includes:
+The NGINX web server is configured with **Rate Limiting** to prevent Brute Force or DDoS attacks.
+
+Also, the NGINX web server is configured with robust **Security Headers** to protect against common web vulnerabilities. This includes:
 
 - **Content-Security-Policy (CSP)**: To prevent Cross-Site Scripting (XSS) attacks.
 - Other standard security headers to harden the server response.
-\
-The NGINX web server is configured with **Rate Limiting** to prevent Brute Force or DDoS attacks.
 
 ## Authentication & Data Protection
 

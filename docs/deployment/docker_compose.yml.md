@@ -1,12 +1,15 @@
+# docker-compose
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [docker-compose.yml example](#docker-composeyml-example)
+- [docker-compose](#docker-compose)
+  - [docker-compose.yml example](#docker-composeyml-example)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# docker-compose.yml example
+## docker-compose.yml example
 
 ```yaml
 services:

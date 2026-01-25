@@ -1,12 +1,15 @@
+# CakePlanner Environment Variables
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Example of an .env file for the CakePlanner Backend](#example-of-an-env-file-for-the-cakeplanner-backend)
+- [CakePlanner Environment Variables](#cakeplanner-environment-variables)
+  - [Example of an .env file for the CakePlanner Backend](#example-of-an-env-file-for-the-cakeplanner-backend)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Example of an .env file for the CakePlanner Backend
+## Example of an .env file for the CakePlanner Backend
 
 ```toml
 # Server Configuration
@@ -31,4 +34,3 @@ SMTP_PASS=your_password
 SMTP_FROM=noreply@example.com
 SMTP_STARTTLS=true
 ```
-
