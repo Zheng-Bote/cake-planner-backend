@@ -17,6 +17,32 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`crow::json::wvalue Event::toJson() const `](#crowjsonwvalue-eventtojson-const-)
+  - [`std::vector<Event> Event::getRange(const QString &start,`](#stdvectorevent-eventgetrangeconst-qstring-start)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb)
+  - [`bool Event::create(const QString &userId) `](#bool-eventcreateconst-qstring-userid-)
+  - [`QSqlQuery userQuery(db)`](#qsqlquery-userquerydb)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb-1)
+  - [`std::optional<Event> Event::getById(const QString& eventId, const QString& currentUserId) `](#stdoptionalevent-eventgetbyidconst-qstring-eventid-const-qstring-currentuserid-)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb-2)
+  - [`bool Event::deleteEvent(const QString& eventId, const QString& currentUserId) `](#bool-eventdeleteeventconst-qstring-eventid-const-qstring-currentuserid-)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb-3)
+  - [`bool Event::rateEvent(const QString& eventId, const QString& userId, int stars, const QString& comment) `](#bool-eventrateeventconst-qstring-eventid-const-qstring-userid-int-stars-const-qstring-comment-)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb-4)
+  - [`INSERT INTO ratings (id, event_id, rater_id, rating_value, comment)`](#insert-into-ratings-id-event_id-rater_id-rating_value-comment)
+  - [`bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QString& filename) `](#bool-eventuploadphotoconst-qstring-eventid-const-qstring-userid-const-qstring-filename-)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb-5)
+  - [`INSERT INTO event_photos (event_id, user_id, photo_path, uploaded_at)`](#insert-into-event_photos-event_id-user_id-photo_path-uploaded_at)
+  - [`QSqlQuery updateCover(db)`](#qsqlquery-updatecoverdb)
+  - [`std::string Event::toIcsString() const `](#stdstring-eventtoicsstring-const-)
+  - [`std::vector<Event> Event::getRanked(const QString& userId, int limit) `](#stdvectorevent-eventgetrankedconst-qstring-userid-int-limit-)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb-6)
+  - [`QSqlQuery galQuery(db)`](#qsqlquery-galquerydb)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

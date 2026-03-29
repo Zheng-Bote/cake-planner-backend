@@ -4,8 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Dockerfile.appimage](#dockerfileappimage)
-  - [Dockerfile.appimage Example](#dockerfileappimage-example)
+- [Dockerfile.appimage Example](#dockerfileappimage-example)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

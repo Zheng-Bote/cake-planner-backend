@@ -8,16 +8,15 @@ This guide describes how to deploy the Cake Planner Backend using **Docker Compo
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Deployment Guide](#deployment-guide)
-  - [Architecture](#architecture)
-  - [Prerequisites](#prerequisites)
-  - [Configuration Files](#configuration-files)
-  - [Step-by-Step Deployment](#step-by-step-deployment)
-    - [1. Build the AppImage](#1-build-the-appimage)
-    - [2. Configure Environment](#2-configure-environment)
-    - [3. Start Services](#3-start-services)
-    - [4. Verify](#4-verify)
-  - [Notes](#notes)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Configuration Files](#configuration-files)
+- [Step-by-Step Deployment](#step-by-step-deployment)
+  - [1. Build the AppImage](#1-build-the-appimage)
+  - [2. Configure Environment](#2-configure-environment)
+  - [3. Start Services](#3-start-services)
+  - [4. Verify](#4-verify)
+- [Notes](#notes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

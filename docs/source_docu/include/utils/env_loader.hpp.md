@@ -17,6 +17,15 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace utils `](#namespace-utils-)
+  - [`class EnvLoader `](#class-envloader-)
+  - [`static void load(const std::string& path)`](#static-void-loadconst-stdstring-path)
+  - [`static int getInt(const std::string& key, int defaultVal = 0)`](#static-int-getintconst-stdstring-key-int-defaultval--0)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation
