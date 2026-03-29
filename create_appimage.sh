@@ -68,6 +68,7 @@ fi
 echo "📦 Generiere AppImage (inklusive Qt Dependencies)..."
 
 # Umgebungsvariable für Qt Plugin setzen (sucht automatisch nach qmake)
+export QMAKE=$(which qmake6 || which qmake)
 export EXTRA_QT_PLUGINS="iconengines,imageformats,sqldrivers,platforms"
 
 ./linuxdeploy-x86_64.AppImage \
