@@ -1,20 +1,33 @@
 /**
+ * SPDX-FileComment: Configuration Model to load env vars
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file ConfigModel.hpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Configuration Model to load env vars
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
+
 #pragma once
 
 #include <QString>
 #include <string>
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz {
+/**
+ * @brief model namespace.
+ */
 namespace model {
 
 /**

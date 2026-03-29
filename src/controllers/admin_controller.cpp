@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Admin Controller Implementation with Group Management
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file admin_controller.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Admin Controller Implementation with Group Management
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "controllers/admin_controller.hpp"
@@ -16,6 +22,9 @@
 #include "services/notification_service.hpp"
 #include "database.hpp"
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz::controller {
 
 /**

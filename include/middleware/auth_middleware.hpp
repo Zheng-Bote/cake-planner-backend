@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Auth Middleware
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file auth_middleware.hpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Auth Middleware
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #pragma once
@@ -15,15 +21,27 @@
 #include "utils/token_utils.hpp"
 #include <string>
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz {
+/**
+ * @brief middleware namespace.
+ */
 namespace middleware {
 
+/**
+ * @brief AuthMiddleware struct.
+ */
 struct AuthMiddleware {
   // Context stores data for the controller
   struct context {
     rz::utils::TokenPayload currentUser;
   };
 
+  /**
+   * @brief Function implementation.
+   */
   void before_handle(crow::request &req, crow::response &res, context &ctx) {
     // 1. Whitelist
     std::string url = req.url;
@@ -65,6 +83,9 @@ struct AuthMiddleware {
     ctx.currentUser = *payload;
   }
 
+  /**
+   * @brief Function implementation.
+   */
   void after_handle(crow::request &req, crow::response &res, context &ctx) {
     // no-op
   }

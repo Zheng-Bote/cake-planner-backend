@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: No description provided
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file database.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief No description provided
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "database.hpp"
@@ -90,6 +96,9 @@ QSqlDatabase DatabaseManager::getDatabase() {
     qCritical() << "Error opening DB in thread" << connectionName
                 << ":" << db.lastError().text();
   } else {
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     query.exec("PRAGMA journal_mode = WAL;");
     query.exec("PRAGMA synchronous = NORMAL;");
@@ -184,12 +193,24 @@ bool DatabaseManager::migrate() {
         );
 
         -- INDICES for Performance
+        /**
+         * @brief Function implementation.
+         */
         CREATE INDEX IF NOT EXISTS idx_ratings_event_id ON ratings(event_id);
+        /**
+         * @brief Function implementation.
+         */
         CREATE INDEX IF NOT EXISTS idx_event_photos_event_id ON event_photos(event_id);
+        /**
+         * @brief Function implementation.
+         */
         CREATE INDEX IF NOT EXISTS idx_events_group_date ON events(group_id, event_date);
     )";
 
   QStringList statements = schemaSql.split(';', Qt::SkipEmptyParts);
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   bool success = true;
 
@@ -215,6 +236,9 @@ bool DatabaseManager::migrate() {
     // OR inspect the table info. For simplicity/robustness here, we'll try to add and catch error.
 
     auto checkAndAddColumn = [&](const QString& table, const QString& column, const QString& type) {
+        /**
+         * @brief Function implementation.
+         */
         QSqlQuery checkQ(db);
         // Simple check: try to select the column. If it fails, it likely doesn't exist.
         // A cleaner way is PRAGMA table_info, but this is quick.

@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Seeder Utilities
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file seeder.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Seeder Utilities
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "utils/seeder.hpp"
@@ -18,6 +24,9 @@
 
 // Namespace rz::utils
 namespace rz {
+/**
+ * @brief utils namespace.
+ */
 namespace utils {
 
 /**

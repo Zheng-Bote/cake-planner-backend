@@ -52,9 +52,6 @@
   html {
     font-display: swap;
   }
-  body {
-    background-color: var(--bg-body);
-  }
 }
 
 @view-transition {

@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Auth Controller with Notification Service injection
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file auth_controller.hpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Auth Controller with Notification Service injection
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #pragma once
@@ -16,6 +22,9 @@
 
 // Forward Declaration
 namespace rz {
+/**
+ * @brief service namespace.
+ */
 namespace service {
     class NotificationService;
 }
@@ -23,8 +32,14 @@ namespace service {
 
 // Namespace rz::controller
 namespace rz {
+/**
+ * @brief controller namespace.
+ */
 namespace controller {
 
+/**
+ * @brief AuthController class.
+ */
 class AuthController {
 public:
     /**

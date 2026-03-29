@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Event Controller Implementation (Safe Blocking Long Polling)
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file event_controller.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Controller Implementation (Safe Blocking Long Polling)
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "controllers/event_controller.hpp"
@@ -31,6 +37,9 @@
 std::mutex event_mutex;
 std::condition_variable event_cv;
 
+/**
+ * @brief LatestEventData struct.
+ */
 struct LatestEventData {
     long long generation = 0;
     crow::json::wvalue payload;
@@ -43,6 +52,9 @@ struct LatestEventData {
  */
 void broadcastNewEvent(const Event& evt) {
     {
+        /**
+         * @brief Function implementation.
+         */
         std::lock_guard<std::mutex> lock(event_mutex);
         latestEvent.generation++;
         crow::json::wvalue msg;
@@ -55,7 +67,13 @@ void broadcastNewEvent(const Event& evt) {
     event_cv.notify_all();
 }
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz {
+/**
+ * @brief controller namespace.
+ */
 namespace controller {
 
 /**
@@ -106,9 +124,15 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
 
         long long myGen;
         {
+            /**
+             * @brief Function implementation.
+             */
             std::lock_guard<std::mutex> lock(event_mutex);
             myGen = latestEvent.generation;
         }
+        /**
+         * @brief Function implementation.
+         */
         std::unique_lock<std::mutex> lock(event_mutex);
         bool hasNewEvent = event_cv.wait_for(lock, std::chrono::seconds(29), [&]{
             return latestEvent.generation > myGen;
@@ -157,6 +181,9 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
     CROW_ROUTE(app, "/api/events")
     .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) {
         const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+        /**
+         * @brief Function implementation.
+         */
         crow::multipart::message msg(req);
         QString date, description, savedRelativePath;
 
@@ -198,6 +225,9 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
                         QDir().mkpath(eventDir);
 
                         QString fullPath = eventDir + "/" + fileName;
+                        /**
+                         * @brief Function implementation.
+                         */
                         QFile file(fullPath);
                         if (file.open(QIODevice::WriteOnly)) {
                             file.write(part.body.data(), part.body.size());
@@ -234,7 +264,8 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
                     if (u.emailLanguage == "de") de.push_back(u.email);
                     else en.push_back(u.email);
                 }
-                notifyService->notifyGroupNewEvent(e.groupName, e.bakerName, e.date, de, en);
+                QByteArray icsData = QByteArray::fromStdString(e.toIcsString());
+                notifyService->notifyGroupNewEvent(e.groupName, e.bakerName, e.date, de, en, icsData);
             }
 
             crow::json::wvalue res;
@@ -329,6 +360,9 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         auto evt = Event::getById(QString::fromStdString(eventId), ctx.currentUser.userId);
         if (!evt) return crow::response(404, "Event not found");
 
+        /**
+         * @brief Function implementation.
+         */
         crow::multipart::message msg(req);
         std::string fileContent;
         for (const auto &part : msg.parts) {
@@ -353,6 +387,9 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         QDir().mkpath(eventDir);
 
         QString fullPath = eventDir + "/" + fileName;
+        /**
+         * @brief Function implementation.
+         */
         QFile file(fullPath);
 
         if (file.open(QIODevice::WriteOnly)) {

@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Time-based One-Time Password (TOTP) Utilities
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file totp_utils.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Time-based One-Time Password (TOTP) Utilities
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "utils/totp_utils.hpp"
@@ -26,6 +32,9 @@ static const char *B32_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 // Namespace rz::utils
 namespace rz {
+/**
+ * @brief utils namespace.
+ */
 namespace utils {
 
 /**
@@ -37,6 +46,9 @@ namespace utils {
  */
 QString TotpUtils::generateSecret() {
   std::random_device rd;
+  /**
+   * @brief Function implementation.
+   */
   std::uniform_int_distribution<int> dist(0, 31);
 
   QString secret;

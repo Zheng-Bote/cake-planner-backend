@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: JWT Token Utilities Implementation
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file token_utils.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief JWT Token Utilities Implementation
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "utils/token_utils.hpp"
@@ -20,6 +26,9 @@ using json_value = jwt::traits::kazuho_picojson::value_type;
 
 // CORRECTION: Put everything in the namespace rz::utils
 namespace rz {
+/**
+ * @brief utils namespace.
+ */
 namespace utils {
 
 // Helper in namespace (now finds EnvLoader)

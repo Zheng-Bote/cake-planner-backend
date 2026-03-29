@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Password Hashing Utilities
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file password_utils.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Password Hashing Utilities
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 // (OWASP Recommendations).
@@ -32,6 +38,9 @@ const uint32_t HASH_LEN = 32;   // 32 Bytes Output Hash
 
 // Namespace rz::utils
 namespace rz {
+/**
+ * @brief utils namespace.
+ */
 namespace utils {
 
 /**
@@ -48,6 +57,9 @@ namespace utils {
 QString PasswordUtils::hashPassword(const QString &plainText) {
   uint8_t salt[SALT_LEN];
   std::random_device rd;
+  /**
+   * @brief Function implementation.
+   */
   std::uniform_int_distribution<uint8_t> dist(0, 255);
   for (uint32_t i = 0; i < SALT_LEN; ++i) {
     salt[i] = dist(rd);
@@ -55,6 +67,9 @@ QString PasswordUtils::hashPassword(const QString &plainText) {
 
   size_t encodedLen = argon2_encodedlen(T_COST, M_COST, PARALLELISM, SALT_LEN,
                                         HASH_LEN, Argon2_id);
+  /**
+   * @brief Function implementation.
+   */
   std::vector<char> encoded(encodedLen);
 
   QByteArray pwdBytes = plainText.toUtf8();
@@ -104,6 +119,9 @@ QString PasswordUtils::generateRandomPassword(int length) {
 
     std::random_device rd;
     std::mt19937 generator(rd());
+    /**
+     * @brief Function implementation.
+     */
     std::uniform_int_distribution<size_t> distribution(0, max_index - 1); // fix range
 
     QString password;

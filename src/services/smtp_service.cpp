@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: SMTP Service Implementation
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file smtp_service.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief SMTP Service Implementation
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "services/smtp_service.hpp"
@@ -16,6 +22,7 @@
 #include "server.h"
 #include "mimemessage.h"
 #include "mimetext.h"
+#include "mimeattachment.h"
 #include "emailaddress.h"
 #include "serverreply.h"
 
@@ -25,7 +32,13 @@
 
 #include "spdlog/spdlog.h"
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz {
+/**
+ * @brief service namespace.
+ */
 namespace service {
 
 /**
@@ -37,6 +50,7 @@ namespace service {
 SmtpService::SmtpService(const model::ConfigModel& config, QObject* parent)
     : QObject(parent), m_config(config) {
     qRegisterMetaType<QString>("QString");
+    qRegisterMetaType<QByteArray>("QByteArray");
 }
 
 SmtpService::~SmtpService() = default;
@@ -47,12 +61,17 @@ SmtpService::~SmtpService() = default;
  * @param to Recipient email address.
  * @param subject Email subject.
  * @param body Email body content.
+ * @param attachmentData Optional attachment data.
+ * @param attachmentName Optional attachment filename.
  */
-void SmtpService::sendEmailAsync(const QString& to, const QString& subject, const QString& body) {
+void SmtpService::sendEmailAsync(const QString& to, const QString& subject, const QString& body,
+                                 const QByteArray& attachmentData, const QString& attachmentName) {
     QMetaObject::invokeMethod(this, "doSendEmail", Qt::QueuedConnection,
                               Q_ARG(QString, to),
                               Q_ARG(QString, subject),
-                              Q_ARG(QString, body));
+                              Q_ARG(QString, body),
+                              Q_ARG(QByteArray, attachmentData),
+                              Q_ARG(QString, attachmentName));
 }
 
 /**
@@ -63,8 +82,11 @@ void SmtpService::sendEmailAsync(const QString& to, const QString& subject, cons
  * @param to Recipient email address.
  * @param subject Email subject.
  * @param body Email body content.
+ * @param attachmentData Optional attachment data.
+ * @param attachmentName Optional attachment filename.
  */
-void SmtpService::doSendEmail(const QString& to, const QString& subject, const QString& body) {
+void SmtpService::doSendEmail(const QString& to, const QString& subject, const QString& body,
+                               const QByteArray& attachmentData, const QString& attachmentName) {
     qInfo() << "[SMTP] Preparing email to:" << to;
 
     auto server = new SimpleMail::Server(this);
@@ -87,6 +109,11 @@ void SmtpService::doSendEmail(const QString& to, const QString& subject, const Q
     auto textPart = std::make_shared<SimpleMail::MimeText>();
     textPart->setText(body);
     message.addPart(textPart);
+
+    if (!attachmentData.isEmpty() && !attachmentName.isEmpty()) {
+        auto attachmentPart = std::make_shared<SimpleMail::MimeAttachment>(attachmentData, attachmentName);
+        message.addPart(attachmentPart);
+    }
 
     SimpleMail::ServerReply* reply = server->sendMail(message);
 

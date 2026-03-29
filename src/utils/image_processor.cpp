@@ -1,15 +1,20 @@
 /**
+ * SPDX-FileComment: Image Processor Implementation
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file image_processor.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Image Processor Implementation
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
-
 
 #include "utils/image_processor.hpp"
 #include <QImage>
@@ -29,6 +34,9 @@ const std::vector<int> ImageProcessor::TARGET_WIDTHS = {480, 800, 1280};
  * @param sourcePath The file path of the source image.
  */
 void ImageProcessor::generateWebPVersions(const QString& sourcePath) {
+    /**
+     * @brief Function implementation.
+     */
     QImage img(sourcePath);
     if (img.isNull()) {
         qCritical() << "ImageProcessor: Failed to load image. Check path and Qt Plugins (JPEG support)!" << sourcePath;
@@ -36,6 +44,9 @@ void ImageProcessor::generateWebPVersions(const QString& sourcePath) {
         return;
     }
 
+    /**
+     * @brief Function implementation.
+     */
     QFileInfo fileInfo(sourcePath);
     QDir dir = fileInfo.dir();
     QString baseName = fileInfo.completeBaseName();
@@ -74,6 +85,9 @@ void ImageProcessor::generateWebPVersions(const QString& sourcePath) {
  * @param sourcePath The file path of the original image (used to derive version filenames).
  */
 void ImageProcessor::deleteAllVersions(const QString& sourcePath) {
+    /**
+     * @brief Function implementation.
+     */
     QFileInfo fileInfo(sourcePath);
     QDir dir = fileInfo.dir();
     QString baseName = fileInfo.completeBaseName();

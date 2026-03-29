@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Implementation of system routes
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file system_controller.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Implementation of system routes
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "controllers/system_controller.hpp"
@@ -15,6 +21,9 @@
 #include <QDateTime>
 #include <string>
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz::controller {
 
 /**

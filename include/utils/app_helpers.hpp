@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Application Helpers Header
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file app_helpers.hpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Application Helpers Header
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #pragma once
@@ -17,6 +23,9 @@
 #include <iostream>
 #include <string>
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz::utils {
 
 /**
@@ -25,6 +34,9 @@ namespace rz::utils {
  */
 inline void ensureDirectoryExists(const std::string& path) {
     if (path.empty()) return;
+    /**
+     * @brief fs namespace.
+     */
     namespace fs = std::filesystem;
     if (!fs::exists(path)) {
         try {

@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: User Model Implementation
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file user_model.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Model Implementation
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "models/user_model.hpp"
@@ -30,6 +36,9 @@
  */
 std::pair<QString, QString> User::getGroupAndRole(const QString &userId) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   query.prepare(
       "SELECT group_id, role FROM group_members WHERE user_id = :uid");
@@ -76,6 +85,9 @@ crow::json::wvalue User::toJson() const {
  */
 std::optional<User> User::getByEmail(const QString &email) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   // FIX 2: Add email_language in SELECT
   query.prepare("SELECT id, full_name, email, language, email_language, password_hash, is_active, "
@@ -125,6 +137,9 @@ std::optional<User> User::getByEmail(const QString &email) {
  */
 std::optional<User> User::getById(const QString &id) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   // FIX 3: Add email_language in SELECT
   query.prepare(
@@ -175,6 +190,9 @@ std::optional<User> User::getById(const QString &id) {
  */
 std::vector<User> User::getAll(const QString &filterGroupId) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   std::vector<User> users;
 
@@ -230,6 +248,9 @@ std::vector<User> User::getAll(const QString &filterGroupId) {
  */
 bool User::existsAnyAdmin() {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   query.prepare("SELECT COUNT(*) FROM users WHERE is_admin = 1");
   if (query.exec() && query.next()) {
@@ -250,6 +271,9 @@ bool User::create() {
     this->id = QUuid::createUuid().toString(QUuid::WithoutBraces);
   }
 
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   // FIX 4: Save email_language
   query.prepare("INSERT INTO users (id, full_name, email, password_hash, "
@@ -277,6 +301,9 @@ bool User::create() {
  */
 bool User::enable2FA(const QString &secret) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   query.prepare("UPDATE users SET totp_secret = :secret WHERE id = :id");
   query.bindValue(":secret", secret);
@@ -298,6 +325,9 @@ bool User::enable2FA(const QString &secret) {
  */
 bool User::updateStatus(const QString &userId, bool isActive) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
 
   query.prepare("UPDATE users SET is_active = :active WHERE id = :id");
@@ -316,6 +346,9 @@ bool User::updateStatus(const QString &userId, bool isActive) {
  */
 bool User::setMustChangePassword(const QString &userId, bool mustChange) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   query.prepare("UPDATE users SET must_change_password = :val WHERE id = :id");
   query.bindValue(":val", mustChange ? 1 : 0);
@@ -334,6 +367,9 @@ bool User::setMustChangePassword(const QString &userId, bool mustChange) {
  */
 bool User::updatePassword(const QString &userId, const QString &newHash) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
 
   query.prepare("UPDATE users SET password_hash = :hash, must_change_password "
@@ -353,6 +389,9 @@ bool User::updatePassword(const QString &userId, const QString &newHash) {
  */
 bool User::setTempPassword(const QString &hash, int durationInHours) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
 
     QDateTime expiry = QDateTime::currentDateTime().addSecs(durationInHours * 3600);
@@ -372,6 +411,9 @@ bool User::setTempPassword(const QString &hash, int durationInHours) {
  */
 bool User::clearTempPassword() {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     query.prepare("UPDATE users SET temp_password_hash = NULL, temp_password_expiry = NULL WHERE id = :id");
     query.bindValue(":id", this->id);
@@ -385,8 +427,14 @@ bool User::clearTempPassword() {
  * @return True if successful, false otherwise.
  */
 
+/**
+ * @brief Function implementation.
+ */
 bool User::touchLastLogin(const QString &userId) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     // We use Qt::ISODate for a standard format (YYYY-MM-DDTHH:mm:ss)
     query.prepare("UPDATE users SET last_login_at = :time WHERE id = :id");
@@ -409,6 +457,9 @@ bool User::touchLastLogin(const QString &userId) {
  */
 std::vector<std::pair<QString, QString>> User::getAllGroups() {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   std::vector<std::pair<QString, QString>> groups;
 
@@ -432,6 +483,9 @@ std::vector<std::pair<QString, QString>> User::getAllGroups() {
  */
 bool User::assignToGroup(const QString &userId, const QString &groupId) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
 
   query.prepare("DELETE FROM group_members WHERE user_id = :uid");
@@ -457,6 +511,9 @@ bool User::assignToGroup(const QString &userId, const QString &groupId) {
 bool User::setGroupRole(const QString &userId, const QString &groupId,
                         const QString &role) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
 
   query.prepare("UPDATE group_members SET role = :role WHERE user_id = :uid "
@@ -480,6 +537,9 @@ bool User::setGroupRole(const QString &userId, const QString &groupId,
  */
 QString User::getGroupRole(const QString &userId, const QString &groupId) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   query.prepare("SELECT role FROM group_members WHERE user_id = :uid AND "
                 "group_id = :gid");
@@ -502,6 +562,9 @@ QString User::getGroupRole(const QString &userId, const QString &groupId) {
  */
 bool User::softDelete(const QString& userId) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     query.prepare(R"(
         UPDATE users
@@ -525,6 +588,9 @@ bool User::softDelete(const QString& userId) {
  */
 bool User::updateEmailLanguage(const QString& userId, const QString& lang) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     query.prepare("UPDATE users SET email_language = :lang WHERE id = :id");
     query.bindValue(":lang", lang);
@@ -541,6 +607,9 @@ bool User::updateEmailLanguage(const QString& userId, const QString& lang) {
  */
 bool User::updateLanguage(const QString& userId, const QString& lang) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     query.prepare("UPDATE users SET language = :lang WHERE id = :id");
     query.bindValue(":lang", lang);
@@ -565,6 +634,9 @@ QString User::createGroup(const QString &name) {
     QSqlDatabase db = DatabaseManager::instance().getDatabase();
     QString newGroupId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     query.prepare("INSERT INTO groups (id, name) VALUES (:id, :name)");
     query.bindValue(":id", newGroupId);
@@ -633,8 +705,14 @@ bool User::deleteGroup(const QString &groupId) {
 }
 
 
+/**
+ * @brief Function implementation.
+ */
 std::vector<User::GroupMembership> User::getGroupsForUser(const QString &userId) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     std::vector<GroupMembership> result;
 

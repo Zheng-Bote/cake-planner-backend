@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Notification Service Implementation
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file notification_service.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Notification Service Implementation
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "services/notification_service.hpp"
@@ -16,7 +22,13 @@
 #include <QVariant>
 #include <QDebug>
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz {
+/**
+ * @brief service namespace.
+ */
 namespace service {
 
 /**
@@ -35,6 +47,9 @@ NotificationService::NotificationService(SmtpService* smtp)
 std::vector<QString> NotificationService::getGlobalAdminEmails() {
     std::vector<QString> emails;
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     // Get all users with is_admin = 1
     query.prepare("SELECT email FROM users WHERE is_admin = 1 AND is_active = 1");
@@ -79,19 +94,27 @@ void NotificationService::notifyAdminsNewUser(const QString& newUserName, const 
  * @param recipientsDe List of email addresses for German notifications.
  * @param recipientsEn List of email addresses for English notifications.
  */
-void NotificationService::notifyGroupNewEvent(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn) {
+void NotificationService::notifyGroupNewEvent(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn, const QByteArray& icsData) {
+    QString icsName = "cake_event.ics";
+
     // German
     if (!recipientsDe.empty()) {
         QString subject = QString("Neuer Kuchen in %1!").arg(groupName);
         QString body = QString("Hallo,\n\n%1 bringt am %2 einen Kuchen mit!\n\nYummy!").arg(bakerName, date);
-        for (const auto& mail : recipientsDe) m_smtp->sendEmailAsync(mail, subject, body);
+        for (const auto& mail : recipientsDe) {
+            if (!icsData.isEmpty()) m_smtp->sendEmailAsync(mail, subject, body, icsData, icsName);
+            else m_smtp->sendEmailAsync(mail, subject, body);
+        }
     }
 
     // English
     if (!recipientsEn.empty()) {
         QString subject = QString("New Cake in %1!").arg(groupName);
         QString body = QString("Hello,\n\n%1 is bringing a cake on %2!\n\nYummy!").arg(bakerName, date);
-        for (const auto& mail : recipientsEn) m_smtp->sendEmailAsync(mail, subject, body);
+        for (const auto& mail : recipientsEn) {
+            if (!icsData.isEmpty()) m_smtp->sendEmailAsync(mail, subject, body, icsData, icsName);
+            else m_smtp->sendEmailAsync(mail, subject, body);
+        }
     }
 }
 

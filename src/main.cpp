@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Entry Point
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file main.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Entry Point
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "crow.h"
@@ -44,6 +50,9 @@
 #include "services/smtp_service.hpp"
 #include "services/notification_service.hpp"
 
+/**
+ * @brief fs namespace.
+ */
 namespace fs = std::filesystem;
 
 // Global function for safe shutdown (necessary for Signal Handler)
@@ -74,6 +83,9 @@ void signalHandler(int signum) {
  * @return Exit code.
  */
 int main(int argc, char *argv[]) {
+    /**
+     * @brief Function implementation.
+     */
     QCoreApplication qtApp(argc, argv);
 
     // 1. Load environment
@@ -107,6 +119,9 @@ int main(int argc, char *argv[]) {
         if (logLevelStr == "debug") spdlog::set_level(spdlog::level::debug);
         else if (logLevelStr == "warn") spdlog::set_level(spdlog::level::warn);
         else if (logLevelStr == "error") spdlog::set_level(spdlog::level::err);
+        /**
+         * @brief Function implementation.
+         */
         else spdlog::set_level(spdlog::level::info);
 
         // --- FIX: Flush on Error AND periodically every 3 seconds ---
@@ -130,6 +145,9 @@ int main(int argc, char *argv[]) {
     spdlog::info("Using Database File: {}", dbFullPath);
 
     if (!dbFullPath.empty()) {
+        /**
+         * @brief Function implementation.
+         */
         std::filesystem::path dbP(dbFullPath);
         if (dbP.has_parent_path()) rz::utils::ensureDirectoryExists(dbP.parent_path().string());
     }
@@ -150,7 +168,13 @@ int main(int argc, char *argv[]) {
     rz::model::ConfigModel configModel;
     configModel.loadEnv(envFilePath.toStdString());
 
+    /**
+     * @brief Function implementation.
+     */
     rz::service::SmtpService smtpService(configModel, &qtApp);
+    /**
+     * @brief Function implementation.
+     */
     rz::service::NotificationService notifyService(&smtpService);
 
     // 6. Crow App Setup
@@ -175,6 +199,9 @@ int main(int argc, char *argv[]) {
 
     // 7. Register Controllers
     rz::controller::SystemController::registerRoutes(app);
+    /**
+     * @brief Function implementation.
+     */
     rz::controller::AuthController authController(&notifyService);
     authController.registerRoutes(app);
     rz::controller::UserController::registerRoutes(app, &notifyService);
@@ -196,6 +223,9 @@ int main(int argc, char *argv[]) {
     std::signal(SIGINT, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
+    /**
+     * @brief Function implementation.
+     */
     std::thread serverThread([&app, serverPort, &qtApp](){
         int serverThreads = rz::utils::EnvLoader::getInt("CAKE_THREADS", 0);
         if (serverThreads > 0) {

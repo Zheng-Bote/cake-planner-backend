@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: User Controller with Email Notifications
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file user_controller.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief User Controller with Email Notifications
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "controllers/user_controller.hpp"
@@ -18,7 +24,13 @@
 
 #include "spdlog/spdlog.h"
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz {
+/**
+ * @brief controller namespace.
+ */
 namespace controller {
 
 // Signature Update: notifyService

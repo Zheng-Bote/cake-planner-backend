@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Environment Loader Implementation
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file env_loader.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Environment Loader Implementation
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "utils/env_loader.hpp"
@@ -17,7 +23,13 @@
 #include <QFile>
 #include <QTextStream>
 
+/**
+ * @brief rz namespace.
+ */
 namespace rz {
+/**
+ * @brief utils namespace.
+ */
 namespace utils {
 
 /**
@@ -50,8 +62,14 @@ void EnvLoader::load(const std::string &filenameStd) {
   }
 
   qInfo() << "Loading configuration from:" << foundPath;
+  /**
+   * @brief Function implementation.
+   */
   QFile file(foundPath);
   if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    /**
+     * @brief Function implementation.
+     */
     QTextStream in(&file);
     while (!in.atEnd()) {
       QString line = in.readLine().trimmed();

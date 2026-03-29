@@ -1,13 +1,19 @@
 /**
+ * SPDX-FileComment: Event Model Implementation
+ * SPDX-FileType: SOURCE
+ * SPDX-FileContributor: ZHENG Robert
+ * SPDX-FileCopyrightText: 2026 ZHENG Robert
+ * SPDX-License-Identifier: MIT
+ *
  * @file event_model.cpp
- * @author ZHENG Robert (robert@hase-zheng.net)
  * @brief Event Model Implementation
  * @version 0.15.0
  * @date 2026-01-24
  *
+ * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
  *
- * SPDX-License-Identifier: MIT
+ * @license MIT
  */
 
 #include "models/event_model.hpp"
@@ -76,6 +82,9 @@ std::vector<Event> Event::getRange(const QString &start,
                                    const QString &end,
                                    const QString &userId) {
   auto db = DatabaseManager::instance().getDatabase();
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   std::vector<Event> events;
 
@@ -132,6 +141,9 @@ bool Event::create(const QString &userId) {
     this->id = QUuid::createUuid().toString(QUuid::WithoutBraces);
   }
 
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery userQuery(db);
   userQuery.prepare(R"(
     SELECT u.full_name, gm.group_id, g.name as group_name
@@ -151,6 +163,9 @@ bool Event::create(const QString &userId) {
     return false;
   }
 
+  /**
+   * @brief Function implementation.
+   */
   QSqlQuery query(db);
   // Saves cover image directly in events
   query.prepare("INSERT INTO events (id, group_id, baker_id, event_date, "
@@ -176,6 +191,9 @@ bool Event::create(const QString &userId) {
  */
 std::optional<Event> Event::getById(const QString& eventId, const QString& currentUserId) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
 
     // Loads event incl. cover image (photo_path)
@@ -263,6 +281,9 @@ bool Event::deleteEvent(const QString& eventId, const QString& currentUserId) {
     if (!evt->isOwner || !evt->isFuture) return false;
 
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     query.prepare("DELETE FROM events WHERE id = :id");
     query.bindValue(":id", eventId);
@@ -280,8 +301,14 @@ bool Event::deleteEvent(const QString& eventId, const QString& currentUserId) {
  */
 bool Event::rateEvent(const QString& eventId, const QString& userId, int stars, const QString& comment) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
     query.prepare(R"(
+        /**
+         * @brief Function implementation.
+         */
         INSERT INTO ratings (id, event_id, rater_id, rating_value, comment)
         VALUES (:id, :eid, :uid, :val, :comment)
         ON CONFLICT(event_id, rater_id) DO UPDATE SET
@@ -310,11 +337,17 @@ bool Event::rateEvent(const QString& eventId, const QString& userId, int stars, 
  */
 bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QString& filename) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
 
     // 1. Insert into event_photos table (1 photo per user per event)
     // We use ON CONFLICT DO UPDATE (Upsert)
     query.prepare(R"(
+        /**
+         * @brief Function implementation.
+         */
         INSERT INTO event_photos (event_id, user_id, photo_path, uploaded_at)
         VALUES (:eid, :uid, :path, CURRENT_TIMESTAMP)
         ON CONFLICT(event_id, user_id) DO UPDATE SET
@@ -340,6 +373,9 @@ bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QSt
 
         // 3. If yes, we update the cover image in the events table
         if (bakerId == userId) {
+            /**
+             * @brief Function implementation.
+             */
             QSqlQuery updateCover(db);
             updateCover.prepare("UPDATE events SET photo_path = :path WHERE id = :id");
             updateCover.bindValue(":path", filename);
@@ -360,13 +396,15 @@ bool Event::uploadPhoto(const QString& eventId, const QString& userId, const QSt
  */
 std::string Event::toIcsString() const {
     std::stringstream ss;
+    QDate eventDate = QDate::fromString(date, "yyyy-MM-dd");
     ss << "BEGIN:VCALENDAR\r\n"
        << "VERSION:2.0\r\n"
        << "PRODID:-//CakePlanner//DE\r\n"
        << "BEGIN:VEVENT\r\n"
        << "UID:" << id.toStdString() << "\r\n"
        << "DTSTAMP:" << QDateTime::currentDateTimeUtc().toString("yyyyMMdd'T'HHmmss'Z'").toStdString() << "\r\n"
-       << "DTSTART;VALUE=DATE:" << QDate::fromString(date, "yyyy-MM-dd").toString("yyyyMMdd").toStdString() << "\r\n"
+       << "DTSTART;VALUE=DATE:" << eventDate.toString("yyyyMMdd").toStdString() << "\r\n"
+       << "DTEND;VALUE=DATE:" << eventDate.addDays(1).toString("yyyyMMdd").toStdString() << "\r\n"
        << "SUMMARY:Kuchen: " << bakerName.toStdString() << "\r\n"
        << "DESCRIPTION:" << description.toStdString() << "\r\n"
        << "END:VEVENT\r\n"
@@ -383,6 +421,9 @@ std::string Event::toIcsString() const {
  */
 std::vector<Event> Event::getRanked(const QString& userId, int limit) {
     auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
     QSqlQuery query(db);
 
     // We join ratings, calculate average, and sort by it
@@ -419,6 +460,9 @@ std::vector<Event> Event::getRanked(const QString& userId, int limit) {
             e.photoPath = query.value("photo_path").toString();
             e.rating.average = query.value("avg_rating").toDouble(); // The sorted rating
 
+            /**
+             * @brief Function implementation.
+             */
             QSqlQuery galQuery(db);
             galQuery.prepare(R"(
                 SELECT ep.photo_path, ep.user_id, u.full_name
