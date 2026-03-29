@@ -1,324 +1,60 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CakePlanner | index</title>
-
-    <meta name="description" content="Cake Planner - The sweetest way to organize your cake events within your team."/>
-    <meta name="keywords" content="Cake Planner, sweet team events, cake events, team events, cake planning, team planning, cake management, ZHENG Robert, Robert Zheng, ZHENG Bote, 郑 伯特"/>
-    <meta name="author" content="Zheng Robert" />
-
-    <meta name="color-scheme" content="light dark" />
-    <meta name="robots" content="index, follow" />
-    <meta name="googlebot" content="index, follow" />
-
-
-
-    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
-    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
-
-     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
+<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>CakePlanner | index</title><meta name="description" content="Cake Planner - The sweetest way to organize your cake events within your team."/><meta name="keywords" content="Cake Planner, sweet team events, cake events, team events, cake planning, team planning, cake management, ZHENG Robert, Robert Zheng, ZHENG Bote, 郑 伯特"/><meta name="author" content="Zheng Robert" /><meta name="color-scheme" content="light dark" /><meta name="robots" content="index, follow" /><meta name="googlebot" content="index, follow" /><link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" /><link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" /><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500&display=swap"
       rel="stylesheet"
-    />
-        <link rel="preload" href="assets/css/main.css" as="style" />
-    <link rel="stylesheet" href="assets/css/main.css" />
-
-     <meta property="og:type" content="website" />
-    <meta
+    /><link rel="preload" href="assets/css/main.css" as="style" /><link rel="stylesheet" href="assets/css/main.css" /><meta property="og:type" content="website" /><meta
       property="og:title"
       content="Cake Planner - The sweetest way to organize your cake events."
-    />
-    <meta
+    /><meta
       property="og:description"
       content="Cake Planner - The sweetest way to organize your cake events within your team."
-    />
-    <meta property="og:site_name" content="Cake Planner" />
-    <meta property="og:url" content="" />
-    <meta property="og:image" content="assets/img/logo_256x256.png" />
-    <meta
+    /><meta property="og:site_name" content="Cake Planner" /><meta property="og:url" content="" /><meta property="og:image" content="assets/img/logo_256x256.png" /><meta
       property="og:image:alt"
       content="Cake Planner - The sweetest way to organize your cake events within your team."
-    />
-    <meta property="og:locale" content="en_EN" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta
+    /><meta property="og:locale" content="en_EN" /><meta name="twitter:card" content="summary_large_image" /><meta
       name="twitter:title"
       content="Cake Planner - The sweetest way to organize your cake events within your team."
-    />
-    <meta
+    /><meta
       name="twitter:description"
       content="Cake Planner - The sweetest way to organize your cake events within your team."
-    />
-  </head>
-  <body>
-    <header>
-      <div class="header_left">
-        <img src="assets/img/favicon.svg" alt="Logo" title="Home" loading="eager" />
-        <h1>Cake Planner</h1>
-      </div>
-      <div class="header_middle">
-        <span>Backend</span>
-      </div>
-      <div class="header_right">
-      <button id="share-btn" class="tron-btn icon-only" title="Share" style="display: none;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="18" cy="5" r="3"></circle>
-      <circle cx="6" cy="12" r="3"></circle>
-      <circle cx="18" cy="19" r="3"></circle>
-      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-    </svg>
-  </button>
-
-        <label class="theme-switch" for="checkbox" title="Switch Light/Dark Mode">
-          <input type="checkbox" id="checkbox" />
-          <div class="slider round">
-            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-          </div>
-        </label>
-      </div>
-    </header>
-
-    <aside class="aside">
-      <nav class="nav"><ul class="nav-list">
-  <li><strong>architecture</strong>
-<ul class="nav-list">
-  <li><a href="architecture/overview.html">overview</a></li>
-  <li><a href="architecture/workflows.html">workflows</a></li>
-  <li><strong>backend</strong>
-<ul class="nav-list">
-  <li><a href="architecture/backend/class_diagrams.html">class diagrams</a></li>
-  <li><a href="architecture/backend/crow_server.html">crow server</a></li>
-  <li><a href="architecture/backend/database.html">database</a></li>
-</ul>
-  </li>
-</ul>
-  </li>
-  <li><strong>deployment</strong>
-<ul class="nav-list">
-  <li><a href="deployment/CakePlanner_env.html">CakePlanner env</a></li>
-  <li><a href="deployment/Dockerfile_appimage.html">Dockerfile appimage</a></li>
-  <li><a href="deployment/Dockerfile_nginx.html">Dockerfile nginx</a></li>
-  <li><a href="deployment/deployment_guide.html">deployment guide</a></li>
-  <li><a href="deployment/docker_compose.yml.html">docker compose.yml</a></li>
-  <li><a href="deployment/nginx_configuration.html">nginx configuration</a></li>
-  <li><a href="deployment/overview.html">overview</a></li>
-</ul>
-  </li>
-  <li><strong>development</strong>
-<ul class="nav-list">
-  <li><a href="development/api.html">api</a></li>
-  <li><a href="development/build_process.html">build process</a></li>
-</ul>
-  </li>
-  <li><strong>security</strong>
-<ul class="nav-list">
-  <li><a href="security/backend_security.html">backend security</a></li>
-  <li><a href="security/overview.html">overview</a></li>
-</ul>
-  </li>
-</ul>
-</nav>
-    </aside>
-
-    <main class="main"><h1 id="cakeplanner">CakePlanner</h1>
-<p><strong>The sweetest way to organize your cake events.</strong></p>
-<p>Gone are the days of chaotic spreadsheets and asking “Who’s bringing
+    /></head><body><header><div class="header_left"><img src="assets/img/favicon.svg" alt="Logo" title="Home" loading="eager" /><h1>Cake Planner</h1></div><div class="header_middle"><span>Backend</span></div><div class="header_right"><button id="share-btn" class="tron-btn icon-only" title="Share" style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg></button><label class="theme-switch" for="checkbox" title="Switch Light/Dark Mode"><input type="checkbox" id="checkbox" /><div class="slider round"><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></div></label></div></header><aside class="aside"><nav class="nav"><ul class="nav-list"><li><strong>architecture</strong><ul class="nav-list"><li><a href="architecture/overview.html">overview</a></li><li><a href="architecture/workflows.html">workflows</a></li><li><strong>backend</strong><ul class="nav-list"><li><a href="architecture/backend/class_diagrams.html">class diagrams</a></li><li><a href="architecture/backend/crow_server.html">crow server</a></li><li><a href="architecture/backend/database.html">database</a></li></ul></li></ul></li><li><strong>deployment</strong><ul class="nav-list"><li><a href="deployment/CakePlanner_env.html">CakePlanner env</a></li><li><a href="deployment/Dockerfile_appimage.html">Dockerfile appimage</a></li><li><a href="deployment/Dockerfile_nginx.html">Dockerfile nginx</a></li><li><a href="deployment/deployment_guide.html">deployment guide</a></li><li><a href="deployment/docker_compose.yml.html">docker compose.yml</a></li><li><a href="deployment/nginx_configuration.html">nginx configuration</a></li><li><a href="deployment/overview.html">overview</a></li></ul></li><li><strong>development</strong><ul class="nav-list"><li><a href="development/api.html">api</a></li><li><a href="development/build_process.html">build process</a></li></ul></li><li><strong>security</strong><ul class="nav-list"><li><a href="security/backend_security.html">backend security</a></li><li><a href="security/overview.html">overview</a></li></ul></li><li><strong>source_docu</strong><ul class="nav-list"><li><a href="source_docu/README.html">README</a></li><li><strong>include</strong><ul class="nav-list"><li><a href="source_docu/include/database.hpp.html">database.hpp</a></li><li><a href="source_docu/include/rz_config.hpp.html">rz config.hpp</a></li><li><strong>controllers</strong><ul class="nav-list"><li><a href="source_docu/include/controllers/admin_controller.hpp.html">admin controller.hpp</a></li><li><a href="source_docu/include/controllers/auth_controller.hpp.html">auth controller.hpp</a></li><li><a href="source_docu/include/controllers/event_controller.hpp.html">event controller.hpp</a></li><li><a href="source_docu/include/controllers/system_controller.hpp.html">system controller.hpp</a></li><li><a href="source_docu/include/controllers/user_controller.hpp.html">user controller.hpp</a></li></ul></li><li><strong>middleware</strong><ul class="nav-list"><li><a href="source_docu/include/middleware/auth_middleware.hpp.html">auth middleware.hpp</a></li></ul></li><li><strong>models</strong><ul class="nav-list"><li><a href="source_docu/include/models/config_model.hpp.html">config model.hpp</a></li><li><a href="source_docu/include/models/event_model.hpp.html">event model.hpp</a></li><li><a href="source_docu/include/models/user_model.hpp.html">user model.hpp</a></li></ul></li><li><strong>services</strong><ul class="nav-list"><li><a href="source_docu/include/services/notification_service.hpp.html">notification service.hpp</a></li><li><a href="source_docu/include/services/smtp_service.hpp.html">smtp service.hpp</a></li></ul></li><li><strong>utils</strong><ul class="nav-list"><li><a href="source_docu/include/utils/app_helpers.hpp.html">app helpers.hpp</a></li><li><a href="source_docu/include/utils/env_loader.hpp.html">env loader.hpp</a></li><li><a href="source_docu/include/utils/image_processor.hpp.html">image processor.hpp</a></li><li><a href="source_docu/include/utils/password_utils.hpp.html">password utils.hpp</a></li><li><a href="source_docu/include/utils/seeder.hpp.html">seeder.hpp</a></li><li><a href="source_docu/include/utils/token_utils.hpp.html">token utils.hpp</a></li><li><a href="source_docu/include/utils/totp_utils.hpp.html">totp utils.hpp</a></li></ul></li></ul></li><li><strong>src</strong><ul class="nav-list"><li><a href="source_docu/src/database.cpp.html">database.cpp</a></li><li><a href="source_docu/src/main.cpp.html">main.cpp</a></li><li><strong>controllers</strong><ul class="nav-list"><li><a href="source_docu/src/controllers/admin_controller.cpp.html">admin controller.cpp</a></li><li><a href="source_docu/src/controllers/auth_controller.cpp.html">auth controller.cpp</a></li><li><a href="source_docu/src/controllers/event_controller.cpp.html">event controller.cpp</a></li><li><a href="source_docu/src/controllers/system_controller.cpp.html">system controller.cpp</a></li><li><a href="source_docu/src/controllers/user_controller.cpp.html">user controller.cpp</a></li></ul></li><li><strong>models</strong><ul class="nav-list"><li><a href="source_docu/src/models/config_model.cpp.html">config model.cpp</a></li><li><a href="source_docu/src/models/event_model.cpp.html">event model.cpp</a></li><li><a href="source_docu/src/models/user_model.cpp.html">user model.cpp</a></li></ul></li><li><strong>services</strong><ul class="nav-list"><li><a href="source_docu/src/services/notification_service.cpp.html">notification service.cpp</a></li><li><a href="source_docu/src/services/smtp_service.cpp.html">smtp service.cpp</a></li></ul></li><li><strong>utils</strong><ul class="nav-list"><li><a href="source_docu/src/utils/env_loader.cpp.html">env loader.cpp</a></li><li><a href="source_docu/src/utils/image_processor.cpp.html">image processor.cpp</a></li><li><a href="source_docu/src/utils/password_utils.cpp.html">password utils.cpp</a></li><li><a href="source_docu/src/utils/seeder.cpp.html">seeder.cpp</a></li><li><a href="source_docu/src/utils/token_utils.cpp.html">token utils.cpp</a></li><li><a href="source_docu/src/utils/totp_utils.cpp.html">totp utils.cpp</a></li></ul></li></ul></li></ul></li></ul></nav></aside><main class="main"><h1 id="cakeplanner">CakePlanner</h1><p><strong>The sweetest way to organize your cake events.</strong></p><p>Gone are the days of chaotic spreadsheets and asking “Who’s bringing
 the cake next Friday?” in the group chat. <strong>CakePlanner</strong>
 makes organizing baking events, office parties, or club gatherings easy,
-fun, and visually stunning.</p>
-
-<hr>
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<h2>Table of Contents</h2>
-<ul class="toc-level-2">
-<li><a href="#what-is-cakeplanner">🌟 What is CakePlanner?</a></li>
-<ul class="toc-level-3">
-<li><a href="#key-features">✨ Key Features</a></li>
-<li><a href="#how-it-works">🚀 How it works</a></li>
-</ul>
-<li><a href="#overview">🍰 Overview</a></li>
-<li><a href="#key-features-1">🚀 Key Features</a></li>
-<li><a href="#technology-stack">🛠️ Technology Stack</a></li>
-<li><a href="#getting-started">📦 Getting Started</a></li>
-</ul>
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-<hr>
-
-<h2 id="what-is-cakeplanner">🌟 What is CakePlanner?</h2>
-<p>CakePlanner is a simple app that helps groups coordinate who brings
+fun, and visually stunning.</p><hr><div class="toc"><h3>Table of Contents</h3><ul class="toc-level-2"><li><a href="#what-is-cakeplanner">🌟 What is CakePlanner?</a></li><ul class="toc-level-3"><li><a href="#key-features">✨ Key Features</a></li><li><a href="#how-it-works">🚀 How it works</a></li></ul><li><a href="#overview">🍰 Overview</a></li><li><a href="#key-features-1">🚀 Key Features</a></li><li><a href="#technology-stack">🛠️ Technology Stack</a></li><li><a href="#getting-started">📦 Getting Started</a></li></ul></div><hr><h2 id="what-is-cakeplanner">🌟 What is CakePlanner?</h2><p>CakePlanner is a simple app that helps groups coordinate who brings
 what and when. It adds a layer of fun by allowing everyone to rate the
-creations and share photos of the delicious results.</p>
-<h3 id="key-features">✨ Key Features</h3>
-<ul>
-<li><p><strong>📅 The Calendar</strong> See at a glance who is baking
+creations and share photos of the delicious results.</p><h3 id="key-features">✨ Key Features</h3><ul><li><p><strong>📅 The Calendar</strong> See at a glance who is baking
 next. Never miss a cake day again! You can even download appointments
-directly to your personal calendar (ICS).</p></li>
-<li><p><strong>🏆 Hall of Fame</strong> Who is the master baker in your
-group? The Hall of Fame showcases the best-rated cakes.</p>
-<ul class="ul-sub">
-<li><strong>Voting:</strong> Give 1 to 5 stars for every creation.</li>
-<li><strong>Rankings:</strong> See the top-rated cakes sorted by
-popularity.</li>
-</ul></li>
-<li><p><strong>📸 Photo Galleries</strong></p>
-<ul class="ul-sub">
-<li><strong>Baker’s Pride:</strong> The event creator can upload a cover
-photo.</li>
-<li><strong>Community Gallery:</strong> Did you take a picture of the
+directly to your personal calendar (ICS).</p></li><li><p><strong>🏆 Hall of Fame</strong> Who is the master baker in your
+group? The Hall of Fame showcases the best-rated cakes.</p><ul class="ul-sub"><li><strong>Voting:</strong> Give 1 to 5 stars for every creation.</li><li><strong>Rankings:</strong> See the top-rated cakes sorted by
+popularity.</li></ul></li><li><p><strong>📸 Photo Galleries</strong></p><ul class="ul-sub"><li><strong>Baker’s Pride:</strong> The event creator can upload a cover
+photo.</li><li><strong>Community Gallery:</strong> Did you take a picture of the
 cake before it was gone? Upload it! Everyone can contribute photos to an
-event.</li>
-<li><strong>Lightbox View:</strong> Click on any photo to see it in high
-quality with a beautiful blur effect.</li>
-</ul></li>
-<li><p><strong>📱 Mobile Friendly</strong> Whether on your laptop or
+event.</li><li><strong>Lightbox View:</strong> Click on any photo to see it in high
+quality with a beautiful blur effect.</li></ul></li><li><p><strong>📱 Mobile Friendly</strong> Whether on your laptop or
 your smartphone – CakePlanner looks great and works perfectly on the
-go.</p></li>
-<li><p><strong>🌍 Multi-Language</strong> Fully localized for
-<strong>English</strong> 🇬🇧 and <strong>German</strong> 🇩🇪.</p></li>
-</ul>
-
-<h3 id="how-it-works">🚀 How it works</h3>
-<ol type="1">
-<li><strong>Dashboard:</strong> Log in and see a friendly greeting and
-upcoming events.</li>
-<li><strong>Plan:</strong> Click on a date in the calendar to announce
-your cake. Add a description and a tasty preview photo.</li>
-<li><strong>Eat &amp; Rate:</strong> After the event, log in to rate the
-cake and upload your own photos (“Food Porn”) to the gallery.</li>
-<li><strong>Win:</strong> Check the <em>Hall of Fame</em> to see if your
-creation made it to the top!</li>
-</ol>
-<br>
-<p><strong>see also:</strong> <a
+go.</p></li><li><p><strong>🌍 Multi-Language</strong> Fully localized for
+<strong>English</strong> 🇬🇧 and <strong>German</strong> 🇩🇪.</p></li></ul><h3 id="how-it-works">🚀 How it works</h3><ol type="1"><li><strong>Dashboard:</strong> Log in and see a friendly greeting and
+upcoming events.</li><li><strong>Plan:</strong> Click on a date in the calendar to announce
+your cake. Add a description and a tasty preview photo.</li><li><strong>Eat &amp; Rate:</strong> After the event, log in to rate the
+cake and upload your own photos (“Food Porn”) to the gallery.</li><li><strong>Win:</strong> Check the <em>Hall of Fame</em> to see if your
+creation made it to the top!</li></ol><br><p><strong>see also:</strong><a
 href="https://zheng-bote.github.io/cake-planner-frontends/">CakePlanner
-Frontends</a></p>
-<hr />
-<br>
-<h1 id="cake-planner-backend">Cake Planner Backend</h1>
-<p>A high-performance C++ REST API backend for the Cake Planner
+Frontends</a></p><hr /><br><h1 id="cake-planner-backend">Cake Planner Backend</h1><p>A high-performance C++ REST API backend for the Cake Planner
 application, built with the <a href="https://crowcpp.org/">Crow</a>
-microframework and <a href="https://www.qt.io/">Qt6</a>.</p>
-<h2 id="overview">🍰 Overview</h2>
-<p>The <strong>Cake Planner Backend</strong> serves as the core
+microframework and <a href="https://www.qt.io/">Qt6</a>.</p><h2 id="overview">🍰 Overview</h2><p>The <strong>Cake Planner Backend</strong> serves as the core
 infrastructure for coordinating cake-baking events. It manages users,
 departments (groups), and schedules to ensure there is always cake in
-the office!</p>
-<p>The application is designed to be lightweight yet robust, leveraging
+the office!</p><p>The application is designed to be lightweight yet robust, leveraging
 C++23 for performance and Qt6 for reliable cross-platform core
-functionalities.</p>
-<h2 id="key-features-1">🚀 Key Features</h2>
-<ul>
-<li><strong>High Performance API</strong>: Asynchronous REST API powered
-by Crow.</li>
-<li><strong>Security First</strong>:
-<ul class="ul-sub">
-<li>Stateless Authentication using <strong>JWT</strong> (JSON Web
-Tokens).</li>
-<li>Secure Password Storage using <strong>Argon2id</strong>.</li>
-<li>Protection against SQL Injection via <strong>Qt SQL</strong>
-prepared statements.</li>
-</ul></li>
-<li><strong>Structured Data</strong>: Manages Users, Groups, Events,
-Ratings, and Photo Galleries.</li>
-<li><strong>Easy Deployment</strong>:
-<ul class="ul-sub">
-<li>Compiles into a single standalone <strong>AppImage</strong>.</li>
-<li>Docker-ready with <strong>Docker Compose</strong> support.</li>
-</ul></li>
-<li><strong>Integrated Services</strong>: SMTP Email Notifications
-(Welcome, Password Reset) and Internal Health Checks.</li>
-</ul>
-<br>
-<h2 id="technology-stack">🛠️ Technology Stack</h2>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Component</th>
-<th style="text-align: left;">Technology</th>
-<th style="text-align: left;">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><strong>Language</strong></td>
-<td style="text-align: left;">C++ 23</td>
-<td style="text-align: left;">Modern C++ features.</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Web Framework</strong></td>
-<td style="text-align: left;">Crow</td>
-<td style="text-align: left;">Fast, microframework for C++.</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong>Core Libs</strong></td>
-<td style="text-align: left;">Qt 6 (Core, Sql)</td>
-<td style="text-align: left;">Event loop, String manipulation,
-Database/SQL abstraction.</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Database</strong></td>
-<td style="text-align: left;">SQLite</td>
-<td style="text-align: left;">Serverless, self-contained SQL database
-engine.</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong>Logging</strong></td>
-<td style="text-align: left;">spdlog</td>
-<td style="text-align: left;">Fast C++ logging library.</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>JSON</strong></td>
-<td style="text-align: left;">nlohmann/json</td>
-<td style="text-align: left;">JSON serialization/deserialization.</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong>Security</strong></td>
-<td style="text-align: left;">Argon2id / OpenSSL</td>
-<td style="text-align: left;">Cryptography and hashing.</td>
-</tr>
-</tbody>
-</table>
-<br>
-<h2 id="getting-started">📦 Getting Started</h2>
-<ul>
-<li>For Setup, see the <a
-href="deployment/setup.html">Deployment</a>.</li>
-<li>For full build instructions, including AppImage creation, see the <a
-href="development/build_process.html">Development</a>.</li>
-<li>For the frontends, see the <a
-href="https://zheng-bote.github.io/cake-planner-frontends/" alt="CakePlanner Frontends" title="CakePlanner Frontends">CakePlanner Frontends</a> website.</li>
-</ul>
-<br>
-<hr>
-<br>
-<h1 id="license">📄 License</h1>
-<p>This project is licensed under the <strong>MIT License</strong>.</p>
-<br>
-<hr>
-<br>
-<p>Made with ❤️ and a lot of sugar. 🖖</p>
-
-</main>
-
-    <footer class="footer">
-      <div class="footer-section_left">v1.0.0</div>
-      <div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div>
-      <div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div>
-    </footer>
-
-    <script src="assets/js/main.js" defer></script>
-  </body>
-</html>
+functionalities.</p><h2 id="key-features-1">🚀 Key Features</h2><ul><li><strong>High Performance API</strong>: Asynchronous REST API powered
+by Crow.</li><li><strong>Security First</strong>:
+<ul class="ul-sub"><li>Stateless Authentication using <strong>JWT</strong> (JSON Web
+Tokens).</li><li>Secure Password Storage using <strong>Argon2id</strong>.</li><li>Protection against SQL Injection via <strong>Qt SQL</strong>
+prepared statements.</li></ul></li><li><strong>Structured Data</strong>: Manages Users, Groups, Events,
+Ratings, and Photo Galleries.</li><li><strong>Easy Deployment</strong>:
+<ul class="ul-sub"><li>Compiles into a single standalone <strong>AppImage</strong>.</li><li>Docker-ready with <strong>Docker Compose</strong> support.</li></ul></li><li><strong>Integrated Services</strong>: SMTP Email Notifications
+(Welcome, Password Reset) and Internal Health Checks.</li></ul><br><h2 id="technology-stack">🛠️ Technology Stack</h2><table><colgroup><col style="width: 33%" /><col style="width: 33%" /><col style="width: 33%" /></colgroup><thead><tr class="header"><th style="text-align: left;">Component</th><th style="text-align: left;">Technology</th><th style="text-align: left;">Description</th></tr></thead><tbody><tr class="odd"><td style="text-align: left;"><strong>Language</strong></td><td style="text-align: left;">C++ 23</td><td style="text-align: left;">Modern C++ features.</td></tr><tr class="even"><td style="text-align: left;"><strong>Web Framework</strong></td><td style="text-align: left;">Crow</td><td style="text-align: left;">Fast, microframework for C++.</td></tr><tr class="odd"><td style="text-align: left;"><strong>Core Libs</strong></td><td style="text-align: left;">Qt 6 (Core, Sql)</td><td style="text-align: left;">Event loop, String manipulation,
+Database/SQL abstraction.</td></tr><tr class="even"><td style="text-align: left;"><strong>Database</strong></td><td style="text-align: left;">SQLite</td><td style="text-align: left;">Serverless, self-contained SQL database
+engine.</td></tr><tr class="odd"><td style="text-align: left;"><strong>Logging</strong></td><td style="text-align: left;">spdlog</td><td style="text-align: left;">Fast C++ logging library.</td></tr><tr class="even"><td style="text-align: left;"><strong>JSON</strong></td><td style="text-align: left;">nlohmann/json</td><td style="text-align: left;">JSON serialization/deserialization.</td></tr><tr class="odd"><td style="text-align: left;"><strong>Security</strong></td><td style="text-align: left;">Argon2id / OpenSSL</td><td style="text-align: left;">Cryptography and hashing.</td></tr></tbody></table><br><h2 id="getting-started">📦 Getting Started</h2><ul><li>For Setup, see the <a
+href="deployment/setup.html">Deployment</a>.</li><li>For full build instructions, including AppImage creation, see the <a
+href="development/build_process.html">Development</a>.</li><li>For the frontends, see the <a
+href="https://zheng-bote.github.io/cake-planner-frontends/" alt="CakePlanner Frontends" title="CakePlanner Frontends">CakePlanner Frontends</a> website.</li></ul><br><hr><br><h1 id="license">📄 License</h1><p>This project is licensed under the <strong>MIT License</strong>.</p><br><hr><br><p>Made with ❤️ and a lot of sugar. 🖖</p></main><footer class="footer"><div class="footer-section_left">v1.0.0</div><div class="footer-section_center">&copy; 2026 ZHENG ROBERT</div><div class="footer-section_right"><a href="https://github.com/Zheng-Bote/cake-planner-backend" alt="GitHub" title="GitHub">&lt;/&gt;</a></div></footer><script src="assets/js/main.js" defer></script></body></html>
