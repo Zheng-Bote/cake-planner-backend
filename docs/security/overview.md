@@ -8,12 +8,11 @@ This document outlines the security measures implemented in the application to e
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Security Overview](#security-overview)
-  - [Network Security](#network-security)
-  - [Web Server Security](#web-server-security)
-  - [Authentication \& Data Protection](#authentication--data-protection)
-  - [Data Protection](#data-protection)
-  - [Email Security](#email-security)
+- [Network Security](#network-security)
+- [Web Server Security](#web-server-security)
+- [Authentication & Data Protection](#authentication--data-protection)
+- [Data Protection](#data-protection)
+- [Email Security](#email-security)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

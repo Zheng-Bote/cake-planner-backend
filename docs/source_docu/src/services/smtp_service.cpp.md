@@ -17,6 +17,16 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace rz `](#namespace-rz-)
+  - [`namespace service `](#namespace-service-)
+  - [`SmtpService::SmtpService(const model::ConfigModel& config, QObject* parent)`](#smtpservicesmtpserviceconst-modelconfigmodel-config-qobject-parent)
+  - [`void SmtpService::sendEmailAsync(const QString& to, const QString& subject, const QString& body,`](#void-smtpservicesendemailasyncconst-qstring-to-const-qstring-subject-const-qstring-body)
+  - [`void SmtpService::doSendEmail(const QString& to, const QString& subject, const QString& body,`](#void-smtpservicedosendemailconst-qstring-to-const-qstring-subject-const-qstring-body)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

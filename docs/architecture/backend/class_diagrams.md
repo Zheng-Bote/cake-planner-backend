@@ -8,15 +8,14 @@ The Backend is built using modern C++23 and the Crow framework. It follows a lay
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Backend Class Design](#backend-class-design)
-  - [Description](#description)
-  - [Class Diagrams](#class-diagrams)
-  - [Component Details](#component-details)
-    - [Controllers](#controllers)
-    - [Models](#models)
-    - [Services](#services)
-    - [Middleware](#middleware)
-    - [Utilities \& Core](#utilities--core)
+- [Description](#description)
+- [Class Diagrams](#class-diagrams)
+- [Component Details](#component-details)
+  - [Controllers](#controllers)
+  - [Models](#models)
+  - [Services](#services)
+  - [Middleware](#middleware)
+  - [Utilities & Core](#utilities--core)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

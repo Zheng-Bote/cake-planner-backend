@@ -8,15 +8,14 @@ This guide explains how to build the Cake Planner Backend from source and how to
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Build Process \& Development Guide](#build-process--development-guide)
-  - [Prerequisites](#prerequisites)
-    - [System Requirements](#system-requirements)
-    - [Installing Dependencies (Ubuntu/Debian)](#installing-dependencies-ubuntudebian)
-  - [Building from Source](#building-from-source)
-  - [creating an AppImage](#creating-an-appimage)
-    - [Script: `create_appimage.sh`](#script-create_appimagesh)
-    - [Usage](#usage)
-    - [Result](#result)
+- [Prerequisites](#prerequisites)
+  - [System Requirements](#system-requirements)
+  - [Installing Dependencies (Ubuntu/Debian)](#installing-dependencies-ubuntudebian)
+- [Building from Source](#building-from-source)
+- [creating an AppImage](#creating-an-appimage)
+  - [Script: `create_appimage.sh`](#script-create_appimagesh)
+  - [Usage](#usage)
+  - [Result](#result)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

@@ -17,6 +17,17 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace rz `](#namespace-rz-)
+  - [`namespace utils `](#namespace-utils-)
+  - [`class PasswordUtils `](#class-passwordutils-)
+  - [`static QString hashPassword(const QString &plainText)`](#static-qstring-hashpasswordconst-qstring-plaintext)
+  - [`static bool verifyPassword(const QString &plainText,`](#static-bool-verifypasswordconst-qstring-plaintext)
+  - [`static QString generateRandomPassword(int length = 12)`](#static-qstring-generaterandompasswordint-length--12)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

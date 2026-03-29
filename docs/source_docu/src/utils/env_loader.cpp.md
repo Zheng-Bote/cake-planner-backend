@@ -17,6 +17,19 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace rz `](#namespace-rz-)
+  - [`namespace utils `](#namespace-utils-)
+  - [`void EnvLoader::load(const std::string &filenameStd) `](#void-envloaderloadconst-stdstring-filenamestd-)
+  - [`QFile file(foundPath)`](#qfile-filefoundpath)
+  - [`QTextStream in(&file)`](#qtextstream-infile)
+  - [`QString EnvLoader::get(const std::string &keyStd, const std::string &defaultValueStd) `](#qstring-envloadergetconst-stdstring-keystd-const-stdstring-defaultvaluestd-)
+  - [`std::string EnvLoader::getString(const std::string &keyStd, const std::string &defaultValueStd) `](#stdstring-envloadergetstringconst-stdstring-keystd-const-stdstring-defaultvaluestd-)
+  - [`int EnvLoader::getInt(const std::string &keyStd, int defaultValue) `](#int-envloadergetintconst-stdstring-keystd-int-defaultvalue-)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

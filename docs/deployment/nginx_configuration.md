@@ -2,13 +2,11 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
-- [NGINX Configuration](#nginx-configuration)
-  - [nginx.conf Example](#nginxconf-example)
-  - [cake-planner.conf Example](#cake-plannerconf-example)
-  - [check configuration](#check-configuration)
+- [nginx.conf Example](#nginxconf-example)
+- [cake-planner.conf Example](#cake-plannerconf-example)
+- [check configuration](#check-configuration)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

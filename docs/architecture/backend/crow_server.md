@@ -8,17 +8,16 @@ This document describes the architecture of the Cake Planner Backend, which is b
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Crow Server Architecture](#crow-server-architecture)
-  - [Overview](#overview)
-  - [High-Level Architecture](#high-level-architecture)
-  - [Key Components](#key-components)
-    - [1. Entry Point (src/main.cpp)](#1-entry-point-srcmaincpp)
-    - [2. Middleware](#2-middleware)
-    - [3. Controllers](#3-controllers)
-    - [4. Database Integration](#4-database-integration)
-  - [Request Flow](#request-flow)
-  - [Configuration](#configuration)
-  - [Signal Handling \& Shutdown](#signal-handling--shutdown)
+- [Overview](#overview)
+- [High-Level Architecture](#high-level-architecture)
+- [Key Components](#key-components)
+  - [1. Entry Point (src/main.cpp)](#1-entry-point-srcmaincpp)
+  - [2. Middleware](#2-middleware)
+  - [3. Controllers](#3-controllers)
+  - [4. Database Integration](#4-database-integration)
+- [Request Flow](#request-flow)
+- [Configuration](#configuration)
+- [Signal Handling & Shutdown](#signal-handling--shutdown)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
