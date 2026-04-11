@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.24)
 # killall CakePlanner
 
 project(CakePlanner
-    VERSION 1.1.0
+    VERSION 1.2.0
     DESCRIPTION "Cake Planner Backend"
     HOMEPAGE_URL "https://zheng-bote.github.io/cake-planner-backend"
     LANGUAGES C CXX)
@@ -22,7 +22,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Sql Gui)
+find_package(Qt6 REQUIRED COMPONENTS Core Sql Gui Network)
 find_package(OpenSSL REQUIRED)
 find_package(Threads REQUIRED)
 
@@ -178,6 +178,7 @@ target_link_libraries(CakePlanner PRIVATE
     Qt6::Core
     Qt6::Sql
     Qt6::Gui
+    Qt6::Network
     SimpleMail3Qt6
     argon2_lib
     OpenSSL::SSL

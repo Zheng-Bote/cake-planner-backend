@@ -7,8 +7,8 @@
  *
  * @file notification_service.hpp
  * @brief Notification Service
- * @version 0.15.0
- * @date 2026-01-24
+ * @version 1.2.0
+ * @date 2026-04-11
  *
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
@@ -68,11 +68,28 @@ public:
      */
     void notifyForgotPassword(const QString& email, const QString& name, const QString& tempPassword, const QString& lang);
 
+    /**
+     * @brief Sends an email to all members of a group with automatic translation.
+     *
+     * @param groupId The ID of the group.
+     * @param text The message to send.
+     */
+    void sendGroupEmail(const QString& groupId, const QString& text);
+
 private:
     SmtpService* m_smtp;
 
     // Helper method to fetch all global admins from DB
     std::vector<QString> getGlobalAdminEmails();
+
+    /**
+     * @brief Translates text using the external translation API.
+     *
+     * @param text The text to translate.
+     * @param targetLang The target language code (e.g., "de", "en").
+     * @return The translated text.
+     */
+    QString translateText(const QString& text, const QString& targetLang);
 };
 
 } // namespace service

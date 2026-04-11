@@ -7,8 +7,8 @@
  *
  * @file notification_service.cpp
  * @brief Notification Service Implementation
- * @version 0.15.0
- * @date 2026-01-24
+ * @version 1.2.0
+ * @date 2026-04-11
  *
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
@@ -18,9 +18,17 @@
 
 #include "services/notification_service.hpp"
 #include "database.hpp"
+#include "models/user_model.hpp"
 #include <QSqlQuery>
 #include <QVariant>
 #include <QDebug>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QEventLoop>
+#include "spdlog/spdlog.h"
 
 /**
  * @brief rz namespace.
@@ -38,6 +46,82 @@ namespace service {
  */
 NotificationService::NotificationService(SmtpService* smtp)
     : m_smtp(smtp) {}
+
+/**
+ * @brief Sends an email to all members of a group with automatic translation.
+ *
+ * This method fetches all active users in the specified group, groups them by their
+ * preferred email language, and sends a translated version of the message to each language group.
+ *
+ * @param groupId The ID of the group.
+ * @param text The original message to translate and send.
+ */
+void NotificationService::sendGroupEmail(const QString& groupId, const QString& text) {
+    auto users = User::getAll(groupId);
+    if (users.empty()) {
+        spdlog::warn("sendGroupEmail: No users found for group {}", groupId.toStdString());
+        return;
+    }
+
+    // Group users by email language
+    std::map<QString, std::vector<QString>> languageGroups;
+    for (const auto& user : users) {
+        if (user.is_active) {
+            languageGroups[user.emailLanguage].push_back(user.email);
+        }
+    }
+
+    // Process each language
+    for (auto const& [lang, emails] : languageGroups) {
+        QString translated = translateText(text, lang);
+        QString subject = (lang == "de") ? "Nachricht vom Administrator" : "Message from Administrator";
+
+        for (const auto& email : emails) {
+            m_smtp->sendEmailAsync(email, subject, translated);
+        }
+    }
+}
+
+/**
+ * @brief Translates text using an external translation API.
+ *
+ * Sends a POST request to a local translation service and parses the JSON response.
+ *
+ * @param text The text to translate.
+ * @param targetLang The target language code (e.g., "de", "en").
+ * @return The translated text, or the original text if translation fails.
+ */
+QString NotificationService::translateText(const QString& text, const QString& targetLang) {
+    QNetworkAccessManager manager;
+    QNetworkRequest request(QUrl("http://localhost:18080/api/v1/prompt"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject body;
+    QString prompt = QString("translate to %1: %2").arg(targetLang, text);
+    body["prompt"] = prompt;
+
+    QJsonDocument doc(body);
+    QNetworkReply* reply = manager.post(request, doc.toJson());
+
+    // Use a local event loop to wait for the reply (synchronous feel for the backend thread)
+    QEventLoop loop;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() == QNetworkReply::NoError) {
+        QJsonDocument responseDoc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject responseObj = responseDoc.object();
+        if (responseObj.contains("response") && responseObj["status"].toString() == "success") {
+            QString translated = responseObj["response"].toString();
+            reply->deleteLater();
+            return translated;
+        }
+    }
+
+    spdlog::error("Translation failed for lang {}: {}", targetLang.toStdString(), reply->errorString().toStdString());
+    reply->deleteLater();
+    return text; // Fallback to original text
+}
 
 /**
  * @brief Retrieves the email addresses of all global administrators.

@@ -51,6 +51,7 @@ The application is designed to be lightweight yet robust, leveraging C++23 for p
     -   Compiles into a single standalone **AppImage**.
     -   Docker-ready with **Docker Compose** support.
 -   **Integrated Services**: SMTP Email Notifications (Welcome, Password Reset) and Internal Health Checks.
+-   **AI-Powered Group Email**: Administrators can send group-wide messages with **automatic translation** into each recipient's preferred language, powered by an integrated LLM/Translation API.
 
 ## 🛠️ Technology Stack
 

@@ -7,8 +7,8 @@
  *
  * @file admin_controller.cpp
  * @brief Admin Controller Implementation with Group Management
- * @version 0.15.0
- * @date 2026-01-24
+ * @version 1.2.0
+ * @date 2026-04-11
  *
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
@@ -230,6 +230,41 @@ void AdminController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
         }
 
         return crow::response(500, "Database error");
+      });
+
+  // --- POST /api/admin/group-email ---
+  CROW_ROUTE(app, "/api/admin/group-email")
+      .methods(crow::HTTPMethod::POST)([&, notifyService](const crow::request &req) {
+        const auto &ctx = app.get_context<rz::middleware::AuthMiddleware>(req);
+
+        // Security check: Only global admins OR group admins
+        bool isAuthorized = false;
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("groupId") || !json.has("text")) {
+            return crow::response(400, "Missing groupId or text in payload");
+        }
+
+        QString groupId = QString::fromStdString(json["groupId"].s());
+
+        if (ctx.currentUser.isAdmin) {
+            isAuthorized = true;
+        } else {
+            auto info = User::getGroupAndRole(ctx.currentUser.userId);
+            if (info.first == groupId && info.second == "admin") {
+                isAuthorized = true;
+            }
+        }
+
+        if (!isAuthorized) return crow::response(403);
+
+        if (!notifyService) return crow::response(500, "Notification service unavailable");
+
+        QString text = QString::fromStdString(json["text"].s());
+        
+        // Call the service (which handles translation and sending)
+        notifyService->sendGroupEmail(groupId, text);
+
+        return crow::response(200, crow::json::wvalue({{"message", "Emails are being sent"}}));
       });
 }
 
