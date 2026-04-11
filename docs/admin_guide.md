@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Administrator Guide - Group Emails](#administrator-guide---group-emails)
+  - [Features](#features)
+  - [API Endpoint](#api-endpoint)
+    - [Send Group Email](#send-group-email)
+  - [Technical Details](#technical-details)
+  - [Usage Example (curl)](#usage-example-curl)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Administrator Guide - Group Emails
 
 This document describes how administrators can send group-wide emails with automatic translation.
