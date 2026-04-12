@@ -17,6 +17,21 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace rz `](#namespace-rz-)
+  - [`namespace service `](#namespace-service-)
+  - [`class NotificationService `](#class-notificationservice-)
+  - [`explicit NotificationService(SmtpService* smtp)`](#explicit-notificationservicesmtpservice-smtp)
+  - [`void notifyAccountDeactivated(const QString& email, const QString& name, const QString& lang)`](#void-notifyaccountdeactivatedconst-qstring-email-const-qstring-name-const-qstring-lang)
+  - [`void notifyAccountDeleted(const QString& email, const QString& name, const QString& lang)`](#void-notifyaccountdeletedconst-qstring-email-const-qstring-name-const-qstring-lang)
+  - [`void notifyPasswordChanged(const QString& email, const QString& name, const QString& lang)`](#void-notifypasswordchangedconst-qstring-email-const-qstring-name-const-qstring-lang)
+  - [`void notifyForgotPassword(const QString& email, const QString& name, const QString& tempPassword, const QString& lang)`](#void-notifyforgotpasswordconst-qstring-email-const-qstring-name-const-qstring-temppassword-const-qstring-lang)
+  - [`void sendGroupEmail(const QString& groupId, const QString& text)`](#void-sendgroupemailconst-qstring-groupid-const-qstring-text)
+  - [`QString translateText(const QString& text, const QString& targetLang)`](#qstring-translatetextconst-qstring-text-const-qstring-targetlang)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

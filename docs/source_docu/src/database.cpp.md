@@ -17,6 +17,22 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`DatabaseManager &DatabaseManager::instance() `](#databasemanager-databasemanagerinstance-)
+  - [`void DatabaseManager::initialize(const QString &path) `](#void-databasemanagerinitializeconst-qstring-path-)
+  - [`QSqlDatabase DatabaseManager::getDatabase() `](#qsqldatabase-databasemanagergetdatabase-)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb)
+  - [`DatabaseManager::~DatabaseManager() `](#databasemanagerdatabasemanager-)
+  - [`bool DatabaseManager::migrate() `](#bool-databasemanagermigrate-)
+  - [`CREATE INDEX IF NOT EXISTS idx_ratings_event_id ON ratings(event_id)`](#create-index-if-not-exists-idx_ratings_event_id-on-ratingsevent_id)
+  - [`CREATE INDEX IF NOT EXISTS idx_event_photos_event_id ON event_photos(event_id)`](#create-index-if-not-exists-idx_event_photos_event_id-on-event_photosevent_id)
+  - [`CREATE INDEX IF NOT EXISTS idx_events_group_date ON events(group_id, event_date)`](#create-index-if-not-exists-idx_events_group_date-on-eventsgroup_id-event_date)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb-1)
+  - [`QSqlQuery checkQ(db)`](#qsqlquery-checkqdb)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

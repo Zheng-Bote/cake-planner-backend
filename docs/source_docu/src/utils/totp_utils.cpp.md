@@ -17,6 +17,19 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace utils `](#namespace-utils-)
+  - [`QString TotpUtils::generateSecret() `](#qstring-totputilsgeneratesecret-)
+  - [`std::uniform_int_distribution<int> dist(0, 31)`](#stduniform_int_distributionint-dist0-31)
+  - [`QString TotpUtils::getProvisioningUri(const QString &userEmail,`](#qstring-totputilsgetprovisioninguriconst-qstring-useremail)
+  - [`int64_t TotpUtils::getCurrentTimeStep() `](#int64_t-totputilsgetcurrenttimestep-)
+  - [`std::vector<uint8_t> TotpUtils::base32Decode(const QString &secret) `](#stdvectoruint8_t-totputilsbase32decodeconst-qstring-secret-)
+  - [`QString TotpUtils::generateCodeForStep(const std::vector<uint8_t> &keyBytes,`](#qstring-totputilsgeneratecodeforstepconst-stdvectoruint8_t-keybytes)
+  - [`bool TotpUtils::validateCode(const QString &secret, const QString &code) `](#bool-totputilsvalidatecodeconst-qstring-secret-const-qstring-code-)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

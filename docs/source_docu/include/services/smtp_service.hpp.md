@@ -17,6 +17,16 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace rz `](#namespace-rz-)
+  - [`namespace service `](#namespace-service-)
+  - [`struct EmailTask `](#struct-emailtask-)
+  - [`class SmtpService : public QObject `](#class-smtpservice--public-qobject-)
+  - [`explicit SmtpService(const model::ConfigModel& config, QObject* parent = nullptr)`](#explicit-smtpserviceconst-modelconfigmodel-config-qobject-parent--nullptr)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

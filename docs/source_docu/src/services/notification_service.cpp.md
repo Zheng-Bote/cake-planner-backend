@@ -17,6 +17,25 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace rz `](#namespace-rz-)
+  - [`namespace service `](#namespace-service-)
+  - [`NotificationService::NotificationService(SmtpService* smtp)`](#notificationservicenotificationservicesmtpservice-smtp)
+  - [`void NotificationService::sendGroupEmail(const QString& groupId, const QString& text) `](#void-notificationservicesendgroupemailconst-qstring-groupid-const-qstring-text-)
+  - [`QString NotificationService::translateText(const QString& text, const QString& targetLang) `](#qstring-notificationservicetranslatetextconst-qstring-text-const-qstring-targetlang-)
+  - [`std::vector<QString> NotificationService::getGlobalAdminEmails() `](#stdvectorqstring-notificationservicegetglobaladminemails-)
+  - [`QSqlQuery query(db)`](#qsqlquery-querydb)
+  - [`void NotificationService::notifyAdminsNewUser(const QString& newUserName, const QString& newUserEmail) `](#void-notificationservicenotifyadminsnewuserconst-qstring-newusername-const-qstring-newuseremail-)
+  - [`void NotificationService::notifyGroupNewEvent(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn, const QByteArray& icsData) `](#void-notificationservicenotifygroupneweventconst-qstring-groupname-const-qstring-bakername-const-qstring-date-const-stdvectorqstring-recipientsde-const-stdvectorqstring-recipientsen-const-qbytearray-icsdata-)
+  - [`void NotificationService::notifyAccountActivated(const QString& email, const QString& name, const QString& lang) `](#void-notificationservicenotifyaccountactivatedconst-qstring-email-const-qstring-name-const-qstring-lang-)
+  - [`void NotificationService::notifyAccountDeactivated(const QString& email, const QString& name, const QString& lang) `](#void-notificationservicenotifyaccountdeactivatedconst-qstring-email-const-qstring-name-const-qstring-lang-)
+  - [`void NotificationService::notifyAccountDeleted(const QString& email, const QString& name, const QString& lang) `](#void-notificationservicenotifyaccountdeletedconst-qstring-email-const-qstring-name-const-qstring-lang-)
+  - [`void NotificationService::notifyPasswordChanged(const QString& email, const QString& name, const QString& lang) `](#void-notificationservicenotifypasswordchangedconst-qstring-email-const-qstring-name-const-qstring-lang-)
+  - [`void NotificationService::notifyForgotPassword(const QString& email, const QString& name, const QString& tempPassword, const QString& lang) `](#void-notificationservicenotifyforgotpasswordconst-qstring-email-const-qstring-name-const-qstring-temppassword-const-qstring-lang-)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

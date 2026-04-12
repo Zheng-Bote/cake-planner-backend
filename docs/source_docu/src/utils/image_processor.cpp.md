@@ -17,6 +17,16 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`void ImageProcessor::generateWebPVersions(const QString& sourcePath) `](#void-imageprocessorgeneratewebpversionsconst-qstring-sourcepath-)
+  - [`QImage img(sourcePath)`](#qimage-imgsourcepath)
+  - [`QFileInfo fileInfo(sourcePath)`](#qfileinfo-fileinfosourcepath)
+  - [`void ImageProcessor::deleteAllVersions(const QString& sourcePath) `](#void-imageprocessordeleteallversionsconst-qstring-sourcepath-)
+  - [`QFileInfo fileInfo(sourcePath)`](#qfileinfo-fileinfosourcepath-1)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

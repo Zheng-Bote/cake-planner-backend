@@ -17,6 +17,18 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [API Documentation](#api-documentation)
+  - [`namespace utils `](#namespace-utils-)
+  - [`QString PasswordUtils::hashPassword(const QString &plainText) `](#qstring-passwordutilshashpasswordconst-qstring-plaintext-)
+  - [`std::uniform_int_distribution<uint8_t> dist(0, 255)`](#stduniform_int_distributionuint8_t-dist0-255)
+  - [`std::vector<char> encoded(encodedLen)`](#stdvectorchar-encodedencodedlen)
+  - [`bool PasswordUtils::verifyPassword(const QString &plainText,`](#bool-passwordutilsverifypasswordconst-qstring-plaintext)
+  - [`QString PasswordUtils::generateRandomPassword(int length) `](#qstring-passwordutilsgeneraterandompasswordint-length-)
+  - [`std::uniform_int_distribution<size_t> distribution(0, max_index - 1)`](#stduniform_int_distributionsize_t-distribution0-max_index---1)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

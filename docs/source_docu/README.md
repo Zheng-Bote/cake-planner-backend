@@ -3,6 +3,21 @@
 This directory contains the automatically generated documentation for the project.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [include Files](#include-files)
+- [include/controllers Files](#includecontrollers-files)
+- [include/middleware Files](#includemiddleware-files)
+- [include/models Files](#includemodels-files)
+- [include/services Files](#includeservices-files)
+- [include/utils Files](#includeutils-files)
+- [src Files](#src-files)
+- [src/controllers Files](#srccontrollers-files)
+- [src/models Files](#srcmodels-files)
+- [src/services Files](#srcservices-files)
+- [src/utils Files](#srcutils-files)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## [include Files](include/)
