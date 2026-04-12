@@ -8,14 +8,17 @@ APP_DIR="AppDir"
 EXECUTABLE_NAME="CakePlanner" # Wie heißt dein Binary in CMakeLists.txt?
 ICON_PATH="logo_256x256.png" # Kuchen-Icon
 
-# 1. Build Verzeichnis sauber machen und neu bauen
-echo "🍰 Baue das Projekt..."
+# 1. Build Verzeichnis sauber machen und neu bauen mit Conan
+echo "🍰 Baue das Projekt mit Conan..."
 if [ -d "$BUILD_DIR" ]; then rm -rf "$BUILD_DIR"; fi
-mkdir "$BUILD_DIR"
-cd "$BUILD_DIR"
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
-make -j$(nproc)
-cd ..
+
+# Conan Installation
+conan profile detect --force || true
+conan install . --output-folder="$BUILD_DIR" --build=missing -s build_type=Release
+
+# CMake Konfiguration und Build
+cmake -S . -B "$BUILD_DIR" -DCMAKE_TOOLCHAIN_FILE="$BUILD_DIR/conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build "$BUILD_DIR" -j$(nproc)
 
 # 2. AppDir Vorbereiten (Die Ordnerstruktur des AppImages)
 echo "📁 Erstelle AppDir Struktur..."

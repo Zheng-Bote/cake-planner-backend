@@ -30,23 +30,21 @@ The project requires a modern Linux environment with C++23 support.
 - **Linux**: (Ubuntu 24.04 recommended)
 - **CMake**: 3.23+
 - **Compiler**: GCC 13+ or Clang 16+ (Must support **C++23**).
-- **Build System**: CMake 3.24 or newer.
-- **Dependencies**:
-  - **Qt6**: Modules `Core`, `Sql`, `Gui`.
-  - **OpenSSL**: `libssl-dev`.
-  - **Git**, **Make**, **wget** (for fetching resources).
+- **Python 3**: To install and run Conan.
+- **Conan**: 2.0 or newer.
 
 ### Installing Dependencies (Ubuntu/Debian)
 
 ```bash
 sudo apt update
-sudo apt install build-essential cmake git
+sudo apt install build-essential cmake git python3-pip
 sudo apt install qt6-base-dev libqt6sql6-sqlite libssl-dev
+pip install conan --break-system-packages
 ```
 
 ## Building from Source
 
-The project uses CMake as its build system.
+The project uses CMake and **Conan 2** for dependency management.
 
 1. **Clone the Repository**:
 
@@ -55,31 +53,29 @@ The project uses CMake as its build system.
     cd cake-planner-backend
 ```
 
-2. **Create a Build Directory**:
+2. **Install Dependencies using Conan**:
 
 ```bash
-mkdir build
-cd build
+    chmod +x conan_install.sh
+    ./conan_install.sh
 ```
 
-1. **Configure the Project**:
+This will download and build all necessary libraries (Qt6, Crow, spdlog, etc.) for both Debug and Release configurations into the `build/` folder.
+
+1. **Configure and Build the Project**:
 
 ```bash
-cmake ..
-```
+# Configure using the Conan-generated toolchain
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
 
-*Note: Dependencies like Crow, spdlog, etc., are automatically fetched via CMake `FetchContent`.*
-
-3. **Compile**:
-
-```bash
-make -j$(nproc)
+# Compile
+cmake --build build -j$(nproc)
 ```
 
 4. **Run**:
 
 ```bash
-./CakePlanner
+./build/CakePlanner
 ```
 
 ## creating an AppImage

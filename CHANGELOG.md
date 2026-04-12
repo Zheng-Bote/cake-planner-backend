@@ -19,6 +19,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-04-12
+
+### Added
+- **User Preference**: Added `receive_event_emails` option in user settings, allowing users to opt-out of automated cake event notifications.
+- **AI Configuration**: The AI Translation API URL is now configurable via the `AI_TXT_API_URL` environment variable.
+- **Email Stability**: Introduced a connection queue in `SmtpService` to limit concurrent SMTP connections, preventing resource exhaustion during large group mail sends.
+- **Translation Protection**: Added a 10-second timeout for AI translation requests to prevent server hangs.
+- **Enhanced Logging**: Integrated comprehensive `spdlog` tracking for group mail dispatch and translation status.
+
+### Changed
+- **Database Schema**: Updated `users` table to include `receive_event_emails` column (Default: 1).
+- **API Endpoints**: 
+    - `POST /api/user/settings` now supports `receiveEventEmails`.
+    - `POST /api/register` now supports optional `receiveEventEmails`.
+- **Notification Logic**: Event notifications (creation and deletion) now respect the user's opt-out preference.
+- **JWT Implementation**: Updated `jwt-cpp` integration to version 0.7.1, now utilizing `nlohmann_json` traits. Moved to `FetchContent` to ensure compatibility with system OpenSSL.
+- **Refactoring**: Refactored `ConfigModel` to use the project's internal `EnvLoader`, allowing for the removal of the redundant `dotenv-cpp` library.
+
+## [1.3.0] - 2026-04-12
+
+### Added
+- **Package Management**: Migrated the build system to use **Conan 2** for managing external dependencies (Qt6, Crow, Asio, spdlog, etc.).
+- **Build Automation**: Added `conan_install.sh` to automate Conan profile detection and dependency installation.
+- **Docker Enhancement**: Updated `Dockerfile` to include Conan-based multi-stage building.
+
+### Changed
+- **Build System**: Significant cleanup of `CMakeLists.txt`, removing most `FetchContent` blocks in favor of Conan packages.
+- **Dependency Purge**: Removed unused `dotenv-cpp` library.
+
 ## [1.2.0] - 2026-04-11
 
 ### Added

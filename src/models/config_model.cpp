@@ -18,9 +18,8 @@
 
 // IMPORTANT: Include adapted to new filename (snake_case)
 #include "models/config_model.hpp"
-#include <dotenv.h>
+#include "utils/env_loader.hpp"
 #include <QDebug>
-#include <cstdlib>
 
 /**
  * @brief rz namespace.
@@ -39,36 +38,27 @@ ConfigModel::ConfigModel() = default;
 /**
  * @brief Load environment variables from a file.
  *
- * Uses dotenv-cpp to load the file. Falls back to system environment variables
+ * Uses EnvLoader to load the file. Falls back to system environment variables
  * if the file is missing or values are not found in the file.
  *
  * @param path The path to the .env file.
  */
 void ConfigModel::loadEnv(const std::string& path) {
-    try {
-        dotenv::init(path.c_str());
-    } catch (const std::exception& e) {
-        qWarning() << "Could not load .env file from" << QString::fromStdString(path)
-                   << ":" << e.what();
-        // Warning is sufficient, we try fallback to system env
-    }
+    // Note: EnvLoader::load is already called in main.cpp, 
+    // but we can call it again if path is different, 
+    // or just rely on EnvLoader::get which checks the environment.
+    rz::utils::EnvLoader::load(path);
 
-    // Helper lambda for clean env access with default values
-    auto getEnv = [](const char* key, const char* defaultVal = "") -> QString {
-        const char* val = std::getenv(key);
-        return val ? QString::fromUtf8(val) : QString::fromUtf8(defaultVal);
-    };
+    m_smtpServer = rz::utils::EnvLoader::get("SMTP_SERVER");
+    m_smtpPort = rz::utils::EnvLoader::getInt("SMTP_PORT", 587);
+    m_smtpUsername = rz::utils::EnvLoader::get("SMTP_USERNAME");
+    m_smtpPassword = rz::utils::EnvLoader::get("SMTP_PASSWORD");
+    m_smtpFrom = rz::utils::EnvLoader::get("SMTP_FROM");
 
-    m_smtpServer = getEnv("SMTP_SERVER");
-    m_smtpPort = getEnv("SMTP_PORT", "587").toInt();
-    m_smtpUsername = getEnv("SMTP_USERNAME");
-    m_smtpPassword = getEnv("SMTP_PASSWORD");
-    m_smtpFrom = getEnv("SMTP_FROM");
-
-    QString startTls = getEnv("SMTP_STARTTLS", "true");
+    QString startTls = rz::utils::EnvLoader::get("SMTP_STARTTLS", "true");
     m_smtpStartTls = (startTls.compare("true", Qt::CaseInsensitive) == 0);
 
-    m_watchDir = getEnv("WATCH_DIR", ".");
+    m_watchDir = rz::utils::EnvLoader::get("WATCH_DIR", ".");
 
     qInfo() << "Loaded Configuration for SMTP Server:" << m_smtpServer;
 }

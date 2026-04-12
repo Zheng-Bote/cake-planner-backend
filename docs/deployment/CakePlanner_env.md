@@ -32,4 +32,7 @@ SMTP_USER=your_email@example.com
 SMTP_PASS=your_password
 SMTP_FROM=noreply@example.com
 SMTP_STARTTLS=true
+
+# AI Translation API Configuration
+AI_TXT_API_URL=http://localhost:18080/api/v1/prompt
 ```

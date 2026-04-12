@@ -63,7 +63,9 @@ The application is designed to be lightweight yet robust, leveraging C++23 for p
 -   **Easy Deployment**:
     -   Compiles into a single standalone **AppImage**.
     -   Docker-ready with **Docker Compose** support.
--   **Integrated Services**: SMTP Email Notifications (Welcome, Password Reset) and Internal Health Checks.
+- **Integrated Services**: SMTP Email Notifications (Welcome, Password Reset), **AI-Powered Translation**, and Internal Health Checks.
+- **Privacy Controls**: Users can opt-out of automated event email notifications via their profile settings.
+
 
 ## 🛠️ Technology Stack
 

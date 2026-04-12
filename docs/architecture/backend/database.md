@@ -57,6 +57,7 @@ Stores user account information, including authentication details and preference
 | password_hash | TEXT | Argon2id password hash. |
 | language | TEXT | Preferred UI language (e.g., 'en', 'de'). |
 | email_language | TEXT | Preferred language for emails. |
+| receive_event_emails | INTEGER | 1 if user wants to receive event emails, 0 otherwise (Default 1). |
 | totp_secret | TEXT | Secret for 2FA (if enabled). |
 | is_active | INTEGER | 1 if active, 0 if inactive. |
 | is_admin | INTEGER | 1 if global admin, 0 otherwise. |

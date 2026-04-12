@@ -136,6 +136,9 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
         newUser.email = email;
         newUser.language = language;
         newUser.emailLanguage = languageEmail;
+        if (json.has("receiveEventEmails")) {
+            newUser.receive_event_emails = json["receiveEventEmails"].b();
+        }
         newUser.password_hash = rz::utils::PasswordUtils::hashPassword(plainPassword);
 
         if (newUser.password_hash.isEmpty()) return crow::response(500, "Hashing failed");
@@ -218,6 +221,13 @@ void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &a
             lang = json["language"].s();
             if (User::updateLanguage(ctx.currentUser.userId, QString::fromStdString(lang))) {
                 res["message"] = "Language changed";
+                return crow::response(200, res);
+            }
+        }
+        if(json.has("receiveEventEmails")) {
+            bool receive = json["receiveEventEmails"].b();
+            if (User::updateReceiveEventEmails(ctx.currentUser.userId, receive)) {
+                res["message"] = "Notification preferences updated";
                 return crow::response(200, res);
             }
         }

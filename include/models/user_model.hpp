@@ -33,6 +33,7 @@ struct User {
   QString password_hash;
   QString language = "en";
   QString emailLanguage = "en";
+  bool receive_event_emails = true;
   QString totp_secret;
   QString groupId;
   QString groupName;
@@ -111,6 +112,10 @@ struct User {
    * @brief Function implementation.
    */
   static bool updateEmailLanguage(const QString& userId, const QString& lang);
+  /**
+   * @brief Function implementation.
+   */
+  static bool updateReceiveEventEmails(const QString& userId, bool receive);
 
   // --- Group Management ---
   static std::vector<std::pair<QString, QString>> getAllGroups();

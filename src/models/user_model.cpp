@@ -66,6 +66,7 @@ crow::json::wvalue User::toJson() const {
   // FIX 1: Include language in JSON
   json["language"] = language.toStdString();
   json["emailLanguage"] = emailLanguage.toStdString();
+  json["receiveEventEmails"] = receive_event_emails;
 
   json["isAdmin"] = is_admin;
   json["isActive"] = is_active;
@@ -90,7 +91,7 @@ std::optional<User> User::getByEmail(const QString &email) {
    */
   QSqlQuery query(db);
   // FIX 2: Add email_language in SELECT
-  query.prepare("SELECT id, full_name, email, language, email_language, password_hash, is_active, "
+  query.prepare("SELECT id, full_name, email, language, email_language, receive_event_emails, password_hash, is_active, "
                 "is_admin, totp_secret, must_change_password, temp_password_hash, temp_password_expiry, last_login_at FROM users WHERE "
                 "email = :email");
   query.bindValue(":email", email);
@@ -106,6 +107,7 @@ std::optional<User> User::getByEmail(const QString &email) {
     if(u.language.isEmpty()) u.language = "en";
     u.emailLanguage = query.value("email_language").toString();
     if(u.emailLanguage.isEmpty()) u.emailLanguage = "en";
+    u.receive_event_emails = query.value("receive_event_emails").toBool();
 
     u.password_hash = query.value("password_hash").toString();
     u.is_active = query.value("is_active").toBool();
@@ -143,7 +145,7 @@ std::optional<User> User::getById(const QString &id) {
   QSqlQuery query(db);
   // FIX 3: Add email_language in SELECT
   query.prepare(
-      "SELECT id, full_name, email, language, email_language, password_hash, is_active, "
+      "SELECT id, full_name, email, language, email_language, receive_event_emails, password_hash, is_active, "
       "is_admin, totp_secret, must_change_password, temp_password_hash, temp_password_expiry, last_login_at FROM users WHERE id = :id");
   query.bindValue(":id", id);
 
@@ -158,6 +160,7 @@ std::optional<User> User::getById(const QString &id) {
     if(u.language.isEmpty()) u.language = "en";
     u.emailLanguage = query.value("email_language").toString();
     if(u.emailLanguage.isEmpty()) u.emailLanguage = "en";
+    u.receive_event_emails = query.value("receive_event_emails").toBool();
 
     u.password_hash = query.value("password_hash").toString();
     u.is_active = query.value("is_active").toBool();
@@ -197,7 +200,7 @@ std::vector<User> User::getAll(const QString &filterGroupId) {
   std::vector<User> users;
 
   QString sql = R"(
-        SELECT u.id, u.full_name, u.email, u.language, u.email_language, u.is_active, u.is_admin, u.must_change_password,
+        SELECT u.id, u.full_name, u.email, u.language, u.email_language, u.receive_event_emails, u.is_active, u.is_admin, u.must_change_password,
                gm.group_id, gm.role
         FROM users u
         LEFT JOIN group_members gm ON u.id = gm.user_id
@@ -227,6 +230,7 @@ std::vector<User> User::getAll(const QString &filterGroupId) {
       if (u.language.isEmpty()) u.language = "en";
       u.emailLanguage = query.value("email_language").toString();
       if (u.emailLanguage.isEmpty()) u.emailLanguage = "en";
+      u.receive_event_emails = query.value("receive_event_emails").toBool();
 
       u.groupId = query.value("group_id").toString();
       u.groupRole = query.value("role").toString();
@@ -277,8 +281,8 @@ bool User::create() {
   QSqlQuery query(db);
   // FIX 4: Save email_language
   query.prepare("INSERT INTO users (id, full_name, email, password_hash, "
-                "is_active, is_admin, email_language, language) "
-                "VALUES (:id, :name, :email, :pass, :active, :admin, :emaillang, :lang)");
+                "is_active, is_admin, email_language, receive_event_emails, language) "
+                "VALUES (:id, :name, :email, :pass, :active, :admin, :emaillang, :receiv_evt, :lang)");
   query.bindValue(":id", this->id);
   query.bindValue(":name", this->full_name);
   query.bindValue(":email", this->email);
@@ -288,6 +292,7 @@ bool User::create() {
 
   // Set default language on creation
   query.bindValue(":emaillang", this->emailLanguage.isEmpty() ? "en" : this->emailLanguage);
+  query.bindValue(":receiv_evt", this->receive_event_emails ? 1 : 0);
   query.bindValue(":lang", this->language.isEmpty() ? "en" : this->language);
 
   return query.exec();
@@ -594,6 +599,25 @@ bool User::updateEmailLanguage(const QString& userId, const QString& lang) {
     QSqlQuery query(db);
     query.prepare("UPDATE users SET email_language = :lang WHERE id = :id");
     query.bindValue(":lang", lang);
+    query.bindValue(":id", userId);
+    return query.exec();
+}
+
+/**
+ * @brief Updates whether the user wants to receive event emails.
+ *
+ * @param userId The ID of the user.
+ * @param receive True if the user wants to receive emails, false otherwise.
+ * @return True if successful, false otherwise.
+ */
+bool User::updateReceiveEventEmails(const QString& userId, bool receive) {
+    auto db = DatabaseManager::instance().getDatabase();
+    /**
+     * @brief Function implementation.
+     */
+    QSqlQuery query(db);
+    query.prepare("UPDATE users SET receive_event_emails = :receive WHERE id = :id");
+    query.bindValue(":receive", receive ? 1 : 0);
     query.bindValue(":id", userId);
     return query.exec();
 }

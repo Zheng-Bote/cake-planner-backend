@@ -261,6 +261,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
                 for (const auto& u : members) {
                     if (u.id == ctx.currentUser.userId) continue;
                     if (!u.is_active) continue;
+                    if (!u.receive_event_emails) continue;
                     if (u.emailLanguage == "de") de.push_back(u.email);
                     else en.push_back(u.email);
                 }
@@ -308,6 +309,7 @@ void EventController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &
                     // Do not notify the user who deletes (optional)
                     if (u.id == ctx.currentUser.userId) continue;
                     if (!u.is_active) continue;
+                    if (!u.receive_event_emails) continue;
 
                     if (u.emailLanguage == "de") de.push_back(u.email);
                     else en.push_back(u.email);

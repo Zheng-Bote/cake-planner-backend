@@ -7,8 +7,8 @@
  *
  * @file notification_service.cpp
  * @brief Notification Service Implementation
- * @version 1.2.0
- * @date 2026-04-11
+ * @version 1.4.0
+ * @date 2026-04-12
  *
  * @author ZHENG Robert (robert@hase-zheng.net)
  * @copyright Copyright (c) 2026 ZHENG Robert
@@ -19,6 +19,7 @@
 #include "services/notification_service.hpp"
 #include "database.hpp"
 #include "models/user_model.hpp"
+#include "utils/env_loader.hpp"
 #include <QSqlQuery>
 #include <QVariant>
 #include <QDebug>
@@ -28,6 +29,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QEventLoop>
+#include <QTimer>
 #include "spdlog/spdlog.h"
 
 /**
@@ -57,28 +59,57 @@ NotificationService::NotificationService(SmtpService* smtp)
  * @param text The original message to translate and send.
  */
 void NotificationService::sendGroupEmail(const QString& groupId, const QString& text) {
-    auto users = User::getAll(groupId);
-    if (users.empty()) {
-        spdlog::warn("sendGroupEmail: No users found for group {}", groupId.toStdString());
+    if (!m_smtp) {
+        spdlog::error("sendGroupEmail: SMTP service not initialized.");
         return;
     }
 
-    // Group users by email language
-    std::map<QString, std::vector<QString>> languageGroups;
-    for (const auto& user : users) {
-        if (user.is_active) {
-            languageGroups[user.emailLanguage].push_back(user.email);
+    try {
+        auto users = User::getAll(groupId);
+        if (users.empty()) {
+            spdlog::warn("sendGroupEmail: No users found for group {}", groupId.toStdString());
+            return;
         }
-    }
 
-    // Process each language
-    for (auto const& [lang, emails] : languageGroups) {
-        QString translated = translateText(text, lang);
-        QString subject = (lang == "de") ? "Nachricht vom Administrator" : "Message from Administrator";
-
-        for (const auto& email : emails) {
-            m_smtp->sendEmailAsync(email, subject, translated);
+        // Group users by email language
+        std::map<QString, std::vector<QString>> languageGroups;
+        int activeUserCount = 0;
+        for (const auto& user : users) {
+            if (user.is_active) {
+                languageGroups[user.emailLanguage].push_back(user.email);
+                activeUserCount++;
+            }
         }
+
+        spdlog::info("Starting group email for group {} with {} active users in {} language groups.", 
+                     groupId.toStdString(), activeUserCount, languageGroups.size());
+
+        // Process each language
+        for (auto const& [lang, emails] : languageGroups) {
+            spdlog::debug("Processing language group '{}' with {} recipients.", lang.toStdString(), emails.size());
+            
+            QString translated = translateText(text, lang);
+            
+            QString subject, terms;
+            if(lang.toLower() == "de") {
+                subject = "Nachricht vom Administrator";
+                terms = "\n\n-- Übersetzt von KI.\nWenn Sie keine eMails mehr erhalten möchten, loggen Sie sich bitte ein und ändern Sie Ihre Profil-Einstellungen.";
+            } else {
+                subject = "Message from Administrator";
+                terms = "\n\n-- Translated by AI.\nIf you do not want to receive emails anymore, please log in and change your profile settings.";
+            }
+
+            translated += terms;
+
+            for (const auto& email : emails) {
+                m_smtp->sendEmailAsync(email, subject, translated);
+            }
+        }
+        spdlog::info("Group email dispatch completed for group {}.", groupId.toStdString());
+    } catch (const std::exception& e) {
+        spdlog::error("Critical error in sendGroupEmail for group {}: {}", groupId.toStdString(), e.what());
+    } catch (...) {
+        spdlog::error("Unknown critical error in sendGroupEmail for group {}.", groupId.toStdString());
     }
 }
 
@@ -92,34 +123,57 @@ void NotificationService::sendGroupEmail(const QString& groupId, const QString& 
  * @return The translated text, or the original text if translation fails.
  */
 QString NotificationService::translateText(const QString& text, const QString& targetLang) {
-    QNetworkAccessManager manager;
-    QNetworkRequest request(QUrl("http://localhost:18080/api/v1/prompt"));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    try {
+        QNetworkAccessManager manager;
+        QString apiUrl = rz::utils::EnvLoader::get("AI_TXT_API_URL", "http://localhost:18080/api/v1/prompt");
+        QNetworkRequest request{QUrl(apiUrl)};
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QJsonObject body;
-    QString prompt = QString("translate to %1: %2").arg(targetLang, text);
-    body["prompt"] = prompt;
+        QJsonObject body;
+        QString prompt = QString("translate to %1: %2").arg(targetLang, text);
+        body["prompt"] = prompt;
 
-    QJsonDocument doc(body);
-    QNetworkReply* reply = manager.post(request, doc.toJson());
+        QJsonDocument doc(body);
+        QNetworkReply* reply = manager.post(request, doc.toJson());
 
-    // Use a local event loop to wait for the reply (synchronous feel for the backend thread)
-    QEventLoop loop;
-    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
+        // Use a local event loop to wait for the reply
+        QEventLoop loop;
+        QTimer timer;
+        timer.setSingleShot(true);
+        
+        QObject::connect(&timer, &QTimer::timeout, &loop, [&]() {
+            spdlog::warn("Translation API timeout (10s) for lang {}. Aborting request.", targetLang.toStdString());
+            reply->abort();
+            loop.quit();
+        });
+        
+        QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+        
+        timer.start(10000); // 10 seconds timeout
+        loop.exec();
 
-    if (reply->error() == QNetworkReply::NoError) {
-        QJsonDocument responseDoc = QJsonDocument::fromJson(reply->readAll());
-        QJsonObject responseObj = responseDoc.object();
-        if (responseObj.contains("response") && responseObj["status"].toString() == "success") {
-            QString translated = responseObj["response"].toString();
-            reply->deleteLater();
-            return translated;
+        if (reply->error() == QNetworkReply::NoError) {
+            QJsonDocument responseDoc = QJsonDocument::fromJson(reply->readAll());
+            if (!responseDoc.isNull()) {
+                QJsonObject responseObj = responseDoc.object();
+                if (responseObj.contains("response") && responseObj["status"].toString() == "success") {
+                    QString translated = responseObj["response"].toString();
+                    reply->deleteLater();
+                    return translated;
+                }
+            }
+            spdlog::warn("Translation API returned invalid format or status for lang {}.", targetLang.toStdString());
+        } else if (reply->error() != QNetworkReply::OperationCanceledError) {
+            spdlog::error("Translation failed for lang {}: {}", targetLang.toStdString(), reply->errorString().toStdString());
         }
-    }
 
-    spdlog::error("Translation failed for lang {}: {}", targetLang.toStdString(), reply->errorString().toStdString());
-    reply->deleteLater();
+        reply->deleteLater();
+    } catch (const std::exception& e) {
+        spdlog::error("Exception in translateText: {}", e.what());
+    } catch (...) {
+        spdlog::error("Unknown exception in translateText.");
+    }
+    
     return text; // Fallback to original text
 }
 
@@ -181,10 +235,15 @@ void NotificationService::notifyAdminsNewUser(const QString& newUserName, const 
 void NotificationService::notifyGroupNewEvent(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn, const QByteArray& icsData) {
     QString icsName = "cake_event.ics";
 
+    spdlog::info("Dispatching new event notification for group '{}'. Recipients DE: {}, EN: {}", 
+                 groupName.toStdString(), recipientsDe.size(), recipientsEn.size());
+
     // German
     if (!recipientsDe.empty()) {
         QString subject = QString("Neuer Kuchen in %1!").arg(groupName);
-        QString body = QString("Hallo,\n\n%1 bringt am %2 einen Kuchen mit!\n\nYummy!").arg(bakerName, date);
+        QString body = QString("Hallo,\n\n%1 bringt am %2 einen Kuchen mit!\n\nYummy!\n\n"
+                               "--\nWenn Sie keine eMails mehr erhalten möchten, loggen Sie sich bitte ein und ändern Sie Ihre Profil-Einstellungen.")
+                       .arg(bakerName, date);
         for (const auto& mail : recipientsDe) {
             if (!icsData.isEmpty()) m_smtp->sendEmailAsync(mail, subject, body, icsData, icsName);
             else m_smtp->sendEmailAsync(mail, subject, body);
@@ -194,7 +253,9 @@ void NotificationService::notifyGroupNewEvent(const QString& groupName, const QS
     // English
     if (!recipientsEn.empty()) {
         QString subject = QString("New Cake in %1!").arg(groupName);
-        QString body = QString("Hello,\n\n%1 is bringing a cake on %2!\n\nYummy!").arg(bakerName, date);
+        QString body = QString("Hello,\n\n%1 is bringing a cake on %2!\n\nYummy!\n\n"
+                               "--\nIf you do not want to receive emails anymore, please log in and change your profile settings.")
+                       .arg(bakerName, date);
         for (const auto& mail : recipientsEn) {
             if (!icsData.isEmpty()) m_smtp->sendEmailAsync(mail, subject, body, icsData, icsName);
             else m_smtp->sendEmailAsync(mail, subject, body);
@@ -205,17 +266,24 @@ void NotificationService::notifyGroupNewEvent(const QString& groupName, const QS
 void NotificationService::notifyGroupEventDeleted(const QString& groupName, const QString& bakerName, const QString& date,
                                                   const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn) {
 
+    spdlog::info("Dispatching cancellation notification for group '{}'. Recipients DE: {}, EN: {}", 
+                 groupName.toStdString(), recipientsDe.size(), recipientsEn.size());
+
     // German
     if (!recipientsDe.empty()) {
         QString subjectDe = QString("Kuchen-Absage: %1").arg(date);
-        QString bodyDe = QString("Hallo,\n\nleider wurde der Kuchen-Termin am %1 von %2 in der Gruppe '%3' abgesagt.\n\nViele Grüße,\nDein CakePlanner")
+        QString bodyDe = QString("Hallo,\n\nleider wurde der Kuchen-Termin am %1 von %2 in der Gruppe '%3' abgesagt.\n\n"
+                                 "--\nWenn Sie keine eMails mehr erhalten möchten, loggen Sie sich bitte ein und ändern Sie Ihre Profil-Einstellungen.\n\n"
+                                 "Viele Grüße,\nDein CakePlanner")
                          .arg(date, bakerName, groupName);
         for (const auto& mail : recipientsDe) m_smtp->sendEmailAsync(mail, subjectDe, bodyDe);
     }
     // English
     if (!recipientsEn.empty()) {
         QString subjectEn = QString("Cake Cancellation: %1").arg(date);
-        QString bodyEn = QString("Hello,\n\nunfortunately, the cake event on %1 by %2 in group '%3' has been cancelled.\n\nBest regards,\nYour CakePlanner")
+        QString bodyEn = QString("Hello,\n\nunfortunately, the cake event on %1 by %2 in group '%3' has been cancelled.\n\n"
+                                 "--\nIf you do not want to receive emails anymore, please log in and change your profile settings.\n\n"
+                                 "Best regards,\nYour CakePlanner")
                          .arg(date, bakerName, groupName);
         for (const auto& mail : recipientsEn) m_smtp->sendEmailAsync(mail, subjectEn, bodyEn);
     }

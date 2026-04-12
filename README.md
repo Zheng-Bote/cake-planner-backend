@@ -50,14 +50,17 @@ The application is designed to be lightweight yet robust, leveraging C++23 for p
 -   **Easy Deployment**:
     -   Compiles into a single standalone **AppImage**.
     -   Docker-ready with **Docker Compose** support.
--   **Integrated Services**: SMTP Email Notifications (Welcome, Password Reset) and Internal Health Checks.
--   **AI-Powered Group Email**: Administrators can send group-wide messages with **automatic translation** into each recipient's preferred language, powered by an integrated LLM/Translation API.
+- **Integrated Services**: SMTP Email Notifications (Welcome, Password Reset), **AI-Powered Translation**, and Internal Health Checks.
+- **Privacy Controls**: Users can opt-out of automated event email notifications via their profile settings.
+- **AI-Powered Group Email**: Administrators can send group-wide messages with **automatic translation** into each recipient's preferred language, powered by an integrated LLM/Translation API (configurable via `.env`).
+
 
 ## 🛠️ Technology Stack
 
 | Component | Technology | Description |
 | :--- | :--- | :--- |
 | **Language** | C++ 23 | Modern C++ features. |
+| **Package Manager**| Conan 2 | Dependency management for external libraries. |
 | **Web Framework** | Crow | Fast, microframework for C++. |
 | **Core Libs** | Qt 6 (Core, Sql) | Event loop, String manipulation, Database/SQL abstraction. |
 | **Database** | SQLite | Serverless, self-contained SQL database engine. |
@@ -74,16 +77,24 @@ Detailed documentation is available on the [Github Pages](https://zheng-bote.git
 ### Prerequisites
 -   Linux (Ubuntu 24.04 recommended)
 -   CMake 3.24+
--   Qt6 & OpenSSL
+-   Conan 2.0+
+-   Python 3 & pip (to install Conan)
+-   **Qt6 (Core, Sql, Gui, Network) & OpenSSL** (must be installed on the system)
 
 ### Quick Build
 ```bash
 git clone https://github.com/Zheng-Bote/cake-planner-backend
 cd cake-planner-backend
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
-./CakePlanner
+
+# Install dependencies using Conan
+./conan_install.sh
+
+# Configure and build
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j$(nproc)
+
+# Run the backend
+./build/CakePlanner
 ```
 
 For full build instructions, including AppImage creation, see the [Build Guide](docs/development/build_process.md).

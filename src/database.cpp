@@ -132,6 +132,7 @@ bool DatabaseManager::migrate() {
             password_hash TEXT NOT NULL,
             language TEXT DEFAULT 'en',
             email_language TEXT DEFAULT 'en',
+            receive_event_emails INTEGER DEFAULT 1,
             totp_secret TEXT,
             is_active INTEGER DEFAULT 0,
             is_admin INTEGER DEFAULT 0,
@@ -258,6 +259,7 @@ bool DatabaseManager::migrate() {
 
     checkAndAddColumn("users", "temp_password_hash", "TEXT");
     checkAndAddColumn("users", "temp_password_expiry", "TEXT");
+    checkAndAddColumn("users", "receive_event_emails", "INTEGER DEFAULT 1");
 
     db.commit();
     qDebug() << "Database migration successfully completed.";

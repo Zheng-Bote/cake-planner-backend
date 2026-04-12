@@ -20,9 +20,12 @@
 #include "utils/env_loader.hpp"
 #include <chrono>
 #include <iostream>
+#include <jwt-cpp/jwt.h>
 
-// Access JSON Traits for Bool conversion
-using json_value = jwt::traits::kazuho_picojson::value_type;
+// Use nlohmann_json traits
+#include <jwt-cpp/traits/nlohmann-json/traits.h>
+using json_traits = jwt::traits::nlohmann_json;
+using json_value = json_traits::value_type;
 
 // CORRECTION: Put everything in the namespace rz::utils
 namespace rz {
@@ -58,14 +61,14 @@ QString TokenUtils::generateToken(const QString &userId, const QString &email,
                                   bool isAdmin) {
   auto now = std::chrono::system_clock::now();
 
-  auto token = jwt::create()
+  auto token = jwt::create<json_traits>()
                    .set_issuer("CakePlanner")
                    .set_type("JWS")
                    .set_issued_at(now)
                    .set_expires_at(now + std::chrono::hours(24))
-                   .set_payload_claim("uid", jwt::claim(userId.toStdString()))
-                   .set_payload_claim("sub", jwt::claim(email.toStdString()))
-                   .set_payload_claim("adm", jwt::claim(json_value(isAdmin)))
+                   .set_payload_claim("uid", userId.toStdString())
+                   .set_payload_claim("sub", email.toStdString())
+                   .set_payload_claim("adm", isAdmin)
                    .sign(jwt::algorithm::hs256{getSecret()});
 
   return QString::fromStdString(token);
@@ -82,11 +85,11 @@ QString TokenUtils::generateToken(const QString &userId, const QString &email,
 std::optional<TokenPayload>
 TokenUtils::verifyToken(const std::string &rawToken) {
   try {
-    auto verifier = jwt::verify()
+    auto verifier = jwt::verify<json_traits>()
                         .allow_algorithm(jwt::algorithm::hs256{getSecret()})
                         .with_issuer("CakePlanner");
 
-    auto decoded = jwt::decode(rawToken);
+    auto decoded = jwt::decode<json_traits>(rawToken);
     verifier.verify(decoded);
 
     TokenPayload payload;
@@ -97,10 +100,7 @@ TokenUtils::verifyToken(const std::string &rawToken) {
 
     if (decoded.has_payload_claim("adm")) {
       auto claim = decoded.get_payload_claim("adm");
-      if (claim.get_type() == jwt::json::type::boolean)
-        payload.isAdmin = claim.as_boolean();
-      else
-        payload.isAdmin = false;
+      payload.isAdmin = claim.as_boolean();
     } else {
       payload.isAdmin = false;
     }
