@@ -17,57 +17,6 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`std::pair<QString, QString> User::getGroupAndRole(const QString &userId) `](#stdpairqstring-qstring-usergetgroupandroleconst-qstring-userid-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb)
-  - [`crow::json::wvalue User::toJson() const `](#crowjsonwvalue-usertojson-const-)
-  - [`std::optional<User> User::getByEmail(const QString &email) `](#stdoptionaluser-usergetbyemailconst-qstring-email-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-1)
-  - [`std::optional<User> User::getById(const QString &id) `](#stdoptionaluser-usergetbyidconst-qstring-id-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-2)
-  - [`std::vector<User> User::getAll(const QString &filterGroupId) `](#stdvectoruser-usergetallconst-qstring-filtergroupid-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-3)
-  - [`bool User::existsAnyAdmin() `](#bool-userexistsanyadmin-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-4)
-  - [`bool User::create() `](#bool-usercreate-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-5)
-  - [`bool User::enable2FA(const QString &secret) `](#bool-userenable2faconst-qstring-secret-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-6)
-  - [`bool User::updateStatus(const QString &userId, bool isActive) `](#bool-userupdatestatusconst-qstring-userid-bool-isactive-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-7)
-  - [`bool User::setMustChangePassword(const QString &userId, bool mustChange) `](#bool-usersetmustchangepasswordconst-qstring-userid-bool-mustchange-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-8)
-  - [`bool User::updatePassword(const QString &userId, const QString &newHash) `](#bool-userupdatepasswordconst-qstring-userid-const-qstring-newhash-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-9)
-  - [`bool User::setTempPassword(const QString &hash, int durationInHours) `](#bool-usersettemppasswordconst-qstring-hash-int-durationinhours-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-10)
-  - [`bool User::clearTempPassword() `](#bool-usercleartemppassword-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-11)
-  - [`/**`](#)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-12)
-  - [`std::vector<std::pair<QString, QString>> User::getAllGroups() `](#stdvectorstdpairqstring-qstring-usergetallgroups-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-13)
-  - [`bool User::assignToGroup(const QString &userId, const QString &groupId) `](#bool-userassigntogroupconst-qstring-userid-const-qstring-groupid-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-14)
-  - [`bool User::setGroupRole(const QString &userId, const QString &groupId,`](#bool-usersetgrouproleconst-qstring-userid-const-qstring-groupid)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-15)
-  - [`QString User::getGroupRole(const QString &userId, const QString &groupId) `](#qstring-usergetgrouproleconst-qstring-userid-const-qstring-groupid-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-16)
-  - [`bool User::softDelete(const QString& userId) `](#bool-usersoftdeleteconst-qstring-userid-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-17)
-  - [`bool User::updateEmailLanguage(const QString& userId, const QString& lang) `](#bool-userupdateemaillanguageconst-qstring-userid-const-qstring-lang-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-18)
-  - [`bool User::updateLanguage(const QString& userId, const QString& lang) `](#bool-userupdatelanguageconst-qstring-userid-const-qstring-lang-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-19)
-  - [`QString User::createGroup(const QString &name) `](#qstring-usercreategroupconst-qstring-name-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-20)
-  - [`bool User::deleteGroup(const QString &groupId) `](#bool-userdeletegroupconst-qstring-groupid-)
-  - [`std::vector<User::GroupMembership> User::getGroupsForUser(const QString &userId) `](#stdvectorusergroupmembership-usergetgroupsforuserconst-qstring-userid-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb-21)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation
@@ -404,6 +353,25 @@
 | --- | --- |
 | `userId` | The ID of the user. |
 | `lang` | The language code (e.g., "en", "de"). |
+
+**Returns:** True if successful, false otherwise.
+
+---
+
+### `QSqlQuery query(db)`
+
+> Function implementation.
+
+---
+
+### `bool User::updateReceiveEventEmails(const QString& userId, bool receive) `
+
+> Updates whether the user wants to receive event emails.
+
+| Parameter | Description |
+| --- | --- |
+| `userId` | The ID of the user. |
+| `receive` | True if the user wants to receive emails, false otherwise. |
 
 **Returns:** True if successful, false otherwise.
 

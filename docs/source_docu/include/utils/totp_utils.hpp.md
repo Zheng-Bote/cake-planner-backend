@@ -17,15 +17,6 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`namespace rz `](#namespace-rz-)
-  - [`namespace utils `](#namespace-utils-)
-  - [`class TotpUtils `](#class-totputils-)
-  - [`static int64_t getCurrentTimeStep()`](#static-int64_t-getcurrenttimestep)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

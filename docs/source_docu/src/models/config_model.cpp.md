@@ -17,22 +17,6 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`namespace rz `](#namespace-rz-)
-  - [`namespace model `](#namespace-model-)
-  - [`ConfigModel::ConfigModel() = default`](#configmodelconfigmodel--default)
-  - [`void ConfigModel::loadEnv(const std::string& path) `](#void-configmodelloadenvconst-stdstring-path-)
-  - [`QString ConfigModel::getSmtpServer() const `](#qstring-configmodelgetsmtpserver-const-)
-  - [`QString ConfigModel::getSmtpUsername() const `](#qstring-configmodelgetsmtpusername-const-)
-  - [`QString ConfigModel::getSmtpPassword() const `](#qstring-configmodelgetsmtppassword-const-)
-  - [`QString ConfigModel::getSmtpFrom() const `](#qstring-configmodelgetsmtpfrom-const-)
-  - [`int ConfigModel::getSmtpPort() const `](#int-configmodelgetsmtpport-const-)
-  - [`bool ConfigModel::getSmtpStartTls() const `](#bool-configmodelgetsmtpstarttls-const-)
-  - [`QString ConfigModel::getWatchDir() const `](#qstring-configmodelgetwatchdir-const-)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

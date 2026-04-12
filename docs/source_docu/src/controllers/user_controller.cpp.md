@@ -17,14 +17,6 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`namespace rz `](#namespace-rz-)
-  - [`namespace controller `](#namespace-controller-)
-  - [`void UserController::registerRoutes(crow::App<rz::middleware::AuthMiddleware> &app, service::NotificationService* notifyService) `](#void-usercontrollerregisterroutescrowapprzmiddlewareauthmiddleware-app-servicenotificationservice-notifyservice-)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

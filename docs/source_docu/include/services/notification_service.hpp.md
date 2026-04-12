@@ -10,26 +10,13 @@
 | **License ID** | MIT |
 | **File** | `notification_service.hpp` |
 | **Description** | Notification Service |
-| **Version** | 0.15.0 |
-| **Date** | 2026-01-24 |
+| **Version** | 1.2.0 |
+| **Date** | 2026-04-11 |
 | **Author** | ZHENG Robert (robert@hase-zheng.net) |
 | **Copyright** | Copyright (c) 2026 ZHENG Robert |
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`namespace rz `](#namespace-rz-)
-  - [`namespace service `](#namespace-service-)
-  - [`class NotificationService `](#class-notificationservice-)
-  - [`explicit NotificationService(SmtpService* smtp)`](#explicit-notificationservicesmtpservice-smtp)
-  - [`void notifyAccountDeactivated(const QString& email, const QString& name, const QString& lang)`](#void-notifyaccountdeactivatedconst-qstring-email-const-qstring-name-const-qstring-lang)
-  - [`void notifyAccountDeleted(const QString& email, const QString& name, const QString& lang)`](#void-notifyaccountdeletedconst-qstring-email-const-qstring-name-const-qstring-lang)
-  - [`void notifyPasswordChanged(const QString& email, const QString& name, const QString& lang)`](#void-notifypasswordchangedconst-qstring-email-const-qstring-name-const-qstring-lang)
-  - [`void notifyForgotPassword(const QString& email, const QString& name, const QString& tempPassword, const QString& lang)`](#void-notifyforgotpasswordconst-qstring-email-const-qstring-name-const-qstring-temppassword-const-qstring-lang)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation
@@ -79,6 +66,30 @@
 ### `void notifyForgotPassword(const QString& email, const QString& name, const QString& tempPassword, const QString& lang)`
 
 > Function implementation.
+
+---
+
+### `void sendGroupEmail(const QString& groupId, const QString& text)`
+
+> Sends an email to all members of a group with automatic translation.
+
+| Parameter | Description |
+| --- | --- |
+| `groupId` | The ID of the group. |
+| `text` | The message to send. |
+
+---
+
+### `QString translateText(const QString& text, const QString& targetLang)`
+
+> Translates text using the external translation API.
+
+| Parameter | Description |
+| --- | --- |
+| `text` | The text to translate. |
+| `targetLang` | The target language code (e.g., "de", "en"). |
+
+**Returns:** The translated text.
 
 ---
 

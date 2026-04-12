@@ -17,15 +17,6 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`namespace rz `](#namespace-rz-)
-  - [`namespace utils `](#namespace-utils-)
-  - [`struct TokenPayload `](#struct-tokenpayload-)
-  - [`class TokenUtils `](#class-tokenutils-)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation

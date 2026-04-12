@@ -10,23 +10,13 @@
 | **License ID** | MIT |
 | **File** | `smtp_service.cpp` |
 | **Description** | SMTP Service Implementation |
-| **Version** | 0.15.0 |
-| **Date** | 2026-01-24 |
+| **Version** | 1.4.0 |
+| **Date** | 2026-04-12 |
 | **Author** | ZHENG Robert (robert@hase-zheng.net) |
 | **Copyright** | Copyright (c) 2026 ZHENG Robert |
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`namespace rz `](#namespace-rz-)
-  - [`namespace service `](#namespace-service-)
-  - [`SmtpService::SmtpService(const model::ConfigModel& config, QObject* parent)`](#smtpservicesmtpserviceconst-modelconfigmodel-config-qobject-parent)
-  - [`void SmtpService::sendEmailAsync(const QString& to, const QString& subject, const QString& body,`](#void-smtpservicesendemailasyncconst-qstring-to-const-qstring-subject-const-qstring-body)
-  - [`void SmtpService::doSendEmail(const QString& to, const QString& subject, const QString& body,`](#void-smtpservicedosendemailconst-qstring-to-const-qstring-subject-const-qstring-body)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation
@@ -43,42 +33,9 @@
 
 ---
 
-### `SmtpService::SmtpService(const model::ConfigModel& config, QObject* parent)`
+### `class SmtpSendJob : public QObject `
 
-> Constructs the SmtpService.
-
-| Parameter | Description |
-| --- | --- |
-| `config` | Configuration model containing SMTP settings. |
-| `parent` | Optional parent QObject. |
-
----
-
-### `void SmtpService::sendEmailAsync(const QString& to, const QString& subject, const QString& body,`
-
-> Sends an email asynchronously using Qt's event loop.
-
-| Parameter | Description |
-| --- | --- |
-| `to` | Recipient email address. |
-| `subject` | Email subject. |
-| `body` | Email body content. |
-| `attachmentData` | Optional attachment data. |
-| `attachmentName` | Optional attachment filename. |
-
----
-
-### `void SmtpService::doSendEmail(const QString& to, const QString& subject, const QString& body,`
-
-> Internal slot to perform the actual email sending.
-
-| Parameter | Description |
-| --- | --- |
-| `to` | Recipient email address. |
-| `subject` | Email subject. |
-| `body` | Email body content. |
-| `attachmentData` | Optional attachment data. |
-| `attachmentName` | Optional attachment filename. |
+> Internal helper class to handle a single email sending job.
 
 ---
 

@@ -10,30 +10,13 @@
 | **License ID** | MIT |
 | **File** | `notification_service.cpp` |
 | **Description** | Notification Service Implementation |
-| **Version** | 0.15.0 |
-| **Date** | 2026-01-24 |
+| **Version** | 1.4.0 |
+| **Date** | 2026-04-12 |
 | **Author** | ZHENG Robert (robert@hase-zheng.net) |
 | **Copyright** | Copyright (c) 2026 ZHENG Robert |
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`namespace rz `](#namespace-rz-)
-  - [`namespace service `](#namespace-service-)
-  - [`NotificationService::NotificationService(SmtpService* smtp)`](#notificationservicenotificationservicesmtpservice-smtp)
-  - [`std::vector<QString> NotificationService::getGlobalAdminEmails() `](#stdvectorqstring-notificationservicegetglobaladminemails-)
-  - [`QSqlQuery query(db)`](#qsqlquery-querydb)
-  - [`void NotificationService::notifyAdminsNewUser(const QString& newUserName, const QString& newUserEmail) `](#void-notificationservicenotifyadminsnewuserconst-qstring-newusername-const-qstring-newuseremail-)
-  - [`void NotificationService::notifyGroupNewEvent(const QString& groupName, const QString& bakerName, const QString& date, const std::vector<QString>& recipientsDe, const std::vector<QString>& recipientsEn, const QByteArray& icsData) `](#void-notificationservicenotifygroupneweventconst-qstring-groupname-const-qstring-bakername-const-qstring-date-const-stdvectorqstring-recipientsde-const-stdvectorqstring-recipientsen-const-qbytearray-icsdata-)
-  - [`void NotificationService::notifyAccountActivated(const QString& email, const QString& name, const QString& lang) `](#void-notificationservicenotifyaccountactivatedconst-qstring-email-const-qstring-name-const-qstring-lang-)
-  - [`void NotificationService::notifyAccountDeactivated(const QString& email, const QString& name, const QString& lang) `](#void-notificationservicenotifyaccountdeactivatedconst-qstring-email-const-qstring-name-const-qstring-lang-)
-  - [`void NotificationService::notifyAccountDeleted(const QString& email, const QString& name, const QString& lang) `](#void-notificationservicenotifyaccountdeletedconst-qstring-email-const-qstring-name-const-qstring-lang-)
-  - [`void NotificationService::notifyPasswordChanged(const QString& email, const QString& name, const QString& lang) `](#void-notificationservicenotifypasswordchangedconst-qstring-email-const-qstring-name-const-qstring-lang-)
-  - [`void NotificationService::notifyForgotPassword(const QString& email, const QString& name, const QString& tempPassword, const QString& lang) `](#void-notificationservicenotifyforgotpasswordconst-qstring-email-const-qstring-name-const-qstring-temppassword-const-qstring-lang-)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation
@@ -57,6 +40,30 @@
 | Parameter | Description |
 | --- | --- |
 | `smtp` | Pointer to the SMTP service used for sending emails. |
+
+---
+
+### `void NotificationService::sendGroupEmail(const QString& groupId, const QString& text) `
+
+> Sends an email to all members of a group with automatic translation.
+
+| Parameter | Description |
+| --- | --- |
+| `groupId` | The ID of the group. |
+| `text` | The original message to translate and send. |
+
+---
+
+### `QString NotificationService::translateText(const QString& text, const QString& targetLang) `
+
+> Translates text using an external translation API.
+
+| Parameter | Description |
+| --- | --- |
+| `text` | The text to translate. |
+| `targetLang` | The target language code (e.g., "de", "en"). |
+
+**Returns:** The translated text, or the original text if translation fails.
 
 ---
 

@@ -3,93 +3,78 @@
 This directory contains the automatically generated documentation for the project.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [include Files](#include-files)
-- [include/controllers Files](#includecontrollers-files)
-- [include/middleware Files](#includemiddleware-files)
-- [include/models Files](#includemodels-files)
-- [include/services Files](#includeservices-files)
-- [include/utils Files](#includeutils-files)
-- [src Files](#src-files)
-- [src/controllers Files](#srccontrollers-files)
-- [src/models Files](#srcmodels-files)
-- [src/services Files](#srcservices-files)
-- [src/utils Files](#srcutils-files)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## [include Files](include/)
 
-- [database.hpp](include/database.hpp.html) - No description provided
-- [rz_config.hpp](include/rz_config.hpp.html) - configuration
+- [database.hpp.md](include/database.hpp.md) - No description provided
+- [rz_config.hpp.md](include/rz_config.hpp.md) - 
 
 ## [include/controllers Files](include/controllers/)
 
-- [admin_controller.hpp](include/controllers/admin_controller.hpp.html) - Admin Controller
-- [auth_controller.hpp](include/controllers/auth_controller.hpp.html) - Auth Controller with Notification Service injection
-- [event_controller.hpp](include/controllers/event_controller.hpp.html) - Event Controller Header
-- [system_controller.hpp](include/controllers/system_controller.hpp.html) - Controller for system related routes (Healthcheck, Sysinfo)
-- [user_controller.hpp](include/controllers/user_controller.hpp.html) - User Controller with Email Notifications
+- [admin_controller.hpp.md](include/controllers/admin_controller.hpp.md) - Admin Controller
+- [auth_controller.hpp.md](include/controllers/auth_controller.hpp.md) - Auth Controller with Notification Service injection
+- [event_controller.hpp.md](include/controllers/event_controller.hpp.md) - Event Controller Header
+- [system_controller.hpp.md](include/controllers/system_controller.hpp.md) - Controller for system related routes (Healthcheck, Sysinfo)
+- [user_controller.hpp.md](include/controllers/user_controller.hpp.md) - User Controller with Email Notifications
 
 ## [include/middleware Files](include/middleware/)
 
-- [auth_middleware.hpp](include/middleware/auth_middleware.hpp.html) - Auth Middleware
+- [auth_middleware.hpp.md](include/middleware/auth_middleware.hpp.md) - Auth Middleware
 
 ## [include/models Files](include/models/)
 
-- [config_model.hpp](include/models/config_model.hpp.html) - Configuration Model to load env vars
-- [event_model.hpp](include/models/event_model.hpp.html) - Unified Event Model
-- [user_model.hpp](include/models/user_model.hpp.html) - User Model with Group Management Extensions
+- [config_model.hpp.md](include/models/config_model.hpp.md) - Configuration Model to load env vars
+- [event_model.hpp.md](include/models/event_model.hpp.md) - Unified Event Model
+- [user_model.hpp.md](include/models/user_model.hpp.md) - User Model with Group Management Extensions
 
 ## [include/services Files](include/services/)
 
-- [notification_service.hpp](include/services/notification_service.hpp.html) - Notification Service
-- [smtp_service.hpp](include/services/smtp_service.hpp.html) - SMTP Service Header
+- [notification_service.hpp.md](include/services/notification_service.hpp.md) - Notification Service
+- [smtp_service.hpp.md](include/services/smtp_service.hpp.md) - SMTP Service Header
 
 ## [include/utils Files](include/utils/)
 
-- [app_helpers.hpp](include/utils/app_helpers.hpp.html) - Application Helpers Header
-- [env_loader.hpp](include/utils/env_loader.hpp.html) - Environment Loader Header
-- [image_processor.hpp](include/utils/image_processor.hpp.html) - Image Processor Header
-- [password_utils.hpp](include/utils/password_utils.hpp.html) - No description provided
-- [seeder.hpp](include/utils/seeder.hpp.html) - No description provided
-- [token_utils.hpp](include/utils/token_utils.hpp.html) - No description provided
-- [totp_utils.hpp](include/utils/totp_utils.hpp.html) - TOTP Utilities (Google Authenticator compatible)
+- [app_helpers.hpp.md](include/utils/app_helpers.hpp.md) - Application Helpers Header
+- [env_loader.hpp.md](include/utils/env_loader.hpp.md) - Environment Loader Header
+- [image_processor.hpp.md](include/utils/image_processor.hpp.md) - Image Processor Header
+- [password_utils.hpp.md](include/utils/password_utils.hpp.md) - No description provided
+- [seeder.hpp.md](include/utils/seeder.hpp.md) - No description provided
+- [token_utils.hpp.md](include/utils/token_utils.hpp.md) - No description provided
+- [totp_utils.hpp.md](include/utils/totp_utils.hpp.md) - TOTP Utilities (Google Authenticator compatible)
 
 ## [src Files](src/)
 
-- [database.cpp](src/database.cpp.html) - No description provided
-- [main.cpp](src/main.cpp.html) - Entry Point
+- [database.cpp.md](src/database.cpp.md) - No description provided
+- [main.cpp.md](src/main.cpp.md) - Entry Point
 
 ## [src/controllers Files](src/controllers/)
 
-- [admin_controller.cpp](src/controllers/admin_controller.cpp.html) - Admin Controller Implementation with Group Management
-- [auth_controller.cpp](src/controllers/auth_controller.cpp.html) - Auth Controller Implementation
-- [event_controller.cpp](src/controllers/event_controller.cpp.html) - Event Controller Implementation (Safe Blocking Long Polling)
-- [system_controller.cpp](src/controllers/system_controller.cpp.html) - Implementation of system routes
-- [user_controller.cpp](src/controllers/user_controller.cpp.html) - User Controller with Email Notifications
+- [admin_controller.cpp.md](src/controllers/admin_controller.cpp.md) - Admin Controller Implementation with Group Management
+- [auth_controller.cpp.md](src/controllers/auth_controller.cpp.md) - Auth Controller Implementation
+- [event_controller.cpp.md](src/controllers/event_controller.cpp.md) - Event Controller Implementation (Safe Blocking Long Polling)
+- [system_controller.cpp.md](src/controllers/system_controller.cpp.md) - Implementation of system routes
+- [user_controller.cpp.md](src/controllers/user_controller.cpp.md) - User Controller with Email Notifications
 
 ## [src/models Files](src/models/)
 
-- [config_model.cpp](src/models/config_model.cpp.html) - Configuration Model implementation
-- [event_model.cpp](src/models/event_model.cpp.html) - Event Model Implementation
-- [user_model.cpp](src/models/user_model.cpp.html) - User Model Implementation
+- [config_model.cpp.md](src/models/config_model.cpp.md) - Configuration Model implementation
+- [event_model.cpp.md](src/models/event_model.cpp.md) - Event Model Implementation
+- [user_model.cpp.md](src/models/user_model.cpp.md) - User Model Implementation
 
 ## [src/services Files](src/services/)
 
-- [notification_service.cpp](src/services/notification_service.cpp.html) - Notification Service Implementation
-- [smtp_service.cpp](src/services/smtp_service.cpp.html) - SMTP Service Implementation
+- [notification_service.cpp.md](src/services/notification_service.cpp.md) - Notification Service Implementation
+- [smtp_service.cpp.md](src/services/smtp_service.cpp.md) - SMTP Service Implementation
 
 ## [src/utils Files](src/utils/)
 
-- [env_loader.cpp](src/utils/env_loader.cpp.html) - Environment Loader Implementation
-- [image_processor.cpp](src/utils/image_processor.cpp.html) - Image Processor Implementation
-- [password_utils.cpp](src/utils/password_utils.cpp.html) - Password Hashing Utilities
-- [seeder.cpp](src/utils/seeder.cpp.html) - Seeder Utilities
-- [token_utils.cpp](src/utils/token_utils.cpp.html) - JWT Token Utilities Implementation
-- [totp_utils.cpp](src/utils/totp_utils.cpp.html) - Time-based One-Time Password (TOTP) Utilities
+- [env_loader.cpp.md](src/utils/env_loader.cpp.md) - Environment Loader Implementation
+- [image_processor.cpp.md](src/utils/image_processor.cpp.md) - Image Processor Implementation
+- [password_utils.cpp.md](src/utils/password_utils.cpp.md) - Password Hashing Utilities
+- [seeder.cpp.md](src/utils/seeder.cpp.md) - Seeder Utilities
+- [token_utils.cpp.md](src/utils/token_utils.cpp.md) - JWT Token Utilities Implementation
+- [totp_utils.cpp.md](src/utils/totp_utils.cpp.md) - Time-based One-Time Password (TOTP) Utilities
 
 ---
 

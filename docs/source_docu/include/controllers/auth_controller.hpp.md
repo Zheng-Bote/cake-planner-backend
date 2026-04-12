@@ -17,16 +17,6 @@
 | **License** | MIT |
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [API Documentation](#api-documentation)
-  - [`namespace service `](#namespace-service-)
-  - [`namespace controller `](#namespace-controller-)
-  - [`class AuthController `](#class-authcontroller-)
-  - [`explicit AuthController(service::NotificationService* notifyService)`](#explicit-authcontrollerservicenotificationservice-notifyservice)
-  - [`// CORRECTED: Fully qualified namespace for AuthMiddleware`](#-corrected-fully-qualified-namespace-for-authmiddleware)
-
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## API Documentation
